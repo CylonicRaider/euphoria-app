@@ -1,0 +1,9 @@
+<resources>
+
+    <!-- Base application theme.
+         No parent to ensure native look across platforms. -->
+    <style name="AppTheme">
+        <!-- None. -->
+    </style>
+
+</resources>
