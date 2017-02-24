@@ -2,6 +2,7 @@ package io.euphoria.xkcd.app.data;
 
 /** Created by Xyzzy on 2017-02-24. */
 
+/** A single Heim message */
 public interface Message {
 
     /** The ID of this message as a string */

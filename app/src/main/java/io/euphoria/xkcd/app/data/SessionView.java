@@ -2,6 +2,7 @@ package io.euphoria.xkcd.app.data;
 
 /** Created by Xyzzy on 2017-02-24. */
 
+/** A capture of the state of a session */
 public interface SessionView {
 
     /** The unique session ID */

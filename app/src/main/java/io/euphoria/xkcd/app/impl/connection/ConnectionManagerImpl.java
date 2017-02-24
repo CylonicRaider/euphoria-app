@@ -5,6 +5,7 @@ import io.euphoria.xkcd.app.connection.ConnectionManager;
 
 /** Created by Xyzzy on 2017-02-24. */
 
+/** Implementation of ConnectionManager */
 public class ConnectionManagerImpl implements ConnectionManager {
 
     @Override
