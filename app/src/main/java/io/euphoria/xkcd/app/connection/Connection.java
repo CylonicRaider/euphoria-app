@@ -40,4 +40,10 @@ public interface Connection {
      */
     int requestLogs(String before, int count);
 
+    /** Add an event listener */
+    void addEventListener(ConnectionListener l);
+
+    /** Remove an event listener */
+    void removeEventListener(ConnectionListener l);
+
 }
