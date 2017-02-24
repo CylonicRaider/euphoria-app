@@ -14,23 +14,30 @@ public interface Connection {
      */
     void close();
 
-    /** Request changing one's nickname */
-    void setNick(String name);
+    /**
+     * Request changing one's nickname
+     *
+     * @param name The nickname to change to.
+     * @return The sequence ID of the message sent.
+     */
+    int setNick(String name);
 
     /**
      * Post a message
      *
      * @param text The text of the message.
      * @param parent The parent of the message, or {@code null} for a new thread.
+     * @return The sequence ID of the message sent.
      */
-    void postMessage(String text, String parent);
+    int postMessage(String text, String parent);
 
     /**
      * Request room logs
      *
      * @param before The last message ID to return.
      * @param count The amount of messages to retrieve. The backend imposes a maximum value.
+     * @return The sequence ID of the message sent.
      */
-    void requestLogs(String before, int count);
+    int requestLogs(String before, int count);
 
 }
