@@ -4,6 +4,7 @@ import io.euphoria.xkcd.app.data.SessionView;
 
 /** Created by Xyzzy on 2017-02-24. */
 
+/** Event encapsulating a nickname change */
 public interface NickChangeEvent extends ConnectionEvent {
 
     /** The session affected (after the nickname change) */
@@ -12,7 +13,7 @@ public interface NickChangeEvent extends ConnectionEvent {
     /** The old nickname */
     String getOldNick();
 
-    /** The new nickname */
+    /** The new nickname (duplicated from {@link #getSession}) */
     String getNewNick();
 
 }

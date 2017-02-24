@@ -7,6 +7,7 @@ import io.euphoria.xkcd.app.connection.event.PresenceChangeEvent;
 
 /** Created by Xyzzy on 2017-02-24. */
 
+/** Receiver interface for connection events */
 public interface ConnectionListener {
 
     /** Someone (or we) changed their nick */
