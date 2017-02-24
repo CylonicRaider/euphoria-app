@@ -13,7 +13,7 @@ public interface ConnectionManager {
     Connection getConnection(String roomName);
 
     /**
-     * Connect to a room.
+     * Connect to a room
      *
      * If a connection is already present, this is equivalent to {@link #getConnection}.
      */
