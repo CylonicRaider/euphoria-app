@@ -1,6 +1,6 @@
 package io.euphoria.xkcd.app.connection;
 
-/* Created by Xyzzy on 2017-02-24. */
+/** Created by Xyzzy on 2017-02-24. */
 
 /* Main entry point of the connection submodule */
 public interface ConnectionManager {

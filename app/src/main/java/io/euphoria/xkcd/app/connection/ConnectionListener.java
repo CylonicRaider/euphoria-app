@@ -5,7 +5,7 @@ import io.euphoria.xkcd.app.connection.event.MessageEvent;
 import io.euphoria.xkcd.app.connection.event.NickChangeEvent;
 import io.euphoria.xkcd.app.connection.event.PresenceChangeEvent;
 
-/* Created by Xyzzy on 2017-02-24. */
+/** Created by Xyzzy on 2017-02-24. */
 
 /* Receiver interface for connection events */
 public interface ConnectionListener {
