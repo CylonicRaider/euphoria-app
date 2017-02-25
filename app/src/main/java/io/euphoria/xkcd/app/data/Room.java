@@ -1,11 +1,11 @@
 package io.euphoria.xkcd.app.data;
 
-/** Created by Xyzzy on 2017-02-24. */
+/* Created by Xyzzy on 2017-02-24. */
 
-/** The data model of a Heim room */
+/* The data model of a Heim room */
 public interface Room {
 
-    /** Room name */
+    /* Room name */
     String getName();
 
 }
