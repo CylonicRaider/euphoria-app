@@ -7,6 +7,7 @@ import io.euphoria.xkcd.app.connection.Connection;
 /* A message received by a Connection wrapped into the event concept
  *
  * Event/reply-event mapping (omitted ones are not implemented):
+ * hello-event       -> IdentityEvent
  * join-event        -> PresenceChangeEvent
  * network-event     -> PresenceChangeEvent
  * nick-event        -> NickChangeEvent
