@@ -4,7 +4,7 @@ import java.util.List;
 
 import io.euphoria.xkcd.app.data.Message;
 
-/* Created by Xyzzy on 2017-02-24. */
+/** Created by Xyzzy on 2017-02-24. */
 
 /* Event encapsulating a batch of old messages */
 public interface LogEvent extends ConnectionEvent {
