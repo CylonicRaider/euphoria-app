@@ -7,14 +7,14 @@ public interface ConnectionManager {
 
     /* Get connection for room name
      *
-     * If there is no connection to the room, {@code null} is returned. Since that would initiate I/O, lazy creation
-     * is not provided.
+     * If there is no connection to the room, null is returned. Since that would initiate I/O, lazy creation is not
+     * provided.
      */
     Connection getConnection(String roomName);
 
     /* Connect to a room
      *
-     * If a connection is already present, this is equivalent to {@link #getConnection}.
+     * If a connection is already present, this is equivalent to getConnection().
      */
     Connection connect(String roomName);
 

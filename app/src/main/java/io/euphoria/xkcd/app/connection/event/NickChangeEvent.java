@@ -13,7 +13,7 @@ public interface NickChangeEvent extends ConnectionEvent {
     /* The old nickname */
     String getOldNick();
 
-    /* The new nickname (duplicated from {@link #getSession}) */
+    /* The new nickname (duplicated from getSession()) */
     String getNewNick();
 
 }

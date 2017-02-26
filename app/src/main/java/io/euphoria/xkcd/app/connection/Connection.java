@@ -24,7 +24,7 @@ public interface Connection {
     /* Post a message
      *
      * @param text The text of the message.
-     * @param parent The parent of the message, or {@code null} for a new thread.
+     * @param parent The parent of the message, or null for a new thread.
      * @return The sequence ID of the message sent.
      */
     int postMessage(String text, String parent);
