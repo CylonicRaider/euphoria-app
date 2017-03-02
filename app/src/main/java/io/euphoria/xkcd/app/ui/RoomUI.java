@@ -13,8 +13,14 @@ public interface RoomUI {
     /* The name of the room */
     String getRoomName();
 
-    /** Show this UI, possibly putting it in front of others */
+    /* Show this UI, possibly putting it in front of others */
     void show();
+
+    /* Close the room UI
+     *
+     * After closing, the object should be considered unusable.
+     */
+    void close();
 
     /* Display the given messages
      *
