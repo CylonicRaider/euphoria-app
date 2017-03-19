@@ -22,4 +22,8 @@ public class RoomController {
     public Context getContext() {
         return context;
     }
+
+    public void shutdown() {
+        throw new AssertionError("Not implemented");
+    }
 }
