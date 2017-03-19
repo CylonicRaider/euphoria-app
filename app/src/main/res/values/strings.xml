@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">Euphoria</string>
+    <string name="service_desc">This service maintains the connections to your rooms.</string>
 </resources>
