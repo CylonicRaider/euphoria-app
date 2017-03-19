@@ -18,4 +18,11 @@ public interface ConnectionManager {
      */
     Connection connect(String roomName);
 
+    /* Check whether there are still any connections present
+     *
+     * Immediately after the last connection managed by this ConnectionManager closes, this should return true, so
+     * that terminal cleanup can begin.
+     */
+    boolean hasConnections();
+
 }
