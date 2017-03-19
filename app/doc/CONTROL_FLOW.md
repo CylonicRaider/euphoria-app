@@ -8,8 +8,10 @@
 6.  The service grants the connection request.
 7.  `RoomController` forwards events between both endpoints.
 8.  If the user intentionally closes the room, the controller terminates the connection immediately.
-9.  If the `Activity` is destroyed without further notice, a temporary event is assumed, and the connection(s) are
+9.  Destruction of the `Activity` is propagated to the `RoomController.shutdown` method.
+10. If the `Activity` is destroyed without further notice, a temporary event is assumed, and the connection(s) are
     held open for some time.
-10. If the activity is restored within the timeout, its `RoomController` binds to the service again.
-11. Otherwise, the connection(s) are closed.
-12. When no connections are left, the background service terminates itself.
+11. If the activity is restored within the timeout, its `RoomController` binds to the service again.
+12. Otherwise, the connection(s) are closed.
+13. When no connections are left, the background service terminates itself.
+14. Service shutdown is propagated to the `ConnectionManager.shutdown` method.
