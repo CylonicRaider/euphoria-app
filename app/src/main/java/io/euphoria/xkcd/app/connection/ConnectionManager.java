@@ -25,4 +25,10 @@ public interface ConnectionManager {
      */
     boolean hasConnections();
 
+    /* Gracefully shut down the connection manager
+     *
+     * Any still-present connections should be closed, and any resources held released.
+     */
+    void shutdown();
+
 }

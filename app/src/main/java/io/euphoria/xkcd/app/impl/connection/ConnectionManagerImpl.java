@@ -27,4 +27,9 @@ public class ConnectionManagerImpl implements ConnectionManager {
         throw new AssertionError("Not implemented");
     }
 
+    @Override
+    public void shutdown() {
+        throw new AssertionError("Not implemented");
+    }
+
 }
