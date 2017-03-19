@@ -8,4 +8,10 @@ public interface RoomUIManager {
     /* Get the room UI for the given name */
     RoomUI getRoomUI(String roomName);
 
+    /* Install an event listener */
+    void addEventListener(UIManagerListener l);
+
+    /* Remove an event listener */
+    void removeEventListener(UIManagerListener l);
+
 }
