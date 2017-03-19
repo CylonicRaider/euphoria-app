@@ -28,4 +28,8 @@ public class RoomController {
     private void start() {
         context.startService(new Intent(context, ConnectionService.class));
     }
+
+    public void shutdown() {
+        throw new AssertionError("Not implemented");
+    }
 }
