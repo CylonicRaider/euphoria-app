@@ -8,6 +8,10 @@ import io.euphoria.xkcd.app.connection.ConnectionManager;
 /* Implementation of ConnectionManager */
 public class ConnectionManagerImpl implements ConnectionManager {
 
+    public static ConnectionManager getInstance() {
+        throw new AssertionError("Not implemented");
+    }
+
     @Override
     public Connection getConnection(String roomName) {
         throw new AssertionError("Not implemented");
@@ -15,6 +19,11 @@ public class ConnectionManagerImpl implements ConnectionManager {
 
     @Override
     public Connection connect(String roomName) {
+        throw new AssertionError("Not implemented");
+    }
+
+    @Override
+    public boolean hasConnections() {
         throw new AssertionError("Not implemented");
     }
 
