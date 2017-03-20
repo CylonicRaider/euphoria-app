@@ -12,8 +12,8 @@ import io.euphoria.xkcd.app.impl.connection.ConnectionManagerImpl;
 /** Created by Xyzzy on 2017-03-19. */
 
 public class ConnectionService extends Service {
-    public class CBinder extends Binder {
-        public ConnectionService getService() {
+    class CBinder extends Binder {
+        ConnectionService getService() {
             return ConnectionService.this;
         }
     }
