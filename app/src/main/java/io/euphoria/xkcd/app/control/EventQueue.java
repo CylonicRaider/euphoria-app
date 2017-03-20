@@ -12,6 +12,9 @@ public class EventQueue<T> {
         this.queue = new ConcurrentLinkedQueue<>();
         this.schedule = schedule;
     }
+    public EventQueue() {
+        this(null);
+    }
 
     public synchronized boolean isEmpty() {
         return this.queue.isEmpty();
@@ -25,6 +28,6 @@ public class EventQueue<T> {
         if (e == null) return;
         boolean doSched = this.queue.isEmpty();
         this.queue.add(e);
-        if (doSched) this.schedule.run();
+        if (doSched && this.schedule != null) this.schedule.run();
     }
 }
