@@ -15,11 +15,13 @@ public class RoomController {
     private final Context context;
     private ConnectionService service;
     private ServiceConnection connection;
+    private UIListenerImpl listener;
 
     public RoomController(RoomUIManager mgr, Context ctx) {
         this.manager = mgr;
         this.context = ctx;
         start();
+        bind();
     }
 
     public RoomUIManager getManager() {
@@ -41,6 +43,7 @@ public class RoomController {
                 // Wheee! I should name even more variables like that!
                 this.service = ((ConnectionService.CBinder) service).getService();
                 RoomController.this.service = this.service;
+                drain();
             }
 
             @Override
@@ -52,6 +55,20 @@ public class RoomController {
         };
         // Service already created.
         context.bindService(intent, connection, Context.BIND_AUTO_CREATE);
+    }
+
+    private void bind() {
+        listener = new UIListenerImpl(new Runnable() {
+            @Override
+            public void run() {
+                drain();
+            }
+        });
+        manager.addEventListener(listener);
+    }
+
+    private synchronized void drain() {
+        if (service != null) service.consume(listener.getEvents());
     }
 
     public void shutdown() {
