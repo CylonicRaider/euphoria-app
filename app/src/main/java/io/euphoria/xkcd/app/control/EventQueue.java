@@ -1,5 +1,7 @@
 package io.euphoria.xkcd.app.control;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 /** Created by Xyzzy on 2017-03-20. */
@@ -20,8 +22,18 @@ public class EventQueue<T> {
         return this.queue.isEmpty();
     }
 
+    public synchronized void clear() {
+        this.queue.clear();
+    }
+
     public synchronized T get() {
         return this.queue.poll();
+    }
+
+    public synchronized List<T> getAll() {
+        List<T> ret = new ArrayList<>(this.queue);
+        this.queue.clear();
+        return ret;
     }
 
     public synchronized void put(T e) {
