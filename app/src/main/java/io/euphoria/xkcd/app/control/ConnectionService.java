@@ -95,7 +95,8 @@ public class ConnectionService extends Service {
                     MessageSendEvent e = (MessageSendEvent) evt.getEvent();
                     conn.postMessage(e.getText(), e.getParent());
                 } else if (evt.getEventClass() == LogRequestEvent.class) {
-                    // NYI
+                    LogRequestEvent e = (LogRequestEvent) evt.getEvent();
+                    conn.requestLogs(e.getBefore(), 100);
                 } else if (evt.getEventClass() == RoomSwitchEvent.class) {
                     /* NOP */
                 } else if (evt.getEventClass() == CloseEvent.class) {
