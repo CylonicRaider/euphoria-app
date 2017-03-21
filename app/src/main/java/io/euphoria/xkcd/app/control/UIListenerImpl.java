@@ -16,8 +16,8 @@ import io.euphoria.xkcd.app.ui.event.UIEvent;
 public class UIListenerImpl implements UIListener, UIManagerListener {
     private final EventQueue<EventWrapper<? extends UIEvent>> queue;
 
-    public UIListenerImpl(Runnable requeue) {
-        queue = new EventQueue<>(requeue);
+    public UIListenerImpl(Runnable schedule) {
+        queue = new EventQueue<>(schedule);
     }
 
     @Override

@@ -24,7 +24,7 @@ public class ConnectionService extends Service {
     }
 
     private final CBinder BINDER = new CBinder();
-    private final Map<String, RoomEventQueue> roomEvents = new HashMap<>();
+    private final Map<String, RoomUIEventQueue> roomEvents = new HashMap<>();
     private ConnectionManager mgr;
 
     @Nullable
@@ -46,9 +46,9 @@ public class ConnectionService extends Service {
     public void consume(List<EventWrapper<? extends UIEvent>> events) {
         for (EventWrapper<? extends UIEvent> evt : events) {
             String roomName = evt.getEvent().getRoomUI().getRoomName();
-            RoomEventQueue queue = roomEvents.get(roomName);
+            RoomUIEventQueue queue = roomEvents.get(roomName);
             if (queue == null) {
-                queue = new RoomEventQueue(roomName);
+                queue = new RoomUIEventQueue(roomName);
                 roomEvents.put(roomName, queue);
             }
             queue.put(evt);
