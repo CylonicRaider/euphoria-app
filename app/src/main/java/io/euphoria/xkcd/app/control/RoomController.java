@@ -68,6 +68,10 @@ public class RoomController {
     }
 
     private synchronized void drain() {
+        ConnectionService service;
+        synchronized (this) {
+            service = this.service;
+        }
         if (service != null) service.consume(listener.getEvents());
     }
 
