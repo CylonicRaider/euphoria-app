@@ -5,13 +5,21 @@ import android.content.Intent;
 import android.os.Binder;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
+import android.util.Log;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
+import io.euphoria.xkcd.app.connection.Connection;
 import io.euphoria.xkcd.app.connection.ConnectionManager;
+import io.euphoria.xkcd.app.connection.event.NickChangeEvent;
 import io.euphoria.xkcd.app.impl.connection.ConnectionManagerImpl;
+import io.euphoria.xkcd.app.ui.event.CloseEvent;
+import io.euphoria.xkcd.app.ui.event.LogRequestEvent;
+import io.euphoria.xkcd.app.ui.event.MessageSendEvent;
 import io.euphoria.xkcd.app.ui.event.RoomSwitchEvent;
 import io.euphoria.xkcd.app.ui.event.UIEvent;
 
@@ -45,6 +53,7 @@ public class ConnectionService extends Service {
     }
 
     public void consume(List<EventWrapper<? extends UIEvent>> events) {
+        Set<RoomUIEventQueue> updated = new HashSet<>();
         for (EventWrapper<? extends UIEvent> evt : events) {
             String roomName;
             /* Room switch events...
@@ -63,6 +72,39 @@ public class ConnectionService extends Service {
                 roomEvents.put(roomName, queue);
             }
             queue.put(evt);
+            updated.add(queue);
         }
+        for (RoomUIEventQueue queue : updated) {
+            Connection conn = null;
+            for (EventWrapper<? extends UIEvent> evt : queue.getAll()) {
+                String room = queue.getRoomName();
+                if (conn == null) {
+                    if (evt.getEvent() instanceof RoomSwitchEvent) {
+                        conn = mgr.connect(room);
+                    } else {
+                        conn = mgr.getConnection(room);
+                    }
+                    if (conn == null) {
+                        Log.e("ConnectionService", "Non-connection UI event for nonexistent connection; dropping.");
+                        continue;
+                    }
+                }
+                if (evt.getEventClass() == NickChangeEvent.class) {
+                    conn.setNick(((NickChangeEvent) evt.getEvent()).getNewNick());
+                } else if (evt.getEventClass() == MessageSendEvent.class) {
+                    MessageSendEvent e = (MessageSendEvent) evt.getEvent();
+                    conn.postMessage(e.getText(), e.getParent());
+                } else if (evt.getEventClass() == LogRequestEvent.class) {
+                    // NYI
+                } else if (evt.getEventClass() == RoomSwitchEvent.class) {
+                    /* NOP */
+                } else if (evt.getEventClass() == CloseEvent.class) {
+                    conn.close();
+                } else {
+                    Log.e("ConnectionService", "Unknown UI event class; dropping.");
+                }
+            }
+        }
+
     }
 }
