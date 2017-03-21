@@ -4,6 +4,7 @@ import java.util.List;
 
 import io.euphoria.xkcd.app.ui.UIListener;
 import io.euphoria.xkcd.app.ui.UIManagerListener;
+import io.euphoria.xkcd.app.ui.event.CloseEvent;
 import io.euphoria.xkcd.app.ui.event.LogRequestEvent;
 import io.euphoria.xkcd.app.ui.event.MessageSendEvent;
 import io.euphoria.xkcd.app.ui.event.NewNickEvent;
@@ -37,6 +38,11 @@ public class UIListenerImpl implements UIListener, UIManagerListener {
     @Override
     public void onRoomSwitch(RoomSwitchEvent evt) {
         queue.put(new EventWrapper<>(RoomSwitchEvent.class, evt));
+    }
+
+    @Override
+    public void onClose(CloseEvent evt) {
+        queue.put(new EventWrapper<>(CloseEvent.class, evt));
     }
 
     public List<EventWrapper<? extends UIEvent>> getEvents() {
