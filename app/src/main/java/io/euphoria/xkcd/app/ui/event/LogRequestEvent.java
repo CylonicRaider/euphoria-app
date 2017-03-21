@@ -5,6 +5,7 @@ package io.euphoria.xkcd.app.ui.event;
 /* Event encapsulating the desire to see more room logs */
 public interface LogRequestEvent extends UIEvent {
 
-    /* Blank */
+    /* The message ID down to which to request logs */
+    String getBefore();
 
 }
