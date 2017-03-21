@@ -52,19 +52,19 @@ public class ConnectionService extends Service {
         mgr.shutdown();
     }
 
-    public void consume(List<EventWrapper<? extends UIEvent>> events) {
+    public void consume(List<UIEvent> events) {
         Set<RoomUIEventQueue> updated = new HashSet<>();
-        for (EventWrapper<? extends UIEvent> evt : events) {
+        for (UIEvent evt : events) {
             String roomName;
             /* Room switch events...
              * (a) are not attached to the room they come *from* and
              * (b) have no associated RoomUI at all,
              * hence we push them into the queue for the new room, which allows us to allocate new rooms elegantly,
              * i.e. as soon as events for them arrive. */
-            if (evt.getEvent() instanceof RoomSwitchEvent) {
-                roomName = ((RoomSwitchEvent) evt.getEvent()).getRoomName();
+            if (evt instanceof RoomSwitchEvent) {
+                roomName = ((RoomSwitchEvent) evt).getRoomName();
             } else {
-                roomName = evt.getEvent().getRoomUI().getRoomName();
+                roomName = evt.getRoomUI().getRoomName();
             }
             RoomUIEventQueue queue = roomEvents.get(roomName);
             if (queue == null) {
@@ -76,10 +76,10 @@ public class ConnectionService extends Service {
         }
         for (RoomUIEventQueue queue : updated) {
             Connection conn = null;
-            for (EventWrapper<? extends UIEvent> evt : queue.getAll()) {
+            for (UIEvent evt : queue.getAll()) {
                 String room = queue.getRoomName();
                 if (conn == null) {
-                    if (evt.getEvent() instanceof RoomSwitchEvent) {
+                    if (evt instanceof RoomSwitchEvent) {
                         conn = mgr.connect(room);
                     } else {
                         conn = mgr.getConnection(room);
@@ -89,23 +89,22 @@ public class ConnectionService extends Service {
                         continue;
                     }
                 }
-                if (evt.getEventClass() == NickChangeEvent.class) {
-                    conn.setNick(((NickChangeEvent) evt.getEvent()).getNewNick());
-                } else if (evt.getEventClass() == MessageSendEvent.class) {
-                    MessageSendEvent e = (MessageSendEvent) evt.getEvent();
+                if (evt instanceof NickChangeEvent) {
+                    conn.setNick(((NickChangeEvent) evt).getNewNick());
+                } else if (evt instanceof MessageSendEvent) {
+                    MessageSendEvent e = (MessageSendEvent) evt;
                     conn.postMessage(e.getText(), e.getParent());
-                } else if (evt.getEventClass() == LogRequestEvent.class) {
-                    LogRequestEvent e = (LogRequestEvent) evt.getEvent();
+                } else if (evt instanceof LogRequestEvent) {
+                    LogRequestEvent e = (LogRequestEvent) evt;
                     conn.requestLogs(e.getBefore(), 100);
-                } else if (evt.getEventClass() == RoomSwitchEvent.class) {
+                } else if (evt instanceof RoomSwitchEvent) {
                     /* NOP */
-                } else if (evt.getEventClass() == CloseEvent.class) {
+                } else if (evt instanceof CloseEvent) {
                     conn.close();
                 } else {
                     Log.e("ConnectionService", "Unknown UI event class; dropping.");
                 }
             }
         }
-
     }
 }

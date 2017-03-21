@@ -14,7 +14,7 @@ import io.euphoria.xkcd.app.ui.event.UIEvent;
 /** Created by Xyzzy on 2017-03-20. */
 
 public class UIListenerImpl implements UIListener, UIManagerListener {
-    private final EventQueue<EventWrapper<? extends UIEvent>> queue;
+    private final EventQueue<UIEvent> queue;
 
     public UIListenerImpl(Runnable schedule) {
         queue = new EventQueue<>(schedule);
@@ -22,30 +22,30 @@ public class UIListenerImpl implements UIListener, UIManagerListener {
 
     @Override
     public void onNewNick(NewNickEvent evt) {
-        queue.put(new EventWrapper<>(NewNickEvent.class, evt));
+        queue.put(evt);
     }
 
     @Override
     public void onMessageSend(MessageSendEvent evt) {
-        queue.put(new EventWrapper<>(MessageSendEvent.class, evt));
+        queue.put(evt);
     }
 
     @Override
     public void onLogRequest(LogRequestEvent evt) {
-        queue.put(new EventWrapper<>(LogRequestEvent.class, evt));
+        queue.put(evt);
     }
 
     @Override
     public void onRoomSwitch(RoomSwitchEvent evt) {
-        queue.put(new EventWrapper<>(RoomSwitchEvent.class, evt));
+        queue.put(evt);
     }
 
     @Override
     public void onClose(CloseEvent evt) {
-        queue.put(new EventWrapper<>(CloseEvent.class, evt));
+        queue.put(evt);
     }
 
-    public List<EventWrapper<? extends UIEvent>> getEvents() {
+    public List<UIEvent> getEvents() {
         return queue.getAll();
     }
 

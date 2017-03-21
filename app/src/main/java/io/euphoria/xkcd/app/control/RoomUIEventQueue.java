@@ -4,7 +4,7 @@ import io.euphoria.xkcd.app.ui.event.UIEvent;
 
 /** Created by Xyzzy on 2017-03-21. */
 
-public class RoomUIEventQueue extends EventQueue<EventWrapper<? extends UIEvent>> {
+public class RoomUIEventQueue extends EventQueue<UIEvent> {
     private final String roomName;
 
     public RoomUIEventQueue(String roomName, Runnable schedule) {
