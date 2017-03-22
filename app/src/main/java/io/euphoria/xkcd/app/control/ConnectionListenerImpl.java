@@ -1,5 +1,7 @@
 package io.euphoria.xkcd.app.control;
 
+import java.util.List;
+
 import io.euphoria.xkcd.app.connection.ConnectionListener;
 import io.euphoria.xkcd.app.connection.event.CloseEvent;
 import io.euphoria.xkcd.app.connection.event.ConnectionEvent;
@@ -8,6 +10,7 @@ import io.euphoria.xkcd.app.connection.event.LogEvent;
 import io.euphoria.xkcd.app.connection.event.MessageEvent;
 import io.euphoria.xkcd.app.connection.event.NickChangeEvent;
 import io.euphoria.xkcd.app.connection.event.PresenceChangeEvent;
+import io.euphoria.xkcd.app.ui.event.UIEvent;
 
 /** Created by Xyzzy on 2017-03-22. */
 
@@ -47,4 +50,9 @@ public class ConnectionListenerImpl implements ConnectionListener {
     public void onClose(CloseEvent evt) {
         queue.add(evt);
     }
+
+    public List<ConnectionEvent> getEvents() {
+        return queue.getAll();
+    }
+
 }

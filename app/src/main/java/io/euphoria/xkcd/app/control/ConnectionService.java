@@ -3,6 +3,7 @@ package io.euphoria.xkcd.app.control;
 import android.app.Service;
 import android.content.Intent;
 import android.os.Binder;
+import android.os.Handler;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
 import android.util.Log;
@@ -35,6 +36,7 @@ public class ConnectionService extends Service {
     private final CBinder BINDER = new CBinder();
     private final Map<String, RoomUIEventQueue> roomEvents = new HashMap<>();
     private ConnectionManager mgr;
+    private ConnectionListenerImpl listener;
 
     @Nullable
     @Override
@@ -50,6 +52,14 @@ public class ConnectionService extends Service {
     @Override
     public void onDestroy() {
         mgr.shutdown();
+    }
+
+    public ConnectionListenerImpl getListener() {
+        return listener;
+    }
+
+    public void setListener(ConnectionListenerImpl l) {
+        listener = l;
     }
 
     public void consume(List<UIEvent> events) {
@@ -81,6 +91,7 @@ public class ConnectionService extends Service {
                 if (conn == null) {
                     if (evt instanceof RoomSwitchEvent) {
                         conn = mgr.connect(room);
+                        conn.addEventListener(listener);
                     } else {
                         conn = mgr.getConnection(room);
                     }
@@ -106,5 +117,9 @@ public class ConnectionService extends Service {
                 }
             }
         }
+    }
+
+    private void drain() {
+        /**/
     }
 }

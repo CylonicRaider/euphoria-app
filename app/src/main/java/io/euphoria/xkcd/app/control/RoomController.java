@@ -4,8 +4,24 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.os.Handler;
 import android.os.IBinder;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import io.euphoria.xkcd.app.connection.event.CloseEvent;
+import io.euphoria.xkcd.app.connection.event.ConnectionEvent;
+import io.euphoria.xkcd.app.connection.event.IdentityEvent;
+import io.euphoria.xkcd.app.connection.event.LogEvent;
+import io.euphoria.xkcd.app.connection.event.MessageEvent;
+import io.euphoria.xkcd.app.connection.event.NickChangeEvent;
+import io.euphoria.xkcd.app.connection.event.PresenceChangeEvent;
+import io.euphoria.xkcd.app.data.SessionView;
+import io.euphoria.xkcd.app.ui.RoomUI;
 import io.euphoria.xkcd.app.ui.RoomUIManager;
 
 /** Created by Xyzzy on 2017-03-19. */
@@ -15,7 +31,8 @@ public class RoomController {
     private final Context context;
     private ConnectionService service;
     private ServiceConnection connection;
-    private UIListenerImpl listener;
+    private UIListenerImpl uiListener;
+    private ConnectionListenerImpl connListener;
 
     public RoomController(RoomUIManager mgr, Context ctx) {
         this.manager = mgr;
@@ -43,6 +60,7 @@ public class RoomController {
                 // Wheee! I should name even more variables like that!
                 this.service = ((ConnectionService.CBinder) service).getService();
                 RoomController.this.service = this.service;
+                this.service.setListener(connListener);
                 drain();
             }
 
@@ -57,13 +75,24 @@ public class RoomController {
     }
 
     private void bind() {
-        listener = new UIListenerImpl(new Runnable() {
+        uiListener = new UIListenerImpl(new Runnable() {
             @Override
             public void run() {
                 drain();
             }
         });
-        manager.addEventListener(listener);
+        connListener = new ConnectionListenerImpl(new Runnable() {
+            @Override
+            public void run() {
+                new Handler(context.getMainLooper()).post(new Runnable() {
+                    @Override
+                    public void run() {
+                        drainConnection();
+                    }
+                });
+            }
+        });
+        manager.addEventListener(uiListener);
     }
 
     private synchronized void drain() {
@@ -71,7 +100,41 @@ public class RoomController {
         synchronized (this) {
             service = this.service;
         }
-        if (service != null) service.consume(listener.getEvents());
+        if (service != null) service.consume(uiListener.getEvents());
+    }
+
+    private void drainConnection() {
+        for (ConnectionEvent evt : service.getListener().getEvents()) {
+            String roomName = evt.getConnection().getRoomName();
+            RoomUI ui = manager.getRoomUI(roomName);
+            if (evt instanceof IdentityEvent) {
+                /* NOP */
+            } else if (evt instanceof NickChangeEvent) {
+                NickChangeEvent e = (NickChangeEvent) evt;
+                ui.showNicks(Collections.singletonMap(e.getSession().getSessionID(), e.getNewNick()));
+            } else if (evt instanceof MessageEvent) {
+                ui.showMessages(Collections.singletonList(((MessageEvent) evt).getMessage()));
+            } else if (evt instanceof PresenceChangeEvent) {
+                PresenceChangeEvent e = (PresenceChangeEvent) evt;
+                if (e.isPresent()) {
+                    Map<String, String> users = new HashMap<>();
+                    for (SessionView s : e.getSessions()) {
+                        users.put(s.getSessionID(), s.getName());
+                    }
+                    ui.showNicks(users);
+                } else {
+                    List<String> users = new ArrayList<>();
+                    for (SessionView s : e.getSessions()) {
+                        users.add(s.getSessionID());
+                    }
+                    ui.removeNicks(users);
+                }
+            } else if (evt instanceof LogEvent) {
+                ui.showMessages(((LogEvent) evt).getMessages());
+            } else if (evt instanceof CloseEvent) {
+                // NYI
+            }
+        }
     }
 
     public void shutdown() {
