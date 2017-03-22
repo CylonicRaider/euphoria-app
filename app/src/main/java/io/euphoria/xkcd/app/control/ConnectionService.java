@@ -3,16 +3,11 @@ package io.euphoria.xkcd.app.control;
 import android.app.Service;
 import android.content.Intent;
 import android.os.Binder;
-import android.os.Handler;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 import io.euphoria.xkcd.app.connection.Connection;
 import io.euphoria.xkcd.app.connection.ConnectionManager;

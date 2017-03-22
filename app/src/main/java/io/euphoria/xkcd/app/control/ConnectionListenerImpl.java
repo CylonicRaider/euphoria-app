@@ -9,8 +9,8 @@ import io.euphoria.xkcd.app.connection.event.IdentityEvent;
 import io.euphoria.xkcd.app.connection.event.LogEvent;
 import io.euphoria.xkcd.app.connection.event.MessageEvent;
 import io.euphoria.xkcd.app.connection.event.NickChangeEvent;
+import io.euphoria.xkcd.app.connection.event.OpenEvent;
 import io.euphoria.xkcd.app.connection.event.PresenceChangeEvent;
-import io.euphoria.xkcd.app.ui.event.UIEvent;
 
 /** Created by Xyzzy on 2017-03-22. */
 
@@ -19,6 +19,11 @@ public class ConnectionListenerImpl implements ConnectionListener {
 
     public ConnectionListenerImpl(Runnable schedule) {
         queue = new EventQueue<>(schedule);
+    }
+
+    @Override
+    public void onOpen(OpenEvent evt) {
+        queue.add(evt);
     }
 
     @Override
