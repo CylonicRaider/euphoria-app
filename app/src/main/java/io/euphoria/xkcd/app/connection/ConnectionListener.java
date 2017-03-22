@@ -5,12 +5,16 @@ import io.euphoria.xkcd.app.connection.event.IdentityEvent;
 import io.euphoria.xkcd.app.connection.event.LogEvent;
 import io.euphoria.xkcd.app.connection.event.MessageEvent;
 import io.euphoria.xkcd.app.connection.event.NickChangeEvent;
+import io.euphoria.xkcd.app.connection.event.OpenEvent;
 import io.euphoria.xkcd.app.connection.event.PresenceChangeEvent;
 
 /** Created by Xyzzy on 2017-02-24. */
 
 /* Receiver interface for connection events */
 public interface ConnectionListener {
+
+    /* Connection actually estabilished */
+    void onOpen(OpenEvent evt);
 
     /* Discovered our identity */
     void onIdentity(IdentityEvent evt);
