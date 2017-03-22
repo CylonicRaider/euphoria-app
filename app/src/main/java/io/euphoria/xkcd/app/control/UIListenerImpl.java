@@ -22,27 +22,27 @@ public class UIListenerImpl implements UIListener, UIManagerListener {
 
     @Override
     public void onNewNick(NewNickEvent evt) {
-        queue.put(evt);
+        queue.add(evt);
     }
 
     @Override
     public void onMessageSend(MessageSendEvent evt) {
-        queue.put(evt);
+        queue.add(evt);
     }
 
     @Override
     public void onLogRequest(LogRequestEvent evt) {
-        queue.put(evt);
+        queue.add(evt);
     }
 
     @Override
     public void onRoomSwitch(RoomSwitchEvent evt) {
-        queue.put(evt);
+        queue.add(evt);
     }
 
     @Override
     public void onClose(CloseEvent evt) {
-        queue.put(evt);
+        queue.add(evt);
     }
 
     public List<UIEvent> getEvents() {

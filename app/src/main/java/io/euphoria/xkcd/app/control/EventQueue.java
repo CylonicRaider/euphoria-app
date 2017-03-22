@@ -36,7 +36,7 @@ public class EventQueue<T> {
         return ret;
     }
 
-    public synchronized void put(T e) {
+    public synchronized void add(T e) {
         if (e == null) return;
         boolean doSched = this.queue.isEmpty();
         this.queue.add(e);

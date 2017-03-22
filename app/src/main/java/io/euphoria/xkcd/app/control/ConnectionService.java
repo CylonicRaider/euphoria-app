@@ -71,7 +71,7 @@ public class ConnectionService extends Service {
                 queue = new RoomUIEventQueue(roomName);
                 roomEvents.put(roomName, queue);
             }
-            queue.put(evt);
+            queue.add(evt);
             updated.add(queue);
         }
         for (RoomUIEventQueue queue : updated) {

@@ -20,31 +20,31 @@ public class ConnectionListenerImpl implements ConnectionListener {
 
     @Override
     public void onIdentity(IdentityEvent evt) {
-        queue.put(evt);
+        queue.add(evt);
     }
 
     @Override
     public void onNickChange(NickChangeEvent evt) {
-        queue.put(evt);
+        queue.add(evt);
     }
 
     @Override
     public void onMessage(MessageEvent evt) {
-        queue.put(evt);
+        queue.add(evt);
     }
 
     @Override
     public void onPresenceChange(PresenceChangeEvent evt) {
-        queue.put(evt);
+        queue.add(evt);
     }
 
     @Override
     public void onLogEvent(LogEvent evt) {
-        queue.put(evt);
+        queue.add(evt);
     }
 
     @Override
     public void onClose(CloseEvent evt) {
-        queue.put(evt);
+        queue.add(evt);
     }
 }
