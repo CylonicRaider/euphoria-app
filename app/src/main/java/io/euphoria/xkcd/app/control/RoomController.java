@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.Handler;
 import android.os.IBinder;
+import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -133,6 +134,8 @@ public class RoomController {
                 ui.showMessages(((LogEvent) evt).getMessages());
             } else if (evt instanceof CloseEvent) {
                 // NYI
+            } else {
+                Log.e("RoomController", "Unknown connection event class; dropping.");
             }
         }
     }

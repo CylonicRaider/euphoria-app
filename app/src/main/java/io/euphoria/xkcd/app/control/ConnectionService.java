@@ -99,8 +99,4 @@ public class ConnectionService extends Service {
             }
         }
     }
-
-    private void drain() {
-        /**/
-    }
 }
