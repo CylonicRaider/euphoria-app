@@ -53,7 +53,6 @@ public class RoomController {
                     RoomController.this.service = null;
             }
         };
-        // Service already created.
         context.bindService(intent, connection, Context.BIND_AUTO_CREATE);
     }
 
