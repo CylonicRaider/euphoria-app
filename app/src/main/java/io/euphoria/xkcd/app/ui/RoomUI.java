@@ -3,6 +3,7 @@ package io.euphoria.xkcd.app.ui;
 import java.util.List;
 import java.util.Map;
 
+import io.euphoria.xkcd.app.connection.ConnectionStatus;
 import io.euphoria.xkcd.app.data.Message;
 
 /** Created by Xyzzy on 2017-02-24. */
@@ -21,6 +22,12 @@ public interface RoomUI {
      * After closing, the object should be considered unusable.
      */
     void close();
+
+    /* Update the connection status of the UI
+     *
+     * The serves as feed-back to the user.
+     */
+    void setConnectionStatus(ConnectionStatus status);
 
     /* Display the given messages
      *
