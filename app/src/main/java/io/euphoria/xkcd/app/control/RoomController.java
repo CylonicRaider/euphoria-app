@@ -14,12 +14,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import io.euphoria.xkcd.app.connection.ConnectionStatus;
 import io.euphoria.xkcd.app.connection.event.CloseEvent;
 import io.euphoria.xkcd.app.connection.event.ConnectionEvent;
 import io.euphoria.xkcd.app.connection.event.IdentityEvent;
 import io.euphoria.xkcd.app.connection.event.LogEvent;
 import io.euphoria.xkcd.app.connection.event.MessageEvent;
 import io.euphoria.xkcd.app.connection.event.NickChangeEvent;
+import io.euphoria.xkcd.app.connection.event.OpenEvent;
 import io.euphoria.xkcd.app.connection.event.PresenceChangeEvent;
 import io.euphoria.xkcd.app.data.SessionView;
 import io.euphoria.xkcd.app.ui.RoomUI;
@@ -108,7 +110,9 @@ public class RoomController {
         for (ConnectionEvent evt : service.getListener().getEvents()) {
             String roomName = evt.getConnection().getRoomName();
             RoomUI ui = manager.getRoomUI(roomName);
-            if (evt instanceof IdentityEvent) {
+            if (evt instanceof OpenEvent) {
+                ui.setConnectionStatus(ConnectionStatus.CONNECTED);
+            } else if (evt instanceof IdentityEvent) {
                 /* NOP */
             } else if (evt instanceof NickChangeEvent) {
                 NickChangeEvent e = (NickChangeEvent) evt;
@@ -133,7 +137,11 @@ public class RoomController {
             } else if (evt instanceof LogEvent) {
                 ui.showMessages(((LogEvent) evt).getMessages());
             } else if (evt instanceof CloseEvent) {
-                // NYI
+                if (((CloseEvent) evt).isFinal()) {
+                    ui.setConnectionStatus(ConnectionStatus.DISCONNECTED);
+                } else {
+                    ui.setConnectionStatus(ConnectionStatus.RECONNECTING);
+                }
             } else {
                 Log.e("RoomController", "Unknown connection event class; dropping.");
             }
