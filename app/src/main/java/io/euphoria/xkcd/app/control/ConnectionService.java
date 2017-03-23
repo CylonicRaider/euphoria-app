@@ -3,6 +3,7 @@ package io.euphoria.xkcd.app.control;
 import android.app.Service;
 import android.content.Intent;
 import android.os.Binder;
+import android.os.Handler;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
 import android.util.Log;
@@ -34,6 +35,12 @@ public class ConnectionService extends Service {
     }
 
     private final CBinder BINDER = new CBinder();
+    private final Runnable TERMINATE = new Runnable() {
+        @Override
+        public void run() {
+            stopSelf();
+        }
+    };
     private final Map<String, EventQueue<UIEvent>> roomEvents = new HashMap<>();
     private boolean isBound;
     private ConnectionManager mgr;
@@ -54,11 +61,13 @@ public class ConnectionService extends Service {
     public void addBinding() {
         if (isBound) throw new IllegalStateException("Service already bound");
         isBound = true;
+        new Handler(getMainLooper()).removeCallbacks(TERMINATE);
     }
 
     public void removeBinding() {
         if (! isBound) throw new IllegalStateException("Service not bound");
         isBound = false;
+        new Handler(getMainLooper()).postDelayed(TERMINATE, 10000);
     }
 
     @Override
