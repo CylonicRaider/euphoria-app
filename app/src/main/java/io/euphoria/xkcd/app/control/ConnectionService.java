@@ -38,15 +38,15 @@ public class ConnectionService extends Service {
     private ConnectionManager mgr;
     private ConnectionListenerImpl listener;
 
+    @Override
+    public void onCreate() {
+        mgr = ConnectionManagerImpl.getInstance();
+    }
+
     @Nullable
     @Override
     public IBinder onBind(Intent intent) {
         return BINDER;
-    }
-
-    @Override
-    public void onCreate() {
-        mgr = ConnectionManagerImpl.getInstance();
     }
 
     @Override
