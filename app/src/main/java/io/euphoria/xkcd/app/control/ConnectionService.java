@@ -16,6 +16,7 @@ import java.util.Set;
 import io.euphoria.xkcd.app.connection.Connection;
 import io.euphoria.xkcd.app.connection.ConnectionManager;
 import io.euphoria.xkcd.app.connection.event.NickChangeEvent;
+import io.euphoria.xkcd.app.connection.event.OpenEvent;
 import io.euphoria.xkcd.app.impl.connection.ConnectionManagerImpl;
 import io.euphoria.xkcd.app.ui.event.CloseEvent;
 import io.euphoria.xkcd.app.ui.event.LogRequestEvent;
@@ -33,7 +34,7 @@ public class ConnectionService extends Service {
     }
 
     private final CBinder BINDER = new CBinder();
-    private final Map<String, RoomUIEventQueue> roomEvents = new HashMap<>();
+    private final Map<String, EventQueue<UIEvent>> roomEvents = new HashMap<>();
     private ConnectionManager mgr;
     private ConnectionListenerImpl listener;
 
@@ -62,7 +63,7 @@ public class ConnectionService extends Service {
     }
 
     public void consume(List<UIEvent> events) {
-        Set<RoomUIEventQueue> updated = new HashSet<>();
+        Set<String> updated = new HashSet<>();
         for (UIEvent evt : events) {
             String roomName;
             /* Room switch events...
@@ -72,48 +73,52 @@ public class ConnectionService extends Service {
              * i.e. as soon as events for them arrive. */
             if (evt instanceof RoomSwitchEvent) {
                 roomName = ((RoomSwitchEvent) evt).getRoomName();
+                if (mgr.getConnection(roomName) == null) {
+                    Connection conn = mgr.connect(roomName);
+                    conn.addEventListener(listener);
+                    conn.addEventListener(new ConnectionListenerAdapter() {
+                        @Override
+                        public void onOpen(OpenEvent evt) {
+                            drain(evt.getConnection().getRoomName());
+                        }
+                    });
+                }
             } else {
                 roomName = evt.getRoomUI().getRoomName();
             }
-            RoomUIEventQueue queue = roomEvents.get(roomName);
+            EventQueue<UIEvent> queue = roomEvents.get(roomName);
             if (queue == null) {
-                queue = new RoomUIEventQueue(roomName);
+                queue = new EventQueue<>();
                 roomEvents.put(roomName, queue);
             }
             queue.add(evt);
-            updated.add(queue);
+            updated.add(roomName);
         }
-        for (RoomUIEventQueue queue : updated) {
-            Connection conn = null;
-            for (UIEvent evt : queue.getAll()) {
-                String room = queue.getRoomName();
-                if (conn == null) {
-                    if (evt instanceof RoomSwitchEvent) {
-                        conn = mgr.connect(room);
-                        conn.addEventListener(listener);
-                    } else {
-                        conn = mgr.getConnection(room);
-                    }
-                    if (conn == null) {
-                        Log.e("ConnectionService", "Non-connection UI event for nonexistent connection; dropping.");
-                        continue;
-                    }
-                }
-                if (evt instanceof NickChangeEvent) {
-                    conn.setNick(((NickChangeEvent) evt).getNewNick());
-                } else if (evt instanceof MessageSendEvent) {
-                    MessageSendEvent e = (MessageSendEvent) evt;
-                    conn.postMessage(e.getText(), e.getParent());
-                } else if (evt instanceof LogRequestEvent) {
-                    LogRequestEvent e = (LogRequestEvent) evt;
-                    conn.requestLogs(e.getBefore(), 100);
-                } else if (evt instanceof RoomSwitchEvent) {
-                    /* NOP */
-                } else if (evt instanceof CloseEvent) {
-                    conn.close();
-                } else {
-                    Log.e("ConnectionService", "Unknown UI event class; dropping.");
-                }
+        for (String roomName : updated) drain(roomName);
+    }
+
+    private void drain(String roomName) {
+        Connection conn = mgr.getConnection(roomName);
+        if (conn == null) {
+            Log.e("ConnectionService", "Events pending for nonexistent connection; ignoring.");
+            return;
+        }
+        if (! conn.getStatus().isConnected()) return;
+        for (UIEvent evt : roomEvents.get(roomName).getAll()) {
+            if (evt instanceof NickChangeEvent) {
+                conn.setNick(((NickChangeEvent) evt).getNewNick());
+            } else if (evt instanceof MessageSendEvent) {
+                MessageSendEvent e = (MessageSendEvent) evt;
+                conn.postMessage(e.getText(), e.getParent());
+            } else if (evt instanceof LogRequestEvent) {
+                LogRequestEvent e = (LogRequestEvent) evt;
+                conn.requestLogs(e.getBefore(), 100);
+            } else if (evt instanceof RoomSwitchEvent) {
+                /* NOP */
+            } else if (evt instanceof CloseEvent) {
+                conn.close();
+            } else {
+                Log.e("ConnectionService", "Unknown UI event class; dropping.");
             }
         }
     }
