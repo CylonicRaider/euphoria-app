@@ -37,6 +37,9 @@ public interface Connection {
      */
     int requestLogs(String before, int count);
 
+    /* The current connection status as an enum value */
+    ConnectionStatus getStatus();
+
     /* Add an event listener */
     void addEventListener(ConnectionListener l);
 
