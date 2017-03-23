@@ -35,18 +35,30 @@ public class ConnectionService extends Service {
 
     private final CBinder BINDER = new CBinder();
     private final Map<String, EventQueue<UIEvent>> roomEvents = new HashMap<>();
+    private boolean isBound;
     private ConnectionManager mgr;
     private ConnectionListenerImpl listener;
 
     @Override
     public void onCreate() {
         mgr = ConnectionManagerImpl.getInstance();
+        roomEvents.clear();
     }
 
     @Nullable
     @Override
     public IBinder onBind(Intent intent) {
         return BINDER;
+    }
+
+    public void addBinding() {
+        if (isBound) throw new IllegalStateException("Service already bound");
+        isBound = true;
+    }
+
+    public void removeBinding() {
+        if (! isBound) throw new IllegalStateException("Service not bound");
+        isBound = false;
     }
 
     @Override

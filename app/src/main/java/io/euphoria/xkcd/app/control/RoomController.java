@@ -63,6 +63,7 @@ public class RoomController {
                 // Wheee! I should name even more variables like that!
                 this.service = ((ConnectionService.CBinder) service).getService();
                 RoomController.this.service = this.service;
+                this.service.addBinding();
                 this.service.setListener(connListener);
                 drain();
             }
@@ -150,6 +151,7 @@ public class RoomController {
 
     public void shutdown() {
         if (service != null) {
+            service.removeBinding();
             context.unbindService(connection);
             service = null;
             connection = null;
