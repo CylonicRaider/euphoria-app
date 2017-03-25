@@ -86,7 +86,7 @@ public class RoomController {
         manager.addEventListener(uiListener);
     }
 
-    private synchronized void drain() {
+    private void drain() {
         ConnectionService service;
         synchronized (this) {
             service = this.service;
