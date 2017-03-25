@@ -1,5 +1,7 @@
 package io.euphoria.xkcd.app.control;
 
+import java.util.List;
+
 import io.euphoria.xkcd.app.ui.event.UIEvent;
 
 /** Created by Xyzzy on 2017-03-25. */
@@ -10,6 +12,24 @@ public class RoomUIEventQueue extends EventQueue<UIEvent> {
     public RoomUIEventQueue(Runnable schedule) {
         super(schedule);
         lastPoll = System.currentTimeMillis();
+    }
+
+    @Override
+    public void clear() {
+        lastPoll = System.currentTimeMillis();
+        super.clear();
+    }
+
+    @Override
+    public UIEvent get() {
+        lastPoll = System.currentTimeMillis();
+        return super.get();
+    }
+
+    @Override
+    public List<UIEvent> getAll() {
+        lastPoll = System.currentTimeMillis();
+        return super.getAll();
     }
 
     @Override
