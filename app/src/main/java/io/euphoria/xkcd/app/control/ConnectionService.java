@@ -56,7 +56,6 @@ public class ConnectionService extends Service {
     @Override
     public void onCreate() {
         mgr = ConnectionManagerImpl.getInstance();
-        roomEvents.clear();
     }
 
     @Nullable
