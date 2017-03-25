@@ -58,29 +58,32 @@ public class ConnectionService extends Service {
         return BINDER;
     }
 
-    public void addBinding() {
+    public void addBinding(ConnectionListenerImpl listener) {
         if (isBound) throw new IllegalStateException("Service already bound");
         isBound = true;
-        new Handler(getMainLooper()).removeCallbacks(TERMINATE);
+        this.listener = listener;
     }
 
     public void removeBinding() {
         if (! isBound) throw new IllegalStateException("Service not bound");
         isBound = false;
+        this.listener = null;
+    }
+
+    @Override
+    public boolean onUnbind(Intent intent) {
         new Handler(getMainLooper()).postDelayed(TERMINATE, 10000);
+        return true;
+    }
+
+    @Override
+    public void onRebind(Intent intent) {
+        new Handler(getMainLooper()).removeCallbacks(TERMINATE);
     }
 
     @Override
     public void onDestroy() {
         mgr.shutdown();
-    }
-
-    public ConnectionListenerImpl getListener() {
-        return listener;
-    }
-
-    public void setListener(ConnectionListenerImpl l) {
-        listener = l;
     }
 
     public void consume(List<UIEvent> events) {

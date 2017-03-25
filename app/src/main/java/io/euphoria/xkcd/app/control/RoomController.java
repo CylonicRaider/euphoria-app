@@ -63,8 +63,7 @@ public class RoomController {
                 // Wheee! I should name even more variables like that!
                 this.service = ((ConnectionService.CBinder) service).getService();
                 RoomController.this.service = this.service;
-                this.service.addBinding();
-                this.service.setListener(connListener);
+                this.service.addBinding(connListener);
                 drain();
             }
 
@@ -108,7 +107,7 @@ public class RoomController {
     }
 
     private void drainConnection() {
-        for (ConnectionEvent evt : service.getListener().getEvents()) {
+        for (ConnectionEvent evt : connListener.getEvents()) {
             String roomName = evt.getConnection().getRoomName();
             RoomUI ui = manager.getRoomUI(roomName);
             if (evt instanceof OpenEvent) {
