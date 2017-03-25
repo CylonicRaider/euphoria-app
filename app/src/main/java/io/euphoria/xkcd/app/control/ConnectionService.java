@@ -16,6 +16,7 @@ import java.util.Set;
 
 import io.euphoria.xkcd.app.connection.Connection;
 import io.euphoria.xkcd.app.connection.ConnectionManager;
+import io.euphoria.xkcd.app.connection.event.ConnectionEvent;
 import io.euphoria.xkcd.app.connection.event.NickChangeEvent;
 import io.euphoria.xkcd.app.connection.event.OpenEvent;
 import io.euphoria.xkcd.app.impl.connection.ConnectionManagerImpl;
@@ -41,14 +42,26 @@ public class ConnectionService extends Service {
             stopSelf();
         }
     };
+    private final PausingEventQueue<ConnectionEvent> backEvents = new PausingEventQueue<>(new Runnable() {
+        @Override
+        public void run() {
+            drain();
+        }
+    });
     private final Map<String, EventQueue<UIEvent>> roomEvents = new HashMap<>();
-    private boolean isBound;
+    private RoomController bound;
     private ConnectionManager mgr;
     private ConnectionListenerImpl listener;
 
     @Override
     public void onCreate() {
         mgr = ConnectionManagerImpl.getInstance();
+        listener = new ConnectionListenerImpl(null) {
+            @Override
+            public void onOpen(OpenEvent evt) {
+                drain(evt.getConnection().getRoomName());
+            }
+        };
         roomEvents.clear();
     }
 
@@ -58,16 +71,16 @@ public class ConnectionService extends Service {
         return BINDER;
     }
 
-    public void addBinding(ConnectionListenerImpl listener) {
-        if (isBound) throw new IllegalStateException("Service already bound");
-        isBound = true;
-        this.listener = listener;
+    public void addBinding(RoomController controller) {
+        if (bound != null) throw new IllegalStateException("Service already bound");
+        bound = controller;
+        backEvents.setPaused(true);
     }
 
     public void removeBinding() {
-        if (! isBound) throw new IllegalStateException("Service not bound");
-        isBound = false;
-        this.listener = null;
+        if (bound == null) throw new IllegalStateException("Service not bound");
+        bound = null;
+        backEvents.setPaused(false);
     }
 
     @Override
@@ -86,7 +99,15 @@ public class ConnectionService extends Service {
         mgr.shutdown();
     }
 
-    public void consume(List<UIEvent> events) {
+    private void drain() {
+        RoomController controller;
+        synchronized (this) {
+            controller = bound;
+        }
+        if (controller != null) controller.consume(backEvents.getAll());
+    }
+
+    void consume(List<UIEvent> events) {
         Set<String> updated = new HashSet<>();
         for (UIEvent evt : events) {
             String roomName;
@@ -100,12 +121,6 @@ public class ConnectionService extends Service {
                 if (mgr.getConnection(roomName) == null) {
                     Connection conn = mgr.connect(roomName);
                     conn.addEventListener(listener);
-                    conn.addEventListener(new ConnectionListenerAdapter() {
-                        @Override
-                        public void onOpen(OpenEvent evt) {
-                            drain(evt.getConnection().getRoomName());
-                        }
-                    });
                 }
             } else {
                 roomName = evt.getRoomUI().getRoomName();

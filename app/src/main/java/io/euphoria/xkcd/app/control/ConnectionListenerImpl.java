@@ -16,44 +16,55 @@ import io.euphoria.xkcd.app.connection.event.PresenceChangeEvent;
 
 public class ConnectionListenerImpl implements ConnectionListener {
     private final EventQueue<ConnectionEvent> queue;
+    private boolean receiving;
 
     public ConnectionListenerImpl(Runnable schedule) {
         queue = new EventQueue<>(schedule);
+        receiving = true;
+    }
+
+    public boolean isReceiving() {
+        return receiving;
+    }
+
+    public void setReceiving(boolean receiving) {
+        this.queue.clear();
+        this.receiving = receiving;
     }
 
     @Override
     public void onOpen(OpenEvent evt) {
-        queue.add(evt);
+        if (receiving) queue.add(evt);
     }
 
     @Override
     public void onIdentity(IdentityEvent evt) {
-        queue.add(evt);
+        if (receiving) queue.add(evt);
     }
 
     @Override
     public void onNickChange(NickChangeEvent evt) {
-        queue.add(evt);
+        if (receiving) queue.add(evt);
     }
 
     @Override
     public void onMessage(MessageEvent evt) {
-        queue.add(evt);
+        if (receiving) queue.add(evt);
     }
 
     @Override
     public void onPresenceChange(PresenceChangeEvent evt) {
-        queue.add(evt);
+        if (receiving) queue.add(evt);
     }
 
     @Override
     public void onLogEvent(LogEvent evt) {
-        queue.add(evt);
+        if (receiving) queue.add(evt);
     }
 
     @Override
     public void onClose(CloseEvent evt) {
-        queue.add(evt);
+        if (receiving) queue.add(evt);
     }
 
     public List<ConnectionEvent> getEvents() {

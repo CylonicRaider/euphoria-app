@@ -35,7 +35,6 @@ public class RoomController {
     private ConnectionService service;
     private ServiceConnection connection;
     private UIListenerImpl uiListener;
-    private ConnectionListenerImpl connListener;
 
     public RoomController(RoomUIManager mgr, Context ctx) {
         this.manager = mgr;
@@ -63,7 +62,7 @@ public class RoomController {
                 // Wheee! I should name even more variables like that!
                 this.service = ((ConnectionService.CBinder) service).getService();
                 RoomController.this.service = this.service;
-                this.service.addBinding(connListener);
+                this.service.addBinding(RoomController.this);
                 drain();
             }
 
@@ -84,17 +83,6 @@ public class RoomController {
                 drain();
             }
         });
-        connListener = new ConnectionListenerImpl(new Runnable() {
-            @Override
-            public void run() {
-                new Handler(context.getMainLooper()).post(new Runnable() {
-                    @Override
-                    public void run() {
-                        drainConnection();
-                    }
-                });
-            }
-        });
         manager.addEventListener(uiListener);
     }
 
@@ -106,8 +94,8 @@ public class RoomController {
         if (service != null) service.consume(uiListener.getEvents());
     }
 
-    private void drainConnection() {
-        for (ConnectionEvent evt : connListener.getEvents()) {
+    void consume(List<ConnectionEvent> events) {
+        for (ConnectionEvent evt : events) {
             String roomName = evt.getConnection().getRoomName();
             RoomUI ui = manager.getRoomUI(roomName);
             if (evt instanceof OpenEvent) {
