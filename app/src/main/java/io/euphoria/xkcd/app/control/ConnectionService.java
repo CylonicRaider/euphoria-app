@@ -51,17 +51,10 @@ public class ConnectionService extends Service {
     private final Map<String, EventQueue<UIEvent>> roomEvents = new HashMap<>();
     private RoomController bound;
     private ConnectionManager mgr;
-    private ConnectionListenerImpl listener;
 
     @Override
     public void onCreate() {
         mgr = ConnectionManagerImpl.getInstance();
-        listener = new ConnectionListenerImpl(null) {
-            @Override
-            public void onOpen(OpenEvent evt) {
-                drain(evt.getConnection().getRoomName());
-            }
-        };
         roomEvents.clear();
     }
 
@@ -119,8 +112,13 @@ public class ConnectionService extends Service {
             if (evt instanceof RoomSwitchEvent) {
                 roomName = ((RoomSwitchEvent) evt).getRoomName();
                 if (mgr.getConnection(roomName) == null) {
-                    Connection conn = mgr.connect(roomName);
-                    conn.addEventListener(listener);
+                    mgr.connect(roomName).addEventListener(new ConnectionListenerImpl(backEvents) {
+                        @Override
+                        public void onOpen(OpenEvent evt) {
+                            super.onOpen(evt);
+                            drain(evt.getConnection().getRoomName());
+                        }
+                    });
                 }
             } else {
                 roomName = evt.getRoomUI().getRoomName();

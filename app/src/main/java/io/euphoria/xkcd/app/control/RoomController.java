@@ -26,6 +26,7 @@ import io.euphoria.xkcd.app.connection.event.PresenceChangeEvent;
 import io.euphoria.xkcd.app.data.SessionView;
 import io.euphoria.xkcd.app.ui.RoomUI;
 import io.euphoria.xkcd.app.ui.RoomUIManager;
+import io.euphoria.xkcd.app.ui.event.UIEvent;
 
 /** Created by Xyzzy on 2017-03-19. */
 
@@ -77,12 +78,12 @@ public class RoomController {
     }
 
     private void bind() {
-        uiListener = new UIListenerImpl(new Runnable() {
+        uiListener = new UIListenerImpl(new EventQueue<UIEvent>(new Runnable() {
             @Override
             public void run() {
                 drain();
             }
-        });
+        }));
         manager.addEventListener(uiListener);
     }
 
