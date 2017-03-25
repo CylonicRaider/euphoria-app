@@ -67,13 +67,13 @@ public class ConnectionService extends Service {
     public void addBinding(RoomController controller) {
         if (bound != null) throw new IllegalStateException("Service already bound");
         bound = controller;
-        backEvents.setPaused(true);
+        backEvents.setPaused(false);
     }
 
     public void removeBinding() {
         if (bound == null) throw new IllegalStateException("Service not bound");
         bound = null;
-        backEvents.setPaused(false);
+        backEvents.setPaused(true);
     }
 
     @Override
