@@ -14,9 +14,6 @@ public class EventQueue<T> {
         this.queue = new ConcurrentLinkedQueue<>();
         this.schedule = schedule;
     }
-    public EventQueue() {
-        this(null);
-    }
 
     public synchronized boolean isEmpty() {
         return this.queue.isEmpty();

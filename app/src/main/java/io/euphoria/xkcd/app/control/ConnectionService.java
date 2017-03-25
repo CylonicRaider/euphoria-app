@@ -10,6 +10,7 @@ import android.util.Log;
 
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -48,7 +49,7 @@ public class ConnectionService extends Service {
             drain();
         }
     });
-    private final Map<String, EventQueue<UIEvent>> roomEvents = new HashMap<>();
+    private final Map<String, RoomUIEventQueue> roomEvents = new HashMap<>();
     private RoomController bound;
     private ConnectionManager mgr;
 
@@ -78,7 +79,19 @@ public class ConnectionService extends Service {
 
     @Override
     public boolean onUnbind(Intent intent) {
-        new Handler(getMainLooper()).postDelayed(TERMINATE, 10000);
+        final long deadline = System.currentTimeMillis();
+        Handler hnd = new Handler(getMainLooper());
+        hnd.postDelayed(TERMINATE, 10000);
+        hnd.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                Iterator<Map.Entry<String, RoomUIEventQueue>> iter = roomEvents.entrySet().iterator();
+                while (iter.hasNext()) {
+                    Map.Entry<String, RoomUIEventQueue> ent = iter.next();
+                    if (! ent.getValue().touchedSince(deadline)) iter.remove();
+                }
+            }
+        }, 10000);
         return true;
     }
 
@@ -103,7 +116,7 @@ public class ConnectionService extends Service {
     void consume(List<UIEvent> events) {
         Set<String> updated = new HashSet<>();
         for (UIEvent evt : events) {
-            String roomName;
+            final String roomName;
             /* Room switch events...
              * (a) are not attached to the room they come *from* and
              * (b) have no associated RoomUI at all,
@@ -123,9 +136,14 @@ public class ConnectionService extends Service {
             } else {
                 roomName = evt.getRoomUI().getRoomName();
             }
-            EventQueue<UIEvent> queue = roomEvents.get(roomName);
+            RoomUIEventQueue queue = roomEvents.get(roomName);
             if (queue == null) {
-                queue = new EventQueue<>();
+                queue = new RoomUIEventQueue(new Runnable() {
+                    @Override
+                    public void run() {
+                        drain(roomName);
+                    }
+                });
                 roomEvents.put(roomName, queue);
             }
             queue.add(evt);
