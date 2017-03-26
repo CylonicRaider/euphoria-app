@@ -30,6 +30,9 @@ import io.euphoria.xkcd.app.ui.event.UIEvent;
 /** Created by Xyzzy on 2017-03-19. */
 
 public class ConnectionService extends Service {
+    public static final int BINDING_LOSS_TIMEOUT = 10000;
+    public static final int DEFAULT_LOGS = 100;
+
     public class CBinder extends Binder {
         public ConnectionService getService() {
             return ConnectionService.this;
@@ -80,7 +83,7 @@ public class ConnectionService extends Service {
     public boolean onUnbind(Intent intent) {
         final long deadline = System.currentTimeMillis();
         Handler hnd = new Handler(getMainLooper());
-        hnd.postDelayed(TERMINATE, 10000);
+        hnd.postDelayed(TERMINATE, BINDING_LOSS_TIMEOUT);
         hnd.postDelayed(new Runnable() {
             @Override
             public void run() {
@@ -90,7 +93,7 @@ public class ConnectionService extends Service {
                     if (! ent.getValue().touchedSince(deadline)) iter.remove();
                 }
             }
-        }, 10000);
+        }, BINDING_LOSS_TIMEOUT);
         return true;
     }
 
@@ -166,7 +169,7 @@ public class ConnectionService extends Service {
                 conn.postMessage(e.getText(), e.getParent());
             } else if (evt instanceof LogRequestEvent) {
                 LogRequestEvent e = (LogRequestEvent) evt;
-                conn.requestLogs(e.getBefore(), 100);
+                conn.requestLogs(e.getBefore(), DEFAULT_LOGS);
             } else if (evt instanceof RoomSwitchEvent) {
                 /* NOP */
             } else if (evt instanceof CloseEvent) {
