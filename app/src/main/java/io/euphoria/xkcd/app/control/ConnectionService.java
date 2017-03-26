@@ -50,7 +50,7 @@ public class ConnectionService extends Service {
         }
     });
     private final Map<String, RoomUIEventQueue> roomEvents = new HashMap<>();
-    private RoomController bound;
+    private RoomController controller;
     private ConnectionManager mgr;
 
     @Override
@@ -65,14 +65,14 @@ public class ConnectionService extends Service {
     }
 
     public void addBinding(RoomController controller) {
-        if (bound != null) throw new IllegalStateException("Service already bound");
-        bound = controller;
+        if (this.controller != null) throw new IllegalStateException("Service already bound");
+        this.controller = controller;
         backEvents.setPaused(false);
     }
 
     public void removeBinding() {
-        if (bound == null) throw new IllegalStateException("Service not bound");
-        bound = null;
+        if (controller == null) throw new IllegalStateException("Service not bound");
+        controller = null;
         backEvents.setPaused(true);
     }
 
@@ -107,7 +107,7 @@ public class ConnectionService extends Service {
     private void drain() {
         RoomController controller;
         synchronized (this) {
-            controller = bound;
+            controller = this.controller;
         }
         if (controller != null) controller.consume(backEvents.getAll());
     }
