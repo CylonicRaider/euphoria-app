@@ -131,7 +131,7 @@ public class ConnectionService extends Service {
                         @Override
                         public void onOpen(OpenEvent evt) {
                             super.onOpen(evt);
-                            drain(evt.getConnection().getRoomName());
+                            drain(roomName);
                         }
                     });
                 }
