@@ -5,6 +5,11 @@ package io.euphoria.xkcd.app.connection.event;
 /* An event informing about the connection having been closed */
 public interface CloseEvent extends ConnectionEvent {
 
-    /* Blank */
+    /* Whether the close was initiated by user action or by network interference
+     *
+     * If true, the close stemmed from the user, and the connection will not be re-established; otherwise, an
+     * automated re-connection attempt will take place.
+     */
+    boolean isFinal();
 
 }
