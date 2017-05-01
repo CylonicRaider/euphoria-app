@@ -19,7 +19,7 @@ import io.euphoria.xkcd.app.connection.event.PresenceChangeEvent;
 
 /** Created by Xyzzy on 2017-04-29. */
 
-class ConnectionImpl implements Connection {
+public class ConnectionImpl implements Connection {
 
     private final ConnectionManagerImpl parent;
     private final String roomName;
