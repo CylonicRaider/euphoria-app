@@ -106,4 +106,5 @@ public class ConnectionImpl implements Connection {
     public synchronized void removeEventListener(ConnectionListener l) {
         listeners.remove(l);
     }
+
 }
