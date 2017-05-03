@@ -31,6 +31,7 @@ public class ConnectionManagerImpl implements ConnectionManager {
         ConnectionImpl conn = connections.get(roomName);
         if (conn == null) {
             conn = new ConnectionImpl(this, roomName);
+            conn.connect();
             connections.put(roomName, conn);
         }
         return conn;

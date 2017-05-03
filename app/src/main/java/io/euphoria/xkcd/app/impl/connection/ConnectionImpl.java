@@ -2,6 +2,8 @@ package io.euphoria.xkcd.app.impl.connection;
 
 import android.util.Log;
 
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -24,11 +26,17 @@ public class ConnectionImpl implements Connection {
     private final ConnectionManagerImpl parent;
     private final String roomName;
     private final List<ConnectionListener> listeners;
+    private final EuphoriaWebSocketClient client;
     private int seqid;
 
     public ConnectionImpl(ConnectionManagerImpl parent, String roomName) {
         this.parent = parent;
         this.roomName = roomName;
+        try {
+            this.client = new EuphoriaWebSocketClient(this, new URI("wss://euphoria.io/room/" + roomName + "/ws"));
+        } catch (URISyntaxException e) {
+            throw new IllegalArgumentException("Bad room name (did not form a valid URI)");
+        }
         listeners = new ArrayList<>();
     }
 
@@ -41,10 +49,14 @@ public class ConnectionImpl implements Connection {
         return roomName;
     }
 
+    public void connect() {
+        client.connect();
+    }
+
     @Override
     public void close() {
         parent.remove(this);
-        throw new AssertionError("Not implemented");
+        client.close();
     }
 
     protected synchronized int sequence() {
@@ -53,17 +65,17 @@ public class ConnectionImpl implements Connection {
 
     @Override
     public int setNick(String name) {
-        throw new AssertionError("Not implemented");
+        return client.sendObject("nick", "name", name);
     }
 
     @Override
     public int postMessage(String text, String parent) {
-        throw new AssertionError("Not implemented");
+        return client.sendObject("send", "content", text, "parent", parent);
     }
 
     @Override
     public int requestLogs(String before, int count) {
-        throw new AssertionError("Not implemented");
+        return client.sendObject("log", "n", count, "before", before);
     }
 
     @Override
