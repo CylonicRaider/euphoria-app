@@ -13,7 +13,7 @@ import io.euphoria.xkcd.app.connection.event.PresenceChangeEvent;
 /* Receiver interface for connection events */
 public interface ConnectionListener {
 
-    /* Connection actually estabilished */
+    /* Connection actually established */
     void onOpen(OpenEvent evt);
 
     /* Discovered our identity */

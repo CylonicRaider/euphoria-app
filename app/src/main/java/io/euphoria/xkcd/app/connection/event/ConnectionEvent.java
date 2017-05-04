@@ -13,7 +13,7 @@ import io.euphoria.xkcd.app.connection.Connection;
  * nick-event        -> NickChangeEvent
  * part-event        -> PresenceChangeEvent
  * send-event        -> MessageEvent
- * snapshot-event    -> LogEvent & PresenceChangeEvent
+ * snapshot-event    -> PresenceChangeEvent & LogEvent
  * get-message-reply -> LogEvent
  * log-reply         -> LogEvent
  * nick-reply        -> NickChangeEvent
