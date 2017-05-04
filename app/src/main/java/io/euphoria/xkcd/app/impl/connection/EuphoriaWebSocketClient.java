@@ -235,7 +235,7 @@ public class EuphoriaWebSocketClient extends WebSocketClient {
                     break;
             }
         } catch (JSONException e) {
-            Log.e("EuphroiaWebSocketClient", type + " packet missing required fields", e);
+            Log.e("EuphoriaWebSocketClient", type + " packet missing required fields", e);
         }
     }
 
