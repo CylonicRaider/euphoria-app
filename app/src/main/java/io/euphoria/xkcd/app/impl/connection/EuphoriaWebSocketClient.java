@@ -11,7 +11,9 @@ import org.json.JSONObject;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import io.euphoria.xkcd.app.connection.Connection;
 import io.euphoria.xkcd.app.connection.event.CloseEvent;
@@ -28,6 +30,104 @@ import io.euphoria.xkcd.app.data.SessionView;
 /** Created by Xyzzy on 2017-05-01. */
 
 public class EuphoriaWebSocketClient extends WebSocketClient {
+
+    private static class SessionViewImpl implements SessionView {
+
+        private final String sessionID;
+        private final String agentID;
+        private final String name;
+        private final boolean staff;
+        private final boolean manager;
+
+        public SessionViewImpl(String sessionID, String agentID, String name, boolean staff, boolean manager) {
+            this.sessionID = sessionID;
+            this.agentID = agentID;
+            this.name = name;
+            this.staff = staff;
+            this.manager = manager;
+        }
+
+        public SessionViewImpl(SessionView base, String newName) {
+            this(base.getSessionID(), base.getAgentID(), newName, base.isStaff(), base.isManager());
+        }
+
+        @Override
+        public String getSessionID() {
+            return sessionID;
+        }
+
+        @Override
+        public String getAgentID() {
+            return agentID;
+        }
+
+        @Override
+        public String getName() {
+            return name;
+        }
+
+        @Override
+        public boolean isStaff() {
+            return staff;
+        }
+
+        @Override
+        public boolean isManager() {
+            return manager;
+        }
+
+    }
+
+    private static class MessageImpl implements Message {
+
+        private final String id;
+        private final String parent;
+        private final long timestamp;
+        private final SessionView sender;
+        private final String content;
+        private final boolean truncated;
+
+        private MessageImpl(String id, String parent, long timestamp, SessionView sender, String content,
+                            boolean truncated) {
+            this.id = id;
+            this.parent = parent;
+            this.timestamp = timestamp;
+            this.sender = sender;
+            this.content = content;
+            this.truncated = truncated;
+        }
+
+        @Override
+        public String getID() {
+            return id;
+        }
+
+        @Override
+        public String getParent() {
+            return parent;
+        }
+
+        @Override
+        public long getTimestamp() {
+            return timestamp;
+        }
+
+        @Override
+        public SessionView getSender() {
+            return sender;
+        }
+
+        @Override
+        public String getContent() {
+            return content;
+        }
+
+        @Override
+        public boolean isTruncated() {
+            return truncated;
+        }
+
+    }
 
     private class EventImpl implements ConnectionEvent {
 
@@ -99,6 +199,7 @@ public class EuphoriaWebSocketClient extends WebSocketClient {
     private class MessageEventImpl extends EventImpl implements MessageEvent {
 
         private final Message message;
+
         private MessageEventImpl(Message message) {
             this.message = message;
         }
@@ -164,10 +265,12 @@ public class EuphoriaWebSocketClient extends WebSocketClient {
     }
 
     private final ConnectionImpl parent;
+    private final Map<String, SessionView> sessions;
 
     public EuphoriaWebSocketClient(ConnectionImpl parent, URI endpoint) {
         super(endpoint);
         this.parent = parent;
+        this.sessions = new HashMap<>();
     }
 
     public ConnectionImpl getParent() {
@@ -200,38 +303,39 @@ public class EuphoriaWebSocketClient extends WebSocketClient {
         try {
             switch (type) {
                 case "hello-event":
-                    parent.submitEvent(new IdentityEventImpl(parseSessionView(data.getJSONObject("session"))));
+                    submitEvent(new IdentityEventImpl(parseSessionView(data.getJSONObject("session"))));
                     break;
                 case "join-event":
-                    parent.submitEvent(new PresenceChangeEventImpl(
-                            Collections.singletonList(parseSessionView(data)), true));
+                    submitEvent(new PresenceChangeEventImpl(Collections.singletonList(parseSessionView(data)),
+                            true));
                     break;
                 // network-event is NYI
                 case "nick-event": case "nick-reply":
-                    parent.submitEvent(new NickChangeEventImpl(parseSessionView(data.getJSONObject("session")),
-                            data.getString("from")));
+                    SessionView session = sessions.get(data.getString("session_id"));
+                    submitEvent(new NickChangeEventImpl(new SessionViewImpl(session, data.getString("to")),
+                            session.getName()));
                     break;
                 case "part-event":
-                    parent.submitEvent(new PresenceChangeEventImpl(
-                            Collections.singletonList(parseSessionView(data)), false));
+                    submitEvent(new PresenceChangeEventImpl(Collections.singletonList(parseSessionView(data)),
+                            false));
                     break;
                 case "send-event": case "send-reply":
                     parent.submitEvent(new MessageEventImpl(parseMessage(data)));
                     break;
                 case "snapshot-event":
-                    parent.submitEvent(new PresenceChangeEventImpl(parseSessionViewArray(data.getJSONArray("who")),
+                    submitEvent(new PresenceChangeEventImpl(parseSessionViewArray(data.getJSONArray("listing")),
                             true));
-                    parent.submitEvent(new LogEventImpl(parseMessageArray(data.getJSONArray("log"))));
+                    submitEvent(new LogEventImpl(parseMessageArray(data.getJSONArray("log"))));
                     break;
                 case "get-message-reply":
-                    parent.submitEvent(new LogEventImpl(Collections.singletonList(parseMessage(data))));
+                    submitEvent(new LogEventImpl(Collections.singletonList(parseMessage(data))));
                     break;
                 case "log-reply":
-                    parent.submitEvent(new LogEventImpl(parseMessageArray(data.getJSONArray("log"))));
+                    submitEvent(new LogEventImpl(parseMessageArray(data.getJSONArray("log"))));
                     break;
                 case "who-reply":
-                    parent.submitEvent(new PresenceChangeEventImpl(parseSessionViewArray(
-                            data.getJSONArray("listing")), true));
+                    submitEvent(new PresenceChangeEventImpl(parseSessionViewArray(data.getJSONArray("listing")),
+                            true));
                     break;
             }
         } catch (JSONException e) {
@@ -261,6 +365,21 @@ public class EuphoriaWebSocketClient extends WebSocketClient {
         return seq;
     }
 
+    private void submitEvent(ConnectionEvent evt) {
+        if (evt instanceof PresenceChangeEvent) {
+            PresenceChangeEvent e = (PresenceChangeEvent) evt;
+            if (e.isPresent()) {
+                for (SessionView s : e.getSessions()) sessions.remove(s.getSessionID());
+            } else {
+                for (SessionView s : e.getSessions()) sessions.put(s.getSessionID(), s);
+            }
+        } else if (evt instanceof NickChangeEvent) {
+            NickChangeEvent e = (NickChangeEvent) evt;
+            sessions.put(e.getSession().getSessionID(), e.getSession());
+        }
+        parent.submitEvent(evt);
+    }
+
     private static JSONObject buildJSONObject(Object... data) throws JSONException {
         if (data.length % 2 != 0) throw new IllegalArgumentException("Invalid JSON object construction shortcut");
         JSONObject ret = new JSONObject();
@@ -273,100 +392,14 @@ public class EuphoriaWebSocketClient extends WebSocketClient {
     }
 
     private static SessionView parseSessionView(final JSONObject source) throws JSONException {
-        return new SessionView() {
-
-            private final String sessionID;
-            private final String agentID;
-            private final String name;
-            private final boolean staff;
-            private final boolean manager;
-
-            {
-                sessionID = source.getString("session_id");
-                agentID = source.getString("id");
-                name = source.getString("name");
-                staff = source.optBoolean("is_staff");
-                manager = source.optBoolean("is_manager");
-            }
-
-            @Override
-            public String getSessionID() {
-                return sessionID;
-            }
-
-            @Override
-            public String getAgentID() {
-                return agentID;
-            }
-
-            @Override
-            public String getName() {
-                return name;
-            }
-
-            @Override
-            public boolean isStaff() {
-                return staff;
-            }
-
-            @Override
-            public boolean isManager() {
-                return manager;
-            }
-
-        };
+        return new SessionViewImpl(source.getString("session_id"), source.getString("id"),
+                source.getString("name"), source.optBoolean("is_staff"), source.optBoolean("is_manager"));
     }
 
     private static Message parseMessage(final JSONObject source) throws JSONException {
-        return new Message() {
-
-            private final String id;
-            private final String parent;
-            private final long timestamp;
-            private final SessionView sender;
-            private final String content;
-            private final boolean truncated;
-
-            {
-                id = source.getString("id");
-                parent = source.getString("parent");
-                timestamp = source.getLong("timestamp");
-                sender = parseSessionView(source.getJSONObject("sender"));
-                content = source.getString("content");
-                truncated = source.optBoolean("truncated");
-            }
-
-            @Override
-            public String getID() {
-                return id;
-            }
-
-            @Override
-            public String getParent() {
-                return parent;
-            }
-
-            @Override
-            public long getTimestamp() {
-                return timestamp;
-            }
-
-            @Override
-            public SessionView getSender() {
-                return sender;
-            }
-
-            @Override
-            public String getContent() {
-                return content;
-            }
-
-            @Override
-            public boolean isTruncated() {
-                return truncated;
-            }
-
-        };
+        return new MessageImpl(source.getString("id"), source.getString("parent"), source.getLong("timestamp"),
+                parseSessionView(source.getJSONObject("sender")), source.getString("content"),
+                source.optBoolean("truncated"));
     }
 
     private static List<SessionView> parseSessionViewArray(JSONArray source) throws JSONException {
