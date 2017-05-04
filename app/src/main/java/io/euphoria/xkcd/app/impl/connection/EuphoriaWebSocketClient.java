@@ -12,6 +12,7 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -31,24 +32,30 @@ import io.euphoria.xkcd.app.data.SessionView;
 
 public class EuphoriaWebSocketClient extends WebSocketClient {
 
-    private static class SessionViewImpl implements SessionView {
+    private static class SessionViewImpl implements ServerSessionView {
 
         private final String sessionID;
         private final String agentID;
         private final String name;
+        private final String serverID;
+        private final String serverEra;
         private final boolean staff;
         private final boolean manager;
 
-        public SessionViewImpl(String sessionID, String agentID, String name, boolean staff, boolean manager) {
+        public SessionViewImpl(String sessionID, String agentID, String name, boolean staff, boolean manager,
+                               String serverID, String serverEra) {
             this.sessionID = sessionID;
             this.agentID = agentID;
             this.name = name;
             this.staff = staff;
             this.manager = manager;
+            this.serverID = serverID;
+            this.serverEra = serverEra;
         }
 
-        public SessionViewImpl(SessionView base, String newName) {
-            this(base.getSessionID(), base.getAgentID(), newName, base.isStaff(), base.isManager());
+        public SessionViewImpl(ServerSessionView base, String newName) {
+            this(base.getSessionID(), base.getAgentID(), newName, base.isStaff(), base.isManager(),
+                    base.getServerID(), base.getServerEra());
         }
 
         @Override
@@ -64,6 +71,16 @@ public class EuphoriaWebSocketClient extends WebSocketClient {
         @Override
         public String getName() {
             return name;
+        }
+
+        @Override
+        public String getServerID() {
+            return serverID;
+        }
+
+        @Override
+        public String getServerEra() {
+            return serverEra;
         }
 
         @Override
@@ -87,7 +104,7 @@ public class EuphoriaWebSocketClient extends WebSocketClient {
         private final String content;
         private final boolean truncated;
 
-        private MessageImpl(String id, String parent, long timestamp, SessionView sender, String content,
+        public MessageImpl(String id, String parent, long timestamp, SessionView sender, String content,
                             boolean truncated) {
             this.id = id;
             this.parent = parent;
@@ -171,16 +188,16 @@ public class EuphoriaWebSocketClient extends WebSocketClient {
 
     private class NickChangeEventImpl extends EventImpl implements NickChangeEvent {
 
-        private final SessionView session;
+        private final ServerSessionView session;
         private final String oldNick;
 
-        private NickChangeEventImpl(SessionView session, String oldNick) {
+        private NickChangeEventImpl(ServerSessionView session, String oldNick) {
             this.session = session;
             this.oldNick = oldNick;
         }
 
         @Override
-        public SessionView getSession() {
+        public ServerSessionView getSession() {
             return session;
         }
 
@@ -213,17 +230,23 @@ public class EuphoriaWebSocketClient extends WebSocketClient {
 
     private class PresenceChangeEventImpl extends EventImpl implements PresenceChangeEvent {
 
-        private final List<SessionView> sessions;
+        private final List<ServerSessionView> sessions;
 
          private final boolean present;
 
-         private PresenceChangeEventImpl(List<SessionView> sessions, boolean present) {
+         private PresenceChangeEventImpl(List<ServerSessionView> sessions, boolean present) {
              this.sessions = sessions;
              this.present = present;
          }
 
          @Override
+         @SuppressWarnings("unchecked")
          public List<SessionView> getSessions() {
+             // HACK: User is supposed to use that read-only anyway.
+             return (List) sessions;
+         }
+
+         public List<ServerSessionView> getSessionsEx() {
              return sessions;
          }
 
@@ -265,7 +288,7 @@ public class EuphoriaWebSocketClient extends WebSocketClient {
     }
 
     private final ConnectionImpl parent;
-    private final Map<String, SessionView> sessions;
+    private final Map<String, ServerSessionView> sessions;
     private boolean closed;
 
     public EuphoriaWebSocketClient(ConnectionImpl parent, URI endpoint) {
@@ -311,9 +334,25 @@ public class EuphoriaWebSocketClient extends WebSocketClient {
                     submitEvent(new PresenceChangeEventImpl(Collections.singletonList(parseSessionView(data)),
                             true));
                     break;
-                // network-event is NYI
+                case "network-event":
+                    String subtype = data.getString("type");
+                    if (subtype.equals("partition")) {
+                        String serverID = data.getString("server_id"), serverEra = data.getString("server_era");
+                        List<ServerSessionView> removed = new ArrayList<>();
+                        Iterator<ServerSessionView> iter = sessions.values().iterator();
+                        while (iter.hasNext()) {
+                            ServerSessionView s = iter.next();
+                            if (s.getServerID().equals(serverID) && s.getServerEra().equals(serverEra)) {
+                                iter.remove();
+                                removed.add(s);
+                            }
+                        }
+                        submitEvent(new PresenceChangeEventImpl(Collections.unmodifiableList(removed), false));
+                    } else {
+                        Log.w("EuphoriaWebSocketClient", "Unknown network-event subtype: " + subtype);
+                    }
                 case "nick-event": case "nick-reply":
-                    SessionView session = sessions.get(data.getString("session_id"));
+                    ServerSessionView session = sessions.get(data.getString("session_id"));
                     submitEvent(new NickChangeEventImpl(new SessionViewImpl(session, data.getString("to")),
                             session.getName()));
                     break;
@@ -380,15 +419,15 @@ public class EuphoriaWebSocketClient extends WebSocketClient {
     }
 
     private void submitEvent(ConnectionEvent evt) {
-        if (evt instanceof PresenceChangeEvent) {
-            PresenceChangeEvent e = (PresenceChangeEvent) evt;
+        if (evt instanceof PresenceChangeEventImpl) {
+            PresenceChangeEventImpl e = (PresenceChangeEventImpl) evt;
             if (e.isPresent()) {
-                for (SessionView s : e.getSessions()) sessions.remove(s.getSessionID());
+                for (ServerSessionView s : e.getSessionsEx()) sessions.remove(s.getSessionID());
             } else {
-                for (SessionView s : e.getSessions()) sessions.put(s.getSessionID(), s);
+                for (ServerSessionView s : e.getSessionsEx()) sessions.put(s.getSessionID(), s);
             }
-        } else if (evt instanceof NickChangeEvent) {
-            NickChangeEvent e = (NickChangeEvent) evt;
+        } else if (evt instanceof NickChangeEventImpl) {
+            NickChangeEventImpl e = (NickChangeEventImpl) evt;
             sessions.put(e.getSession().getSessionID(), e.getSession());
         }
         parent.submitEvent(evt);
@@ -405,9 +444,10 @@ public class EuphoriaWebSocketClient extends WebSocketClient {
         return ret;
     }
 
-    private static SessionView parseSessionView(final JSONObject source) throws JSONException {
+    private static ServerSessionView parseSessionView(final JSONObject source) throws JSONException {
         return new SessionViewImpl(source.getString("session_id"), source.getString("id"),
-                source.getString("name"), source.optBoolean("is_staff"), source.optBoolean("is_manager"));
+                source.getString("name"), source.optBoolean("is_staff"), source.optBoolean("is_manager"),
+                source.getString("server_id"), source.getString("server_era"));
     }
 
     private static Message parseMessage(final JSONObject source) throws JSONException {
@@ -416,8 +456,8 @@ public class EuphoriaWebSocketClient extends WebSocketClient {
                 source.optBoolean("truncated"));
     }
 
-    private static List<SessionView> parseSessionViewArray(JSONArray source) throws JSONException {
-        List<SessionView> accum = new ArrayList<>();
+    private static List<ServerSessionView> parseSessionViewArray(JSONArray source) throws JSONException {
+        List<ServerSessionView> accum = new ArrayList<>();
         for (int i = 0; i < source.length(); i++) {
             accum.add(parseSessionView(source.getJSONObject(i)));
         }
