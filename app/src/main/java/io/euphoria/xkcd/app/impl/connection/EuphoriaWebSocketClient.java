@@ -266,11 +266,13 @@ public class EuphoriaWebSocketClient extends WebSocketClient {
 
     private final ConnectionImpl parent;
     private final Map<String, SessionView> sessions;
+    private boolean closed;
 
     public EuphoriaWebSocketClient(ConnectionImpl parent, URI endpoint) {
         super(endpoint);
         this.parent = parent;
         this.sessions = new HashMap<>();
+        this.closed = false;
     }
 
     public ConnectionImpl getParent() {
@@ -345,12 +347,12 @@ public class EuphoriaWebSocketClient extends WebSocketClient {
 
     @Override
     public void onClose(int code, String reason, boolean remote) {
-        parent.submitEvent(new CloseEventImpl(true));
+        doClose(true);
     }
 
     @Override
     public void onError(Exception ex) {
-        parent.submitEvent(new CloseEventImpl(false));
+        doClose(false);
     }
 
     public int sendObject(String type, Object... data) {
@@ -363,6 +365,18 @@ public class EuphoriaWebSocketClient extends WebSocketClient {
             return -1;
         }
         return seq;
+    }
+
+    public void doClose(boolean fin) {
+        boolean makeEvent = false;
+        synchronized (this) {
+            if (! closed) {
+                makeEvent = true;
+                closed = true;
+            }
+        }
+        if (makeEvent) submitEvent(new CloseEventImpl(fin));
+        close();
     }
 
     private void submitEvent(ConnectionEvent evt) {

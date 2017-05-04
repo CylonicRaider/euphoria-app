@@ -26,18 +26,15 @@ public class ConnectionImpl implements Connection {
     private final ConnectionManagerImpl parent;
     private final String roomName;
     private final List<ConnectionListener> listeners;
-    private final EuphoriaWebSocketClient client;
+    private ConnectionStatus status;
+    private EuphoriaWebSocketClient client;
     private int seqid;
 
     public ConnectionImpl(ConnectionManagerImpl parent, String roomName) {
         this.parent = parent;
         this.roomName = roomName;
-        try {
-            this.client = new EuphoriaWebSocketClient(this, new URI("wss://euphoria.io/room/" + roomName + "/ws"));
-        } catch (URISyntaxException e) {
-            throw new IllegalArgumentException("Bad room name (did not form a valid URI)");
-        }
-        listeners = new ArrayList<>();
+        this.listeners = new ArrayList<>();
+        this.status = ConnectionStatus.CONNECTING;
     }
 
     public ConnectionManagerImpl getParent() {
@@ -49,7 +46,13 @@ public class ConnectionImpl implements Connection {
         return roomName;
     }
 
-    public void connect() {
+    public synchronized void connect() {
+        try {
+            // FIXME: Allow specifying a custom URL template.
+            client = new EuphoriaWebSocketClient(this, new URI("wss://euphoria.io/room/" + roomName + "/ws"));
+        } catch (URISyntaxException e) {
+            throw new IllegalArgumentException("Bad room name (did not form a valid URI)");
+        }
         client.connect();
     }
 
@@ -79,8 +82,8 @@ public class ConnectionImpl implements Connection {
     }
 
     @Override
-    public ConnectionStatus getStatus() {
-        throw new AssertionError("Not implemented");
+    public synchronized ConnectionStatus getStatus() {
+        return status;
     }
 
     protected void submitEvent(ConnectionEvent evt) {
@@ -90,6 +93,9 @@ public class ConnectionImpl implements Connection {
         }
         for (ConnectionListener l : listeners) {
             if (evt instanceof OpenEvent) {
+                synchronized (this) {
+                    status = ConnectionStatus.CONNECTED;
+                }
                 l.onOpen((OpenEvent) evt);
             } else if (evt instanceof IdentityEvent) {
                 l.onIdentity((IdentityEvent) evt);
@@ -102,6 +108,14 @@ public class ConnectionImpl implements Connection {
             } else if (evt instanceof LogEvent) {
                 l.onLogEvent((LogEvent) evt);
             } else if (evt instanceof CloseEvent) {
+                synchronized (this) {
+                    if (((CloseEvent) evt).isFinal()) {
+                        status = ConnectionStatus.DISCONNECTED;
+                    } else {
+                        status = ConnectionStatus.RECONNECTING;
+                        connect();
+                    }
+                }
                 l.onClose((CloseEvent) evt);
             } else {
                 Log.e("ConnectionImpl", "Unknown connection event class; dropping.");
