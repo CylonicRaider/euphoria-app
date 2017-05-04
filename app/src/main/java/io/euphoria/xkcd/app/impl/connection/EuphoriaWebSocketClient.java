@@ -4,10 +4,12 @@ import android.util.Log;
 
 import org.java_websocket.client.WebSocketClient;
 import org.java_websocket.handshake.ServerHandshake;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -15,6 +17,7 @@ import io.euphoria.xkcd.app.connection.Connection;
 import io.euphoria.xkcd.app.connection.event.CloseEvent;
 import io.euphoria.xkcd.app.connection.event.ConnectionEvent;
 import io.euphoria.xkcd.app.connection.event.IdentityEvent;
+import io.euphoria.xkcd.app.connection.event.LogEvent;
 import io.euphoria.xkcd.app.connection.event.MessageEvent;
 import io.euphoria.xkcd.app.connection.event.NickChangeEvent;
 import io.euphoria.xkcd.app.connection.event.OpenEvent;
@@ -130,6 +133,21 @@ public class EuphoriaWebSocketClient extends WebSocketClient {
 
      }
 
+    private class LogEventImpl extends EventImpl implements LogEvent {
+
+        private final List<Message> messages;
+
+        private LogEventImpl(List<Message> messages) {
+            this.messages = messages;
+        }
+
+        @Override
+        public List<Message> getMessages() {
+            return messages;
+        }
+
+    }
+
     private class CloseEventImpl extends EventImpl implements CloseEvent {
 
         private final boolean fin;
@@ -200,10 +218,21 @@ public class EuphoriaWebSocketClient extends WebSocketClient {
                 case "send-event": case "send-reply":
                     parent.submitEvent(new MessageEventImpl(parseMessage(data)));
                     break;
-                // snapshot-event is NYI
-                // get-message-reply is NYI
-                // log-reply is NYI
-                // who-reply is NYI
+                case "snapshot-event":
+                    parent.submitEvent(new PresenceChangeEventImpl(parseSessionViewArray(data.getJSONArray("who")),
+                            true));
+                    parent.submitEvent(new LogEventImpl(parseMessageArray(data.getJSONArray("log"))));
+                    break;
+                case "get-message-reply":
+                    parent.submitEvent(new LogEventImpl(Collections.singletonList(parseMessage(data))));
+                    break;
+                case "log-reply":
+                    parent.submitEvent(new LogEventImpl(parseMessageArray(data.getJSONArray("log"))));
+                    break;
+                case "who-reply":
+                    parent.submitEvent(new PresenceChangeEventImpl(parseSessionViewArray(
+                            data.getJSONArray("listing")), true));
+                    break;
             }
         } catch (JSONException e) {
             Log.e("EuphroiaWebSocketClient", type + " packet missing required fields", e);
@@ -245,6 +274,7 @@ public class EuphoriaWebSocketClient extends WebSocketClient {
 
     private static SessionView parseSessionView(final JSONObject source) throws JSONException {
         return new SessionView() {
+
             private final String sessionID;
             private final String agentID;
             private final String name;
@@ -337,6 +367,22 @@ public class EuphoriaWebSocketClient extends WebSocketClient {
             }
 
         };
+    }
+
+    private static List<SessionView> parseSessionViewArray(JSONArray source) throws JSONException {
+        List<SessionView> accum = new ArrayList<>();
+        for (int i = 0; i < source.length(); i++) {
+            accum.add(parseSessionView(source.getJSONObject(i)));
+        }
+        return Collections.unmodifiableList(accum);
+    }
+
+    private static List<Message> parseMessageArray(JSONArray source) throws JSONException {
+        List<Message> accum = new ArrayList<>();
+        for (int i = 0; i < source.length(); i++) {
+            accum.add(parseMessage(source.getJSONObject(i)));
+        }
+        return Collections.unmodifiableList(accum);
     }
 
 }
