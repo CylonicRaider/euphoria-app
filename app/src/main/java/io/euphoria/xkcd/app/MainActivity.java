@@ -1,11 +1,11 @@
 package io.euphoria.xkcd.app;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.text.InputFilter;
-import android.text.InputType;
 import android.text.Spanned;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
@@ -15,10 +15,11 @@ import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.support.v7.widget.Toolbar;
 
 import java.util.regex.Pattern;
 
-public class MainActivity extends FragmentActivity {
+public class MainActivity extends Activity {
 
     Pattern ROOM_NAME_RE = Pattern.compile("^(?:[A-Za-z0-9\\-._~])+$");
 
@@ -26,13 +27,11 @@ public class MainActivity extends FragmentActivity {
     Button enterBtn;
     AutoCompleteTextView roomField;
 
+    // TODO comment
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-        View roomUIFrame = findViewById(R.id.room_ui_frame);
-        mDualPane = roomUIFrame != null && roomUIFrame.getVisibility() == View.VISIBLE;
 
         enterBtn = (Button) findViewById(R.id.eneter_btn);
         roomField = (AutoCompleteTextView) findViewById(R.id.room_field);
@@ -53,8 +52,6 @@ public class MainActivity extends FragmentActivity {
             }
         };
         roomField.setFilters(new InputFilter[]{inputFilter});
-        roomField.setInputType(InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS);
-        roomField.setImeOptions(EditorInfo.IME_ACTION_GO);
         roomField.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
@@ -69,10 +66,8 @@ public class MainActivity extends FragmentActivity {
         enterBtn.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
-                if (MotionEvent.ACTION_DOWN == event.getAction() && roomField.getText().length() > 0) {
+                if (MotionEvent.ACTION_DOWN == event.getAction()) {
                     showRoom(roomField.getText().toString());
-                } else if (roomField.getText().length() <= 0) {
-                    Toast.makeText(MainActivity.this, "Please enter a valid room name", Toast.LENGTH_SHORT).show();
                 }
                 return false;
             }
@@ -80,10 +75,14 @@ public class MainActivity extends FragmentActivity {
     }
 
     private void showRoom(String roomName) {
-        Intent roomIntent = new Intent(this, RoomActivity.class);
-        Uri roomURI = new Uri.Builder().scheme("https").authority("euphoria.io").encodedPath("/room/" + roomName + "/").build();
-        roomIntent.setData(roomURI);
-        roomIntent.setAction(Intent.ACTION_VIEW);
-        startActivity(roomIntent);
+        if (roomName.length() > 0) {
+            Intent roomIntent = new Intent(this, RoomActivity.class);
+            Uri roomURI = new Uri.Builder().scheme("https").authority("euphoria.io").encodedPath("/room/" + roomName + "/").build();
+            roomIntent.setData(roomURI);
+            roomIntent.setAction(Intent.ACTION_VIEW);
+            startActivity(roomIntent);
+        } else {
+            Toast.makeText(MainActivity.this, "Please enter a valid room name", Toast.LENGTH_SHORT).show();
+        }
     }
 }

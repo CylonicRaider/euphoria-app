@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<io.euphoria.xkcd.app.impl.ui.MessageContainer xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    app:columnCount="2"
+    app:rowCount="2">
+
+    <TextView
+        android:id="@+id/nick_lbl"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="4dp"
+        android:background="@drawable/rounded_rect"
+        android:paddingBottom="2dp"
+        android:paddingEnd="4dp"
+        android:paddingLeft="4dp"
+        android:paddingRight="4dp"
+        android:paddingStart="4dp"
+        android:paddingTop="2dp"
+        android:textColor="#000"
+        android:textIsSelectable="true" />
+
+    <TextView
+        android:id="@+id/content_lbl"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="4dp"
+        android:layout_marginLeft="0dp"
+        android:layout_marginStart="0dp"
+        android:layout_toEndOf="@+id/nick_lbl"
+        android:layout_toRightOf="@+id/nick_lbl"
+        android:autoLink="web|email|map"
+        android:textIsSelectable="true" />
+
+    <LinearLayout
+        android:id="@+id/reply_list"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
+        android:layout_below="@+id/content_lbl"
+        android:layout_marginLeft="32dp"
+        android:layout_marginStart="32dp"
+        android:orientation="vertical" />
+</io.euphoria.xkcd.app.impl.ui.MessageContainer>

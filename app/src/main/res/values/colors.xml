@@ -1,4 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- None. -->
+    <color name="black">#000000</color>
+    <color name="grey_900">#212121</color>
+    <color name="white">#ffffff</color>
+
+    <color name="primary_text">@color/white</color>
+    <color name="secondary_text">#46ffffff</color>
+    <color name="disabled_text">#32ffffff</color>
+    <color name="hint_text">@color/disabled_text</color>
+
+    <color name="toolbar_bg">@color/grey_900</color>
+    <color name="activity_bg">#303030</color>
 </resources>
