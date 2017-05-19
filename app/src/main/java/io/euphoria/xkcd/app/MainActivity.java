@@ -77,7 +77,7 @@ public class MainActivity extends Activity {
     private void showRoom(String roomName) {
         if (roomName.length() > 0) {
             Intent roomIntent = new Intent(this, RoomActivity.class);
-            Uri roomURI = new Uri.Builder().scheme("https").authority("euphoria.io").encodedPath("/room/" + roomName + "/").build();
+            Uri roomURI = Uri.parse("https://euphoria.io/room/"+roomName+"/");
             roomIntent.setData(roomURI);
             roomIntent.setAction(Intent.ACTION_VIEW);
             startActivity(roomIntent);

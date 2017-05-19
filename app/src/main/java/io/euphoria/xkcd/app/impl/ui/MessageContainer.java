@@ -59,6 +59,7 @@ public class MessageContainer extends RelativeLayout {
             throw new RuntimeException("Setting message on established View which was not reset! This should not happen.");
         } else {
             this.message = message;
+            setTag(message.getID());
             message.addUpdateListener(updateListener);
             established = true;
             updateDisplay();
