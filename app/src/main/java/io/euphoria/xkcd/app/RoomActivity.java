@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.widget.RelativeLayout;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -27,6 +28,7 @@ public class RoomActivity extends FragmentActivity {
 
     private RoomUIImpl roomUI;
     private RecyclerView recyclerView;
+    private RelativeLayout inputBar;
     private RootMessageListAdapter rmla;
 
     // TODO debugging test message

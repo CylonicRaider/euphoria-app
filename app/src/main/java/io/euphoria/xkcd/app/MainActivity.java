@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.v4.app.FragmentActivity;
 import android.text.InputFilter;
 import android.text.Spanned;
 import android.view.KeyEvent;
@@ -15,7 +14,6 @@ import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
-import android.support.v7.widget.Toolbar;
 
 import java.util.regex.Pattern;
 
@@ -63,13 +61,10 @@ public class MainActivity extends Activity {
             }
         });
 
-        enterBtn.setOnTouchListener(new View.OnTouchListener() {
+        enterBtn.setOnClickListener(new View.OnClickListener() {
             @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                if (MotionEvent.ACTION_DOWN == event.getAction()) {
-                    showRoom(roomField.getText().toString());
-                }
-                return false;
+            public void onClick(View v) {
+                showRoom(roomField.getText().toString());
             }
         });
     }

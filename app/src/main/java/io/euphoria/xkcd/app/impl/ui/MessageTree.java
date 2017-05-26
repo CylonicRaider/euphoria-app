@@ -27,11 +27,11 @@ public class MessageTree implements Message {
     }
 
     public MessageTree(Message message) {
-        this.message = UIMessageWrapper.wrap(message);
+        this.message = message;
     }
 
     public MessageTree(Message message, MessageTree... children) {
-        this.message = UIMessageWrapper.wrap(message);
+        this.message = message;
         subTrees.addAll(Arrays.asList(children));
     }
 

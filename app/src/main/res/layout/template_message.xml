@@ -37,10 +37,26 @@
         android:id="@+id/reply_list"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentLeft="true"
         android:layout_alignParentEnd="true"
         android:layout_alignParentRight="true"
         android:layout_below="@+id/content_lbl"
         android:layout_marginLeft="32dp"
         android:layout_marginStart="32dp"
         android:orientation="vertical" />
+
+    <FrameLayout
+        android:id="@+id/input_placeholder"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/reply_list"
+        android:layout_marginLeft="32dp"
+        android:layout_marginStart="32dp">
+
+    </FrameLayout>
 </io.euphoria.xkcd.app.impl.ui.MessageContainer>

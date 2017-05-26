@@ -1,5 +1,5 @@
 <resources>
-    <style name="AppTheme" parent="android:Theme.NoTitleBar">
+    <style name="AppTheme" parent="android:Theme.Light.NoTitleBar">
         <item name="toolbarStyle">@style/Widget.AppCompat.Toolbar</item>
         <item name="homeAsUpIndicator">@mipmap/ic_launcher</item>
     </style>
