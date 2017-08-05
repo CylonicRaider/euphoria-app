@@ -2,9 +2,7 @@
 <io.euphoria.xkcd.app.impl.ui.MessageContainer xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    app:columnCount="2"
-    app:rowCount="2">
+    android:layout_height="match_parent">
 
     <TextView
         android:id="@+id/nick_lbl"
@@ -18,33 +16,49 @@
         android:paddingRight="4dp"
         android:paddingStart="4dp"
         android:paddingTop="2dp"
-        android:textColor="#000"
-        android:textIsSelectable="true" />
+        android:textColor="@color/black"
+        android:textIsSelectable="true"
+        android:textSize="18sp" />
 
     <TextView
         android:id="@+id/content_lbl"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_alignBaseline="@+id/nick_lbl"
         android:layout_margin="4dp"
         android:layout_marginLeft="0dp"
         android:layout_marginStart="0dp"
         android:layout_toEndOf="@+id/nick_lbl"
         android:layout_toRightOf="@+id/nick_lbl"
         android:autoLink="web|email|map"
-        android:textIsSelectable="true" />
+        android:textColor="@color/primary_text"
+        android:textIsSelectable="true"
+        android:textSize="18sp" />
 
-    <LinearLayout
-        android:id="@+id/reply_list"
-        android:layout_width="match_parent"
+    <!-- TODO write custom view for collapse thingy -->
+    <View
+        android:id="@+id/collapse_tgl"
+        android:layout_width="12dp"
+        android:layout_height="12dp"
+        android:layout_below="@id/content_lbl"
+        android:layout_marginLeft="12dp"
+        android:layout_marginStart="12dp" />
+
+    <TextView
+        android:id="@+id/collapse_lbl"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentRight="true"
-        android:layout_below="@+id/content_lbl"
-        android:layout_marginLeft="32dp"
-        android:layout_marginStart="32dp"
-        android:orientation="vertical" />
+        android:layout_alignBottom="@+id/collapse_tgl"
+        android:layout_marginLeft="4dp"
+        android:layout_marginStart="4dp"
+        android:layout_toEndOf="@+id/collapse_tgl"
+        android:layout_toRightOf="@+id/collapse_tgl"
+        android:gravity="start"
+        android:text="Show n replies"
+        android:textAlignment="textStart"
+        android:textColor="@color/secondary_text"
+        android:textIsSelectable="false"
+        android:textSize="12sp" />
 
     <FrameLayout
         android:id="@+id/input_placeholder"

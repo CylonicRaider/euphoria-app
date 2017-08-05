@@ -1,5 +1,6 @@
 package io.euphoria.xkcd.app;
 
+import android.content.Context;
 import android.support.v4.app.FragmentManager;
 import android.content.Intent;
 import android.net.Uri;
@@ -7,6 +8,8 @@ import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.view.LayoutInflater;
+import android.widget.FrameLayout;
 import android.widget.RelativeLayout;
 
 import java.util.regex.Matcher;
@@ -16,7 +19,7 @@ import io.euphoria.xkcd.app.control.RoomController;
 import io.euphoria.xkcd.app.data.Message;
 import io.euphoria.xkcd.app.data.SessionView;
 import io.euphoria.xkcd.app.impl.ui.RoomUIImpl;
-import io.euphoria.xkcd.app.impl.ui.RootMessageListAdapter;
+import io.euphoria.xkcd.app.impl.ui.MessageListAdapter;
 
 public class RoomActivity extends FragmentActivity {
 
@@ -29,7 +32,7 @@ public class RoomActivity extends FragmentActivity {
     private RoomUIImpl roomUI;
     private RecyclerView recyclerView;
     private RelativeLayout inputBar;
-    private RootMessageListAdapter rmla;
+    private MessageListAdapter rmla;
 
     // TODO debugging test message
     private Message testMsg = new Message(){
@@ -220,6 +223,11 @@ public class RoomActivity extends FragmentActivity {
 
         recyclerView = (RecyclerView) findViewById(R.id.message_recycler_view);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
+
+        LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        inputBar = (RelativeLayout) inflater.inflate(R.layout.template_message, null);
+        FrameLayout topLvlEntryWrp = (FrameLayout) findViewById(R.id.top_lvl_entry);
+        topLvlEntryWrp.addView(inputBar);
     }
 
     @Override
@@ -229,7 +237,7 @@ public class RoomActivity extends FragmentActivity {
         Matcher m = ROOM_PATH_RE.matcher(i.getData().getPath());
         if (Intent.ACTION_VIEW.equals(i.getAction()) && isEuphoriaURI(i.getData()) && m.matches()) {
             roomUI = (RoomUIImpl) roomController.getManager().getRoomUI(m.group(1));
-            rmla = new RootMessageListAdapter();
+            rmla = new MessageListAdapter();
             // TODO remove test messages
             rmla.add(testMsg);
             rmla.add(testSubMsg);

@@ -3,7 +3,7 @@ package io.euphoria.xkcd.app.impl.ui;
 import android.support.annotation.NonNull;
 
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import io.euphoria.xkcd.app.data.Message;
@@ -14,33 +14,18 @@ import io.euphoria.xkcd.app.data.SessionView;
  */
 
 public class MessageTree implements Message {
-    Message message;
-    List<MessageTree> subTrees = new ArrayList<>();
-    private List<MessageUpdateListener> updateListeners = new ArrayList<>();
 
-    public static MessageTree wrap(@NonNull Message message) {
-        if (message instanceof MessageTree) {
-            return (MessageTree) message;
-        } else {
-            return new MessageTree(message);
-        }
+    public static MessageTree wrap(@NonNull Message m) {
+        return (m instanceof MessageTree) ? (MessageTree) m : new MessageTree(m);
     }
 
-    public MessageTree(Message message) {
-        this.message = message;
-    }
+    private Message message;
+    private List<MessageTree> replies = new ArrayList<>();
+    private int indent = 0;
+    private boolean collapsed = false;
 
-    public MessageTree(Message message, MessageTree... children) {
-        this.message = message;
-        subTrees.addAll(Arrays.asList(children));
-    }
-
-    public void addSubTree(MessageTree child) {
-        subTrees.add(child);
-    }
-
-    public Message getMessage() {
-        return message;
+    private MessageTree(@NonNull Message m) {
+        message = m;
     }
 
     @Override
@@ -73,18 +58,29 @@ public class MessageTree implements Message {
         return message.isTruncated();
     }
 
-    public void updateMessage(Message updatedMsg) {
-        message = updatedMsg;
-        for (MessageUpdateListener updateListener : updateListeners) {
-            updateListener.onUpdate();
-        }
+    public int getIndent() {
+        return indent;
     }
 
-    public void addUpdateListener(MessageUpdateListener updateListener) {
-        updateListeners.add(updateListener);
+    public void addReply(@NonNull Message m) {
+        MessageTree mt = MessageTree.wrap(m);
+        mt.indent = indent + 1;
+        replies.add(mt);
     }
 
-    public void removeUpdateListener(MessageUpdateListener updateListener) {
-        updateListeners.remove(updateListener);
+    public List<MessageTree> getReplies() {
+        return Collections.unmodifiableList(replies);
+    }
+
+    public void updateMessage(@NonNull Message m) {
+        message = MessageTree.wrap(m);
+    }
+
+    public void setCollapsed(boolean collapsed) {
+        this.collapsed = collapsed;
+    }
+
+    public boolean isCollapsed() {
+        return collapsed;
     }
 }

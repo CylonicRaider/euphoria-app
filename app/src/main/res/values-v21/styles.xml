@@ -2,7 +2,7 @@
 <!-- TODO !!! theme is Material.Light, but everything but test is still styled according to the dark theme -->
 <resources>
     <style name="AppTheme" parent="android:Theme.Material.Light.NoActionBar">
-        <item name="android:statusBarColor">@color/black</item>
+        <item name="android:statusBarColor">@color/title_bar</item>
         <item name="toolbarStyle">@style/Widget.AppCompat.Toolbar</item>
         <item name="homeAsUpIndicator">@mipmap/ic_launcher</item>
     </style>

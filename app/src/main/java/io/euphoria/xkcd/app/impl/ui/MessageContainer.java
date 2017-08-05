@@ -9,6 +9,7 @@ import android.support.annotation.NonNull;
 import android.support.v4.graphics.drawable.DrawableCompat;
 import android.util.AttributeSet;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
@@ -35,20 +36,10 @@ public class MessageContainer extends RelativeLayout {
     private static final float COLOR_SENDER_LIGHTNESS = 0.85f;
     private static final float COLOR_AT_SAT = 0.42f;
     private static final float COLOR_AT_LIGHTNESS = 0.50f;
+    private static final int PADDING_PER_INDENT = 10;
 
     private MessageTree message = null;
     private boolean established = false;
-    private MessageUpdateListener updateListener = new MessageUpdateListener() {
-        @Override
-        public void onUpdate() {
-            post(new Runnable() {
-                @Override
-                public void run() {
-                    updateDisplay();
-                }
-            });
-        }
-    };
 
     public MessageContainer(Context ctx, AttributeSet attrs) {
         super(ctx, attrs);
@@ -60,30 +51,8 @@ public class MessageContainer extends RelativeLayout {
         } else {
             this.message = message;
             setTag(message.getID());
-            message.addUpdateListener(updateListener);
             established = true;
             updateDisplay();
-        }
-    }
-
-    public Message getMessage() {
-        return message;
-    }
-
-    public void addChild(MessageTree message) {
-        if (message.getParent().equals(this.message.getID())) {
-            LayoutInflater inflater = (LayoutInflater) getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            MessageContainer child = (MessageContainer) inflater.inflate(R.layout.template_message, this);
-            child.setMessage(message);
-            LinearLayout replyList = (LinearLayout) findViewById(R.id.reply_list);
-            replyList.addView(child);
-            invalidate();
-            requestLayout();
-        } else {
-            throw new RuntimeException(String.format("Added message with parent '%s'"
-                            + "as child of message with id '%s'",
-                    message.getParent(),
-                    this.message.getID()));
         }
     }
 
@@ -92,6 +61,7 @@ public class MessageContainer extends RelativeLayout {
     private void updateDisplay() {
         TextView nickLbl = (TextView) findViewById(R.id.nick_lbl);
         TextView contentLbl = (TextView) findViewById(R.id.content_lbl);
+        this.setPadding(message.getIndent()*dpToPx(PADDING_PER_INDENT),0,0,0);
         if (message != null) {
             contentLbl.setText(message.getContent());
             SessionView sender = message.getSender();
@@ -144,9 +114,13 @@ public class MessageContainer extends RelativeLayout {
 
     public void recycle() {
         if (!established) return;
-        message.removeUpdateListener(updateListener);
         message = null;
         established = false;
+        setOnClickListener(null);
+    }
+
+    private int dpToPx(int dp) {
+        return (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp, getResources().getDisplayMetrics());
     }
 
     /*                                                                       *
@@ -224,7 +198,7 @@ public class MessageContainer extends RelativeLayout {
      */
     private static int hslaToRgbaInt(float h, float s, float l, float a) {
         // ensure proper values
-        h = h % 360;
+        h = (h % 360 + 360) % 360; // real modulus not just remainder
         s = Math.max(Math.min(s, 1f), 0f);
         l = Math.max(Math.min(l, 1f), 0f);
         a = Math.max(Math.min(a, 1f), 0f);

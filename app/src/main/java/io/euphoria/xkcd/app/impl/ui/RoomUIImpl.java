@@ -27,7 +27,7 @@ public class RoomUIImpl implements RoomUI {
     private Map<String, String> activeSessions = new HashMap<>();
     private Map<String, MessageContainer> messages = new HashMap<>();
     private List<MessageContainer> roots = new ArrayList<>();
-    private RootMessageListAdapter adapter = new RootMessageListAdapter();
+    private MessageListAdapter adapter = new MessageListAdapter();
 
     RoomUIImpl(String roomName) {
         this.roomName = roomName;
@@ -104,7 +104,7 @@ public class RoomUIImpl implements RoomUI {
         listeners.remove(l);
     }
 
-    public RootMessageListAdapter getAdapter() {
+    public MessageListAdapter getAdapter() {
         return adapter;
     }
 }

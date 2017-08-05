@@ -25,7 +25,6 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_above="@+id/top_lvl_entry"
-        android:layout_below="@+id/toolbar"
         android:background="@color/activity_bg">
 
     </android.support.v7.widget.RecyclerView>
