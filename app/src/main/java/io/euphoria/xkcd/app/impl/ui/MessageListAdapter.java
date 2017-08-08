@@ -27,7 +27,7 @@ import io.euphoria.xkcd.app.data.Message;
 // TODO input bar
 public class MessageListAdapter extends RecyclerView.Adapter<MessageListAdapter.MessageViewHolder> {
 
-    public static final String TAG = "MessageListAdapter";
+    private static final String TAG = "MessageListAdapter";
 
     private Map<String, MessageTree> allMsgs = new HashMap<>();
     private List<MessageTree> msgList = Collections.synchronizedList(new ArrayList<MessageTree>());
@@ -90,7 +90,6 @@ public class MessageListAdapter extends RecyclerView.Adapter<MessageListAdapter.
         }
     }
 
-    // TODO not robust!! breaks when messing around (creates duplicate messages)
     public synchronized void toggleCollapse(MessageTree mt) {
         List<MessageTree> replies = mt.getReplies();
         if (!replies.isEmpty()) {
@@ -104,7 +103,7 @@ public class MessageListAdapter extends RecyclerView.Adapter<MessageListAdapter.
                 do {
                     lastReply = subReplies.get(subReplies.size()-1);
                     subReplies = lastReply.getReplies();
-                } while (!subReplies.isEmpty());
+                } while (!lastReply.isCollapsed() && !subReplies.isEmpty());
                 int firstReplyI = msgList.indexOf(mt)+1;
                 int lastReplyI = msgList.indexOf(lastReply);
                 for (int i = firstReplyI; i <= lastReplyI; i++)
@@ -119,8 +118,10 @@ public class MessageListAdapter extends RecyclerView.Adapter<MessageListAdapter.
         Log.d(TAG, "recursivelyInsertReplies: "+mt.getIndent());
         int lastReply = index;
         for (MessageTree reply : mt.getReplies()) {
-            msgList.add(lastReply+1, reply);
-            lastReply = recursivelyInsertReplies(reply, lastReply+1);
+            msgList.add(++lastReply, reply);
+            if (!reply.isCollapsed()) {
+                lastReply = recursivelyInsertReplies(reply, lastReply);
+            }
         }
         return lastReply;
     }
