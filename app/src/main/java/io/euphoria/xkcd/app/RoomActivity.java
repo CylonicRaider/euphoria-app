@@ -23,6 +23,76 @@ import io.euphoria.xkcd.app.impl.ui.MessageListAdapter;
 
 public class RoomActivity extends FragmentActivity {
 
+    private class TestMessage implements Message {
+
+        private final String id;
+        private final String parent;
+        private final String content;
+
+        private final SessionView sender = new SessionView() {
+            @Override
+            public String getSessionID() {
+                return "0123-4567-89ab-cdef";
+            }
+
+            @Override
+            public String getAgentID() {
+                return "bot:test";
+            }
+
+            @Override
+            public String getName() {
+                return "TestBot";
+            }
+
+            @Override
+            public boolean isStaff() {
+                return false;
+            }
+
+            @Override
+            public boolean isManager() {
+                return false;
+            }
+        };
+
+        public TestMessage(String parent, String id, String content) {
+            this.id = id;
+            this.parent = parent;
+            this.content = content;
+        }
+
+        @Override
+        public String getID() {
+            return id;
+        }
+
+        @Override
+        public String getParent() {
+            return parent;
+        }
+
+        @Override
+        public long getTimestamp() {
+            return 0;
+        }
+
+        @Override
+        public SessionView getSender() {
+            return sender;
+        }
+
+        @Override
+        public String getContent() {
+            return content;
+        }
+
+        @Override
+        public boolean isTruncated() {
+            return false;
+        }
+    }
+
     // Tag for finding RoomControllerFragment
     private static final String TAG_ROOM_CONTROLLER_FRAGMENT = RoomControllerFragment.class.getSimpleName();
     private static final Pattern ROOM_PATH_RE = Pattern.compile("^/room/(.*?)/?$", Pattern.CASE_INSENSITIVE);
@@ -35,174 +105,13 @@ public class RoomActivity extends FragmentActivity {
     private InputBar inputBar;
     private MessageListAdapter rmla;
 
-    // TODO debugging test message
-    private Message testMsg = new Message(){
-        @Override
-        public String getID() {
-            return "x";
-        }
-
-        @Override
-        public String getParent() {
-            return null;
-        }
-
-        @Override
-        public long getTimestamp() {
-            return 0;
-        }
-
-        @Override
-        public SessionView getSender() {
-            return new SessionView() {
-                @Override
-                public String getSessionID() {
-                    return "bot:porpoise";
-                }
-
-                @Override
-                public String getAgentID() {
-                    return "x";
-                }
-
-                @Override
-                public String getName() {
-                    return "TellBot";
-                }
-
-                @Override
-                public boolean isStaff() {
-                    return false;
-                }
-
-                @Override
-                public boolean isManager() {
-                    return false;
-                }
-            };
-        }
-
-        @Override
-        public String getContent() {
-            return "Test message for testing porpoises. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin sed purus vel leo porta pulvinar a quis ex. Integer vestibulum. ";
-        }
-
-        @Override
-        public boolean isTruncated() {
-            return false;
-        }
-    };
-    private Message testSubMsg = new Message(){
-        @Override
-        public String getID() {
-            return "y";
-        }
-
-        @Override
-        public String getParent() {
-            return "x";
-        }
-
-        @Override
-        public long getTimestamp() {
-            return 1;
-        }
-
-        @Override
-        public SessionView getSender() {
-            return new SessionView() {
-                @Override
-                public String getSessionID() {
-                    return "bot:porpoise";
-                }
-
-                @Override
-                public String getAgentID() {
-                    return "x";
-                }
-
-                @Override
-                public String getName() {
-                    return "TellBot";
-                }
-
-                @Override
-                public boolean isStaff() {
-                    return false;
-                }
-
-                @Override
-                public boolean isManager() {
-                    return false;
-                }
-            };
-        }
-
-        @Override
-        public String getContent() {
-            return "Test sub message for testing porpoises. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin sed purus vel leo porta pulvinar a quis ex. Integer vestibulum. ";
-        }
-
-        @Override
-        public boolean isTruncated() {
-            return false;
-        }
-    };
-    private Message testSubSubMsg = new Message(){
-        @Override
-        public String getID() {
-            return "z";
-        }
-
-        @Override
-        public String getParent() {
-            return "y";
-        }
-
-        @Override
-        public long getTimestamp() {
-            return 2;
-        }
-
-        @Override
-        public SessionView getSender() {
-            return new SessionView() {
-                @Override
-                public String getSessionID() {
-                    return "bot:porpoise";
-                }
-
-                @Override
-                public String getAgentID() {
-                    return "x";
-                }
-
-                @Override
-                public String getName() {
-                    return "TellBot";
-                }
-
-                @Override
-                public boolean isStaff() {
-                    return false;
-                }
-
-                @Override
-                public boolean isManager() {
-                    return false;
-                }
-            };
-        }
-
-        @Override
-        public String getContent() {
-            return "Test sub message for testing porpoises. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin sed purus vel leo porta pulvinar a quis ex. Integer vestibulum. ";
-        }
-
-        @Override
-        public boolean isTruncated() {
-            return false;
-        }
+    private Message[] testMessages = new Message[] {
+            new TestMessage(null, "a", "Test message A"),
+            new TestMessage("a", "b", "Test message A/B"),
+            new TestMessage("b", "c", "Test message A/B/C"),
+            new TestMessage("b", "d", "Test message A/B/D"),
+            new TestMessage("a", "e", "Test message A/E"),
+            new TestMessage("e", "f", "Test message A/E/F")
     };
 
     @Override
@@ -245,9 +154,9 @@ public class RoomActivity extends FragmentActivity {
             roomUI = (RoomUIImpl) roomController.getManager().getRoomUI(m.group(1));
             rmla = new MessageListAdapter();
             // TODO remove test messages
-            rmla.add(testMsg);
-            rmla.add(testSubMsg);
-            rmla.add(testSubSubMsg);
+            for (Message msg : testMessages) {
+                rmla.add(msg);
+            }
             recyclerView.setAdapter(rmla);
         } else {
             Intent chooserIntent = new Intent(this, MainActivity.class);
