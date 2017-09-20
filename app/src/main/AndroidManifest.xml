@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-          package="io.euphoria.xkcd.app">
+    package="io.euphoria.xkcd.app">
 
     <application
         android:allowBackup="true"
@@ -8,13 +8,33 @@
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".RoomChooser">
+        <activity android:name=".MainActivity"
+            android:launchMode="singleInstance"
+            android:windowSoftInputMode="adjustResize">
             <intent-filter>
-                <action android:name="android.intent.action.MAIN"/>
-                <category android:name="android.intent.category.LAUNCHER"/>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".MainActivity">
+        <activity android:name=".RoomActivity"
+            android:launchMode="singleInstance"
+            android:windowSoftInputMode="adjustResize">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data
+                    android:scheme="https"
+                    android:host="euphoria.io"
+                    android:pathPattern="/room/.*" />
+                <data
+                    android:scheme="http"
+                    android:host="euphoria.io"
+                    android:pathPattern="/room/.*" />
+            </intent-filter>
         </activity>
     </application>
 
