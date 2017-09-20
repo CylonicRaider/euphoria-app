@@ -18,18 +18,16 @@ import java.util.Map;
 import io.euphoria.xkcd.app.R;
 import io.euphoria.xkcd.app.data.Message;
 
-/**
- * @author N00bySumairu
- */
-
 // TODO remove ghost item at bottom!!
-// TODO adjust layout so recyclerview is never behind toolbar!!
 // TODO input bar
 public class MessageListAdapter extends RecyclerView.Adapter<MessageListAdapter.MessageViewHolder> {
 
+    // For logging
     private static final String TAG = "MessageListAdapter";
 
+    // HashMap of all MessageTree objects (Messages linked in tree structure)
     private Map<String, MessageTree> allMsgs = new HashMap<>();
+    // List of all displayed messages
     private List<MessageTree> msgList = Collections.synchronizedList(new ArrayList<MessageTree>());
 
     @Override
@@ -61,16 +59,19 @@ public class MessageListAdapter extends RecyclerView.Adapter<MessageListAdapter.
 
     public void add(@NonNull Message message) {
         if (allMsgs.containsKey(message.getID())) {
+            // Message exists already -> update
             MessageTree mt = allMsgs.get(message.getID());
             mt.updateMessage(message);
             notifyItemChanged(msgList.indexOf(mt));
         } else {
             if (message.getParent() == null) {
+                // New top level message -> insert
                 MessageTree mt = MessageTree.wrap(message);
                 msgList.add(mt);
                 allMsgs.put(message.getID(), mt);
                 notifyItemInserted(allMsgs.size() - 1);
             } else {
+                // New reply -> link, and insert if parent not collapsed
                 MessageTree mt = MessageTree.wrap(message);
                 MessageTree parentMt = allMsgs.get(mt.getParent());
                 if (!parentMt.isCollapsed()) {
@@ -94,10 +95,12 @@ public class MessageListAdapter extends RecyclerView.Adapter<MessageListAdapter.
         List<MessageTree> replies = mt.getReplies();
         if (!replies.isEmpty()) {
             if (mt.isCollapsed()) {
+                // Message was collapsed -> insert the message and it's replies
                 int firstReplyI = msgList.indexOf(mt)+1;
                 int lastReplyI = recursivelyInsertReplies(mt, firstReplyI-1);
                 notifyItemRangeInserted(firstReplyI, lastReplyI-firstReplyI+1);
             } else {
+                // Message was not collapsed -> remove it and it's replies
                 MessageTree lastReply = mt;
                 List<MessageTree> subReplies = lastReply.getReplies();
                 do {
@@ -111,10 +114,12 @@ public class MessageListAdapter extends RecyclerView.Adapter<MessageListAdapter.
                 notifyItemRangeRemoved(firstReplyI, lastReplyI-firstReplyI+1);
             }
         }
+        // Update field accordingly
         mt.setCollapsed(!mt.isCollapsed());
     }
 
     private int recursivelyInsertReplies(MessageTree mt, int index) {
+        // TODO remove after debugging (should work correctly now, should be tested more though)
         Log.d(TAG, "recursivelyInsertReplies: "+mt.getIndent());
         int lastReply = index;
         for (MessageTree reply : mt.getReplies()) {

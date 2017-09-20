@@ -10,7 +10,6 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.widget.FrameLayout;
-import android.widget.RelativeLayout;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -18,11 +17,13 @@ import java.util.regex.Pattern;
 import io.euphoria.xkcd.app.control.RoomController;
 import io.euphoria.xkcd.app.data.Message;
 import io.euphoria.xkcd.app.data.SessionView;
+import io.euphoria.xkcd.app.impl.ui.InputBar;
 import io.euphoria.xkcd.app.impl.ui.RoomUIImpl;
 import io.euphoria.xkcd.app.impl.ui.MessageListAdapter;
 
 public class RoomActivity extends FragmentActivity {
 
+    // Tag for finding RoomControllerFragment
     private static final String TAG_ROOM_CONTROLLER_FRAGMENT = RoomControllerFragment.class.getSimpleName();
     private static final Pattern ROOM_PATH_RE = Pattern.compile("^/room/(.*?)/?$", Pattern.CASE_INSENSITIVE);
 
@@ -31,7 +32,7 @@ public class RoomActivity extends FragmentActivity {
 
     private RoomUIImpl roomUI;
     private RecyclerView recyclerView;
-    private RelativeLayout inputBar;
+    private InputBar inputBar;
     private MessageListAdapter rmla;
 
     // TODO debugging test message
@@ -209,6 +210,7 @@ public class RoomActivity extends FragmentActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_room);
 
+        // Get RoomControllerFragment
         FragmentManager fm = getSupportFragmentManager();
         rcf = (RoomControllerFragment) fm.findFragmentByTag(TAG_ROOM_CONTROLLER_FRAGMENT);
 
@@ -219,14 +221,17 @@ public class RoomActivity extends FragmentActivity {
             fm.beginTransaction().add(rcf, TAG_ROOM_CONTROLLER_FRAGMENT).commit();
             fm.executePendingTransactions();
         }
+        // Acquire RoomController
         roomController = rcf.getRoomController();
 
+        // View setup
         recyclerView = (RecyclerView) findViewById(R.id.message_recycler_view);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
         LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        inputBar = (RelativeLayout) inflater.inflate(R.layout.template_message, null);
+        inputBar = (InputBar) inflater.inflate(R.layout.input_bar, null);
         FrameLayout topLvlEntryWrp = (FrameLayout) findViewById(R.id.top_lvl_entry);
+        inputBar.init();
         topLvlEntryWrp.addView(inputBar);
     }
 
@@ -234,6 +239,7 @@ public class RoomActivity extends FragmentActivity {
     protected void onStart() {
         super.onStart();
         Intent i = getIntent();
+        // Check passed path with ROOM_PATH_RE, if it doesn't match return to the MainActivity
         Matcher m = ROOM_PATH_RE.matcher(i.getData().getPath());
         if (Intent.ACTION_VIEW.equals(i.getAction()) && isEuphoriaURI(i.getData()) && m.matches()) {
             roomUI = (RoomUIImpl) roomController.getManager().getRoomUI(m.group(1));

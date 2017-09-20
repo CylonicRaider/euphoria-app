@@ -14,19 +14,12 @@ import io.euphoria.xkcd.app.data.Message;
 import io.euphoria.xkcd.app.ui.RoomUI;
 import io.euphoria.xkcd.app.ui.UIListener;
 
-/**
- * @author N00bySumairu
- */
-
-// TODO add RecyclerView.Adapter for the top-level messages
 public class RoomUIImpl implements RoomUI {
 
     private String roomName;
     // TODO optionally change to ArrayList, if more efficient
     private Set<UIListener> listeners = new LinkedHashSet<>();
     private Map<String, String> activeSessions = new HashMap<>();
-    private Map<String, MessageContainer> messages = new HashMap<>();
-    private List<MessageContainer> roots = new ArrayList<>();
     private MessageListAdapter adapter = new MessageListAdapter();
 
     RoomUIImpl(String roomName) {
@@ -53,10 +46,9 @@ public class RoomUIImpl implements RoomUI {
 
     }
 
-    // TODO Adjust to new MessageContainer
+    // TODO Adjust to new MessageListAdapter
     @Override
     public void showMessages(List<Message> messages) {
-        // STUB
         /*
         for (Message m : messages) {
             if (this.messages.containsKey(m.getID())) {
