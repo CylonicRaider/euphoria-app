@@ -5,12 +5,12 @@
               android:layout_height="match_parent"
               android:gravity="center"
               android:orientation="vertical"
-              android:layout_margin="16sp"
+              android:padding="16sp"
               tools:context="io.euphoria.xkcd.app.MainActivity">
 
     <TextView
         android:id="@+id/textView"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="16sp"
         android:gravity="center"
@@ -18,16 +18,18 @@
         android:textAppearance="@android:style/TextAppearance.Large"
         android:textSize="36sp"/>
 
-    <EditText
+    <AutoCompleteTextView
         android:id="@+id/room_name"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:ems="10"
-        android:hint="@string/select_room_hint"/>
+        android:hint="@string/select_room_hint"
+        android:inputType="text"/>
 
     <Button
         android:id="@+id/join_room"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/join_room_text"/>
+
 </LinearLayout>

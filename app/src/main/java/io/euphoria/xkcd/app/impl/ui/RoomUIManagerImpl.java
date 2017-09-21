@@ -24,7 +24,9 @@ public class RoomUIManagerImpl implements RoomUIManager {
         if (roomUIs.containsKey(roomName)) {
             return roomUIs.get(roomName);
         } else {
-            return new RoomUIImpl(roomName);
+            RoomUI ret = new RoomUIImpl(roomName);
+            roomUIs.put(roomName, ret);
+            return ret;
         }
     }
 
@@ -53,8 +55,7 @@ public class RoomUIManagerImpl implements RoomUIManager {
     }
 
     public void onRoomSwitch(final String roomName) {
-        for (UIManagerListener listener :
-                listeners) {
+        for (UIManagerListener listener : listeners) {
             listener.onRoomSwitch(new RoomSwitchEvent() {
                 @Override
                 public String getRoomName() {

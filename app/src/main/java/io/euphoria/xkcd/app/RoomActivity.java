@@ -95,7 +95,7 @@ public class RoomActivity extends FragmentActivity {
 
     // Tag for finding RoomControllerFragment
     private static final String TAG_ROOM_CONTROLLER_FRAGMENT = RoomControllerFragment.class.getSimpleName();
-    private static final Pattern ROOM_PATH_RE = Pattern.compile("^/room/(.*?)/?$", Pattern.CASE_INSENSITIVE);
+    private static final Pattern ROOM_PATH_RE = Pattern.compile("^/room/([A-Za-z0-9:]+)/?$");
 
     private RoomControllerFragment rcf;
     private RoomController roomController;
@@ -133,11 +133,11 @@ public class RoomActivity extends FragmentActivity {
         // Acquire RoomController
         roomController = rcf.getRoomController();
 
-        /*// View setup
+        // View setup
         recyclerView = (RecyclerView) findViewById(R.id.message_recycler_view);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
-        LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        /*LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         inputBar = (InputBar) inflater.inflate(R.layout.input_bar, null);
         FrameLayout topLvlEntryWrp = (FrameLayout) findViewById(R.id.top_lvl_entry);
         inputBar.init();
@@ -151,13 +151,15 @@ public class RoomActivity extends FragmentActivity {
         // Check passed path with ROOM_PATH_RE, if it doesn't match return to the MainActivity
         Matcher m = ROOM_PATH_RE.matcher(i.getData().getPath());
         if (Intent.ACTION_VIEW.equals(i.getAction()) && isEuphoriaURI(i.getData()) && m.matches()) {
+            setTitle("&" + m.group(1));
+
             roomUI = (RoomUIImpl) roomController.getManager().getRoomUI(m.group(1));
-            rmla = new MessageListAdapter();
+            /*rmla = new MessageListAdapter();
             // TODO remove test messages
             for (Message msg : testMessages) {
                 rmla.add(msg);
             }
-            recyclerView.setAdapter(rmla);
+            recyclerView.setAdapter(rmla);*/
         } else {
             Intent chooserIntent = new Intent(this, MainActivity.class);
             startActivity(chooserIntent);
@@ -167,7 +169,7 @@ public class RoomActivity extends FragmentActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        roomController.shutdown();
+        //roomController.shutdown(); //NYI
     }
 
     /**

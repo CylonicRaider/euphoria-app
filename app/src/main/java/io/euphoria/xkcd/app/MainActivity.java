@@ -20,7 +20,7 @@ import java.util.regex.Pattern;
 
 public class MainActivity extends Activity {
 
-    Pattern ROOM_NAME_RE = Pattern.compile("^(?:[A-Za-z0-9\\-._~])+$");
+    Pattern ROOM_NAME_RE = Pattern.compile("^[A-Za-z0-9:]+$");
 
     boolean mDualPane;
     Button enterBtn;
@@ -34,8 +34,8 @@ public class MainActivity extends Activity {
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.activity_main);
 
-        /*enterBtn = (Button) findViewById(R.id.eneter_btn);
-        roomField = (AutoCompleteTextView) findViewById(R.id.room_field);
+        enterBtn = (Button) findViewById(R.id.join_room);
+        roomField = (AutoCompleteTextView) findViewById(R.id.room_name);
 
         InputFilter inputFilter = new InputFilter() {
             @Override
@@ -43,7 +43,7 @@ public class MainActivity extends Activity {
                 StringBuilder corrected = new StringBuilder();
                 boolean changed = false;
                 for (int i = start; i < end; i++) {
-                    if (ROOM_NAME_RE.matcher("" + source.charAt(i)).matches()) {
+                    if (ROOM_NAME_RE.matcher(Character.toString(source.charAt(i))).matches()) {
                         corrected.append(source.charAt(i));
                     } else {
                         changed = true;
@@ -69,11 +69,11 @@ public class MainActivity extends Activity {
             public void onClick(View v) {
                 showRoom(roomField.getText().toString());
             }
-        });*/
+        });
     }
 
     private void showRoom(String roomName) {
-        if (roomName.length() > 0) {
+        if (ROOM_NAME_RE.matcher(roomName).matches()) {
             Intent roomIntent = new Intent(this, RoomActivity.class);
             Uri roomURI = Uri.parse("https://euphoria.io/room/"+roomName+"/");
             roomIntent.setData(roomURI);

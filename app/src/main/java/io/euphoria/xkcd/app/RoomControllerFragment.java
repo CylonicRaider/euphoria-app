@@ -28,7 +28,7 @@ public class RoomControllerFragment extends Fragment {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        roomController.shutdown();
+        //roomController.shutdown(); //NYI
     }
 
     public RoomController getRoomController() {
