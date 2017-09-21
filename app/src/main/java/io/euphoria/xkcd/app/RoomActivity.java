@@ -133,7 +133,7 @@ public class RoomActivity extends FragmentActivity {
         // Acquire RoomController
         roomController = rcf.getRoomController();
 
-        // View setup
+        /*// View setup
         recyclerView = (RecyclerView) findViewById(R.id.message_recycler_view);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
@@ -141,7 +141,7 @@ public class RoomActivity extends FragmentActivity {
         inputBar = (InputBar) inflater.inflate(R.layout.input_bar, null);
         FrameLayout topLvlEntryWrp = (FrameLayout) findViewById(R.id.top_lvl_entry);
         inputBar.init();
-        topLvlEntryWrp.addView(inputBar);
+        topLvlEntryWrp.addView(inputBar);*/
     }
 
     @Override

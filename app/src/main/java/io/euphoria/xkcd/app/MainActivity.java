@@ -31,7 +31,7 @@ public class MainActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        enterBtn = (Button) findViewById(R.id.eneter_btn);
+        /*enterBtn = (Button) findViewById(R.id.eneter_btn);
         roomField = (AutoCompleteTextView) findViewById(R.id.room_field);
 
         InputFilter inputFilter = new InputFilter() {
@@ -66,7 +66,7 @@ public class MainActivity extends Activity {
             public void onClick(View v) {
                 showRoom(roomField.getText().toString());
             }
-        });
+        });*/
     }
 
     private void showRoom(String roomName) {

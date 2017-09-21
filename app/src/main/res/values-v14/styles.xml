@@ -1,7 +1,0 @@
-<resources>
-
-    <style name="AppTheme" parent="@android:style/Theme.DeviceDefault.Light.NoActionBar">
-        <item name="toolbarStyle">@style/Widget.AppCompat.Toolbar</item>
-        <item name="homeAsUpIndicator">@mipmap/ic_launcher</item>
-    </style>
-</resources>
