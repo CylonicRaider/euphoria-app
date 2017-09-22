@@ -102,13 +102,14 @@ public class RoomActivity extends FragmentActivity {
     private InputBar inputBar;
     private MessageListAdapter rmla;
 
+    // Test handling of out-of-order messages.
     private Message[] testMessages = new Message[] {
-            new TestMessage(null, "a", "Test message A"),
             new TestMessage("a", "b", "Test message A/B"),
-            new TestMessage("b", "c", "Test message A/B/C"),
+            new TestMessage(null, "a", "Test message A"),
+            new TestMessage("e", "f", "Test message A/E/F"),
             new TestMessage("b", "d", "Test message A/B/D"),
             new TestMessage("a", "e", "Test message A/E"),
-            new TestMessage("e", "f", "Test message A/E/F")
+            new TestMessage("b", "c", "Test message A/B/C")
     };
 
     @Override

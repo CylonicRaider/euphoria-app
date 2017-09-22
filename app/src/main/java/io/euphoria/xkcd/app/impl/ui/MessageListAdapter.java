@@ -76,7 +76,7 @@ public class MessageListAdapter extends RecyclerView.Adapter<MessageListAdapter.
             }
             group.add(mt);
         }
-        List<MessageTree> adopted = orphans.remove(parID);
+        List<MessageTree> adopted = orphans.remove(message.getID());
         if (adopted != null) {
             mt.addReplies(adopted);
         }
