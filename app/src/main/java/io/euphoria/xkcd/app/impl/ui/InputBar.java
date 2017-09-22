@@ -13,7 +13,7 @@ import android.widget.RelativeLayout;
 import io.euphoria.xkcd.app.R;
 
 import static io.euphoria.xkcd.app.impl.ui.UIUtils.COLOR_SENDER_LIGHTNESS;
-import static io.euphoria.xkcd.app.impl.ui.UIUtils.COLOR_SENDER_SAT;
+import static io.euphoria.xkcd.app.impl.ui.UIUtils.COLOR_SENDER_SATURATION;
 import static io.euphoria.xkcd.app.impl.ui.UIUtils.hslToRgbInt;
 import static io.euphoria.xkcd.app.impl.ui.UIUtils.hue;
 import static io.euphoria.xkcd.app.impl.ui.UIUtils.tintDrawable;
@@ -45,7 +45,7 @@ public class InputBar extends RelativeLayout {
                 // Recolor background
                 Drawable roundedRect = tintDrawable(getContext(), R.drawable.rounded_rect,
                         hslToRgbInt(hue(s.toString()),
-                                        COLOR_SENDER_SAT,
+                                        COLOR_SENDER_SATURATION,
                                         COLOR_SENDER_LIGHTNESS));
 
                 if (VERSION.SDK_INT >= VERSION_CODES.JELLY_BEAN) {

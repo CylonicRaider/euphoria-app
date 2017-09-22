@@ -17,7 +17,7 @@ import java.util.regex.Pattern;
 public class UIUtils {
 
     // Color saturation and lightness for input-bar and messages
-    public static final float COLOR_SENDER_SAT = 0.65f;
+    public static final float COLOR_SENDER_SATURATION = 0.65f;
     public static final float COLOR_SENDER_LIGHTNESS = 0.85f;
     // Color saturation and lightness for @mentions
     public static final float COLOR_AT_SAT = 0.42f;
