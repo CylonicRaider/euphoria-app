@@ -93,16 +93,22 @@ public class MessageTree implements Comparable<MessageTree> {
 
     /**
      * Return the amount of visible replies to this MessageTree.
+     * If override is true, this (and only this) MessageTree is assumed not to be collapsed.
      * A MessageTree is visible iff it has no parent or its parent is visible and not collapsed.
      * The message this method is invoked upon is assumed not to have a parent.
      */
-    public int countVisibleReplies() {
-        if (collapsed) return 0;
+    public int countVisibleReplies(boolean override) {
+        if (!override && collapsed) return 0;
         int ret = 0;
         for (MessageTree mt : replies) {
-            ret += 1 + mt.countVisibleReplies();
+            ret += 1 + mt.countVisibleReplies(false);
         }
         return ret;
+    }
+
+    /** Equivalent to countVisibleReplies(false) */
+    public int countVisibleReplies() {
+        return countVisibleReplies(false);
     }
 
     /** Return a list of all the visible replies to this MessageTree. */

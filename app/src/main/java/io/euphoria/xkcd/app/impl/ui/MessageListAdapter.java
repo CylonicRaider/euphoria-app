@@ -8,7 +8,6 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -33,14 +32,14 @@ public class MessageListAdapter extends RecyclerView.Adapter<MessageListAdapter.
     @Override
     public MessageViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         LayoutInflater inflater = (LayoutInflater) parent.getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        MessageContainer mc = (MessageContainer) inflater.inflate(R.layout.template_message, null);
+        MessageView mc = (MessageView) inflater.inflate(R.layout.template_message, null);
         mc.setVisibility(View.INVISIBLE);
         return new MessageViewHolder(mc);
     }
 
     @Override
     public void onBindViewHolder(final MessageViewHolder holder, int position) {
-        MessageContainer mc = (MessageContainer) holder.itemView;
+        MessageView mc = (MessageView) holder.itemView;
         mc.recycle();
         mc.setMessage(msgList.get(position));
         mc.setOnClickListener(new View.OnClickListener() {
@@ -105,6 +104,14 @@ public class MessageListAdapter extends RecyclerView.Adapter<MessageListAdapter.
         return ret;
     }
 
+    private void updateWithParents(MessageTree mt) {
+        while (mt != null) {
+            // TODO optimize with some reverse index
+            notifyItemChanged(msgList.indexOf(mt));
+            mt = allMsgs.get(mt.getMessage().getParent());
+        }
+    }
+
     public synchronized void add(@NonNull Message message) {
         if (allMsgs.containsKey(message.getID())) {
             // Message already exists -> update in-place
@@ -133,8 +140,11 @@ public class MessageListAdapter extends RecyclerView.Adapter<MessageListAdapter.
             toInsert.add(0, mt);
             msgList.addAll(insertIndex, toInsert);
             notifyItemRangeInserted(insertIndex, toInsert.size());
-            // Update the parent's idea of its replies, now that they are there
-            if (parID != null) parent.addReply(mt);
+            // Update the parents' ideas of their replies, now that they are there
+            if (parID != null) {
+                parent.addReply(mt);
+                updateWithParents(parent);
+            }
         }
     }
 
@@ -156,11 +166,12 @@ public class MessageListAdapter extends RecyclerView.Adapter<MessageListAdapter.
             // Collapse after replies have been traversed
             mt.setCollapsed(true);
         }
+        updateWithParents(mt);
     }
 
     class MessageViewHolder extends RecyclerView.ViewHolder {
 
-        public MessageViewHolder(MessageContainer mc) {
+        public MessageViewHolder(MessageView mc) {
             super(mc);
         }
 

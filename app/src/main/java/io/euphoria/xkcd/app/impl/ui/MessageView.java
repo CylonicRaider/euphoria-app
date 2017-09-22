@@ -1,6 +1,5 @@
 package io.euphoria.xkcd.app.impl.ui;
 
-import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.drawable.Drawable;
 import android.os.Build.VERSION;
@@ -21,15 +20,14 @@ import static io.euphoria.xkcd.app.impl.ui.UIUtils.hslToRgbInt;
 import static io.euphoria.xkcd.app.impl.ui.UIUtils.hue;
 import static io.euphoria.xkcd.app.impl.ui.UIUtils.tintDrawable;
 
-@SuppressLint("ViewConstructor")
-public class MessageContainer extends RelativeLayout {
+public class MessageView extends RelativeLayout {
     private static final String TAG = "MessageContainer";
     private static final int PADDING_PER_INDENT = 15;
 
     private MessageTree message = null;
     private boolean established = false;
 
-    public MessageContainer(Context ctx, AttributeSet attrs) {
+    public MessageView(Context ctx, AttributeSet attrs) {
         super(ctx, attrs);
     }
 
@@ -47,6 +45,7 @@ public class MessageContainer extends RelativeLayout {
     private void updateDisplay() {
         TextView nickLbl = (TextView) findViewById(R.id.nick_lbl);
         TextView contentLbl = (TextView) findViewById(R.id.content_lbl);
+        TextView collapseLbl = (TextView) findViewById(R.id.collapse_lbl);
         this.setPadding(message.getIndent() * dpToPx(getContext(), PADDING_PER_INDENT), 0, 0, 0);
         if (message != null) {
             contentLbl.setText(message.getMessage().getContent());
@@ -75,6 +74,16 @@ public class MessageContainer extends RelativeLayout {
             }
             Log.e(TAG, "updateDisplay: MessageContainer message is null!",
                     new RuntimeException("MessageContainer message is null!"));
+        }
+        if (message.getReplies().isEmpty()) {
+            collapseLbl.setText("");
+            collapseLbl.setVisibility(GONE);
+        } else {
+            collapseLbl.setVisibility(VISIBLE);
+            int replies = message.countVisibleReplies(true);
+            String pref = message.isCollapsed() ? "Show" : "Hide";
+            String suff = replies == 1 ? "reply" : "replies";
+            collapseLbl.setText(pref + " " + replies + " " + suff);
         }
     }
 
