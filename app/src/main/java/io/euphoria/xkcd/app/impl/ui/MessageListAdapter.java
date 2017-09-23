@@ -219,9 +219,6 @@ public class MessageListAdapter extends RecyclerView.Adapter<MessageListAdapter.
     }
 
     public synchronized void moveInputBar(final String newParentID) {
-        // Already there -> nothing to do
-        if (newParentID == null ? inputBarTree.getParent() == null : newParentID.equals(inputBarTree.getParent()))
-            return;
         // Input bar not present -> use normal insertion logic
         int index = msgList.indexOf(inputBarTree);
         if (index == -1) {
@@ -229,6 +226,9 @@ public class MessageListAdapter extends RecyclerView.Adapter<MessageListAdapter.
             add(inputBarTree);
             return;
         }
+        // Already there -> nothing to do
+        if (newParentID == null ? inputBarTree.getParent() == null : newParentID.equals(inputBarTree.getParent()))
+            return;
         // Unlink from old parent
         MessageTree parent = allMsgs.get(inputBarTree.getParent());
         if (parent != null) parent.removeReply(inputBarTree);
