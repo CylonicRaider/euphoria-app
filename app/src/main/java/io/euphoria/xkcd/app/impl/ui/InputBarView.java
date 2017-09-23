@@ -73,7 +73,7 @@ public class InputBarView extends RelativeLayout {
     }
 
     public void setIndent(int indent) {
-        this.setPadding(indent * dpToPx(getContext(), MessageView.PADDING_PER_INDENT), 0, 0, 0);
+        this.setPadding(MessageView.computeIndentWidth(getContext(), indent), 0, 0, 0);
     }
 
 }

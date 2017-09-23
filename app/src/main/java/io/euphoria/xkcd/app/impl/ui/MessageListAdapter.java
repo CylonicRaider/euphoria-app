@@ -1,6 +1,9 @@
 package io.euphoria.xkcd.app.impl.ui;
 
+import android.animation.ValueAnimator;
+import android.annotation.TargetApi;
 import android.content.Context;
+import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -252,8 +255,22 @@ public class MessageListAdapter extends RecyclerView.Adapter<MessageListAdapter.
         notifyItemMoved(index, insertIndex);
         updateWithParents(parent);
         updateWithParents(newParent);
-        // TODO animate
-        inputBar.setIndent(inputBarTree.getIndent());
+        int newIndent = MessageView.computeIndentWidth(inputBar.getContext(), inputBarTree.getIndent());
+        // TODO Gingerbread...
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
+            ValueAnimator animator = ValueAnimator.ofInt(inputBar.getPaddingLeft(), newIndent);
+            animator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+                @TargetApi(Build.VERSION_CODES.HONEYCOMB)
+                @Override
+                public void onAnimationUpdate(ValueAnimator animation) {
+                    inputBar.setPadding((Integer) animation.getAnimatedValue(), 0, 0, 0);
+                }
+            });
+            animator.setDuration(300);
+            animator.start();
+        } else {
+            inputBar.setIndent(inputBarTree.getIndent());
+        }
     }
 
     public synchronized void toggleCollapse(MessageTree mt) {

@@ -24,7 +24,7 @@ public class MessageView extends RelativeLayout {
 
     private static final String TAG = "MessageView";
 
-    static final int PADDING_PER_INDENT = 15;
+    private static final int PADDING_PER_INDENT = 15;
 
     private MessageTree message = null;
     private boolean established = false;
@@ -48,7 +48,7 @@ public class MessageView extends RelativeLayout {
         TextView nickLbl = (TextView) findViewById(R.id.nick_lbl);
         TextView contentLbl = (TextView) findViewById(R.id.content_lbl);
         TextView collapseLbl = (TextView) findViewById(R.id.collapse_lbl);
-        this.setPadding(message.getIndent() * dpToPx(getContext(), PADDING_PER_INDENT), 0, 0, 0);
+        this.setPadding(computeIndentWidth(getContext(), message.getIndent()), 0, 0, 0);
         if (message != null && message.getMessage() != null) {
             contentLbl.setText(message.getMessage().getContent());
             SessionView sender = message.getMessage().getSender();
@@ -94,6 +94,10 @@ public class MessageView extends RelativeLayout {
         message = null;
         established = false;
         setOnClickListener(null);
+    }
+
+    public static int computeIndentWidth(Context ctx, int indent) {
+        return indent * dpToPx(ctx, PADDING_PER_INDENT);
     }
 
 }
