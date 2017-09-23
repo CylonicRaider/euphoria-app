@@ -18,8 +18,8 @@ import static io.euphoria.xkcd.app.impl.ui.UIUtils.hslToRgbInt;
 import static io.euphoria.xkcd.app.impl.ui.UIUtils.hue;
 import static io.euphoria.xkcd.app.impl.ui.UIUtils.tintDrawable;
 
-public class InputBar extends RelativeLayout {
-    public InputBar(Context context, AttributeSet attrs) {
+public class InputBarView extends RelativeLayout {
+    public InputBarView(Context context, AttributeSet attrs) {
         super(context, attrs);
     }
 
@@ -28,12 +28,12 @@ public class InputBar extends RelativeLayout {
         nickEntry.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
+                // NOP
             }
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-
+                // NOP
             }
 
             @Override

@@ -14,7 +14,7 @@ import java.util.regex.Pattern;
 import io.euphoria.xkcd.app.control.RoomController;
 import io.euphoria.xkcd.app.data.Message;
 import io.euphoria.xkcd.app.data.SessionView;
-import io.euphoria.xkcd.app.impl.ui.InputBar;
+import io.euphoria.xkcd.app.impl.ui.InputBarView;
 import io.euphoria.xkcd.app.impl.ui.MessageListAdapter;
 import io.euphoria.xkcd.app.impl.ui.RoomUIImpl;
 
@@ -99,7 +99,7 @@ public class RoomActivity extends FragmentActivity {
 
     private RoomUIImpl roomUI;
     private RecyclerView recyclerView;
-    private InputBar inputBar;
+    private InputBarView inputBar;
     private MessageListAdapter rmla;
 
     // Test handling of out-of-order messages.

@@ -16,27 +16,50 @@ import io.euphoria.xkcd.app.data.Message;
 public class MessageTree implements Comparable<MessageTree> {
 
     private final List<MessageTree> replies = new ArrayList<>();
+    private String id;
+    private String parent;
     private Message message;
     private int indent = 0;
     private boolean collapsed = false;
 
-    public MessageTree(@NonNull Message m) {
+    public MessageTree(Message m) {
         message = m;
+        if (m != null) {
+            id = m.getID();
+            parent = m.getParent();
+        }
     }
 
     @Override
     public boolean equals(Object o) {
-        return o instanceof MessageTree && message.getID().equals(((MessageTree) o).getMessage().getID());
+        return o instanceof MessageTree && compareTo((MessageTree) o) == 0;
     }
 
+    @Override
     public String toString() {
-        return getClass().getSimpleName() + "@" + Integer.toHexString(hashCode()) + "[id=" + getMessage().getID() +
-                "]";
+        if (id == null) return String.format("%s@%x[%s/-]", getClass().getSimpleName(), hashCode(), parent);
+        return String.format("%s@%x[%s/%s]", getClass().getSimpleName(), hashCode(), parent, id);
     }
 
     @Override
     public int compareTo(@NonNull MessageTree o) {
-        return message.getID().compareTo(o.getMessage().getID());
+        // The input bar is "greater" than every other messgae so that it gets to the bottom
+        return id == null ? (o.id == null ? 0 : 1) : (o.id == null ? -1 : id.compareTo(o.id));
+    }
+
+    /** The ID of this MessageTree (null for the input bar). */
+    public String getID() {
+        return id;
+    }
+
+    /** The parent node of this MessageTree. */
+    public String getParent() {
+        return parent;
+    }
+
+    public void setParent(String parent) {
+        if (message != null) throw new IllegalStateException("Attempting to change parent of message");
+        this.parent = parent;
     }
 
     /** Sorted list of the immediate replies of this tree. */
@@ -44,14 +67,16 @@ public class MessageTree implements Comparable<MessageTree> {
         return Collections.unmodifiableList(replies);
     }
 
-    /** The message wrapped by this. */
+    /** The message wrapped by this; null for the input bar. */
     public Message getMessage() {
         return message;
     }
 
     public void setMessage(@NonNull Message m) {
-        assert message.getID().equals(m.getID()) : "Updating MessageTree with unrelated message";
+        assert message.getID().equals(id) : "Updating MessageTree with unrelated message";
         message = m;
+        id = m.getID();
+        parent = m.getParent();
     }
 
     /** The indentation level of this. */
@@ -76,6 +101,7 @@ public class MessageTree implements Comparable<MessageTree> {
 
     /** Add a MessageTree to the replies list. */
     public void addReply(@NonNull MessageTree t) {
+        if (message == null) throw new IllegalStateException("Input bar cannot have replies");
         t.updateIndent(indent + 1);
         int idx = Collections.binarySearch(replies, t);
         if (idx >= 0) {
@@ -89,6 +115,11 @@ public class MessageTree implements Comparable<MessageTree> {
     public void addReplies(@NonNull Collection<MessageTree> list) {
         // TODO replace with bulk insert, sort, and deduplication?
         for (MessageTree t : list) addReply(t);
+    }
+
+    /** Remove a MessageTree from the replies list. */
+    public void removeReply(@NonNull MessageTree t) {
+        replies.remove(t);
     }
 
     /**

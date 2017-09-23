@@ -36,7 +36,7 @@ public class MessageView extends RelativeLayout {
             throw new IllegalStateException("Setting message of established View that has not been reset");
         } else {
             this.message = message;
-            setTag(message.getMessage().getID());
+            setTag(message.getID());
             established = true;
             updateDisplay();
         }
@@ -47,7 +47,7 @@ public class MessageView extends RelativeLayout {
         TextView contentLbl = (TextView) findViewById(R.id.content_lbl);
         TextView collapseLbl = (TextView) findViewById(R.id.collapse_lbl);
         this.setPadding(message.getIndent() * dpToPx(getContext(), PADDING_PER_INDENT), 0, 0, 0);
-        if (message != null) {
+        if (message != null && message.getMessage() != null) {
             contentLbl.setText(message.getMessage().getContent());
             SessionView sender = message.getMessage().getSender();
             nickLbl.setText(sender.getName());
@@ -72,8 +72,8 @@ public class MessageView extends RelativeLayout {
             } else {
                 nickLbl.setBackgroundDrawable(roundedRect);
             }
-            Log.e(TAG, "updateDisplay: MessageContainer message is null!",
-                    new RuntimeException("MessageContainer message is null!"));
+            Log.e(TAG, "updateDisplay: MessageView message is null!",
+                    new RuntimeException("MessageView message is null!"));
         }
         if (message.getReplies().isEmpty()) {
             collapseLbl.setText("");

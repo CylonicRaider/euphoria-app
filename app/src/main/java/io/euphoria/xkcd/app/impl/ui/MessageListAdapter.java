@@ -57,7 +57,7 @@ public class MessageListAdapter extends RecyclerView.Adapter<MessageListAdapter.
     }
 
     private boolean isVisible(MessageTree mt) {
-        String parID = mt.getMessage().getParent();
+        String parID = mt.getParent();
         if (parID == null) return !mt.isCollapsed();
         MessageTree parent = allMsgs.get(parID);
         return parent != null && !parent.isCollapsed() && isVisible(parent);
@@ -65,8 +65,8 @@ public class MessageListAdapter extends RecyclerView.Adapter<MessageListAdapter.
 
     private MessageTree importNewMessage(Message message) {
         MessageTree mt = new MessageTree(message);
-        allMsgs.put(message.getID(), mt);
-        String parID = mt.getMessage().getParent();
+        allMsgs.put(mt.getID(), mt);
+        String parID = mt.getParent();
         if (parID != null && allMsgs.get(parID) == null) {
             List<MessageTree> group = orphans.get(parID);
             if (group == null) {
@@ -75,7 +75,7 @@ public class MessageListAdapter extends RecyclerView.Adapter<MessageListAdapter.
             }
             group.add(mt);
         }
-        List<MessageTree> adopted = orphans.remove(message.getID());
+        List<MessageTree> adopted = orphans.remove(mt.getID());
         if (adopted != null) {
             mt.addReplies(adopted);
         }
@@ -86,7 +86,7 @@ public class MessageListAdapter extends RecyclerView.Adapter<MessageListAdapter.
         int ret = 0;
         while (ret < msgList.size()) {
             MessageTree t = msgList.get(ret);
-            if (t.getMessage().getID().compareTo(mt.getMessage().getID()) >= 0) break;
+            if (t.compareTo(mt) >= 0) break;
             ret += 1 + t.countVisibleReplies();
         }
         return ret;
@@ -98,7 +98,7 @@ public class MessageListAdapter extends RecyclerView.Adapter<MessageListAdapter.
         // Skip parent.
         ret++;
         for (MessageTree t : parent.getReplies()) {
-            if (t.getMessage().getID().compareTo(mt.getMessage().getID()) >= 0) break;
+            if (t.compareTo(mt) >= 0) break;
             ret += 1 + t.countVisibleReplies();
         }
         return ret;
@@ -108,44 +108,73 @@ public class MessageListAdapter extends RecyclerView.Adapter<MessageListAdapter.
         while (mt != null) {
             // TODO optimize with some reverse index
             notifyItemChanged(msgList.indexOf(mt));
-            mt = allMsgs.get(mt.getMessage().getParent());
+            mt = allMsgs.get(mt.getParent());
         }
     }
 
     public synchronized void add(@NonNull Message message) {
         if (allMsgs.containsKey(message.getID())) {
-            // Message already exists -> update in-place
+            // Message already registered -> might get away with an in-place update
             MessageTree mt = allMsgs.get(message.getID());
             mt.setMessage(message);
-            notifyItemChanged(msgList.indexOf(mt));
-        } else {
-            // Message is new -> import into data structures
-            MessageTree mt = importNewMessage(message);
-            String parID = message.getParent();
-            MessageTree parent = allMsgs.get(parID);
-            // Scan for insertion position
-            int insertIndex;
-            if (parID == null) {
-                // Top-level message -> employ scanner method
-                insertIndex = rootInsertPosition(mt);
-            } else if (parent == null || parent.isCollapsed() || !isVisible(parent)) {
-                // Message not visible -> nothing to do
-                return;
+            int index = msgList.indexOf(mt);
+            if (index != -1) {
+                // Message already visible -> update in-place
+                notifyItemChanged(index);
             } else {
-                // Visible reply -> employ scanner method
-                insertIndex = insertPosition(mt, parent);
+                // Message not visible yet -> perform full-blown import
+                add(mt);
             }
-            // Insert message along with its visible replies
-            List<MessageTree> toInsert = mt.traverseVisibleReplies();
-            toInsert.add(0, mt);
-            msgList.addAll(insertIndex, toInsert);
-            notifyItemRangeInserted(insertIndex, toInsert.size());
-            // Update the parents' ideas of their replies, now that they are there
-            if (parID != null) {
-                parent.addReply(mt);
-                updateWithParents(parent);
-            }
+        } else {
+            // Message not registered -> perform full import
+            add(importNewMessage(message));
         }
+    }
+
+    public synchronized void add(@NonNull MessageTree mt) {
+        String parID = mt.getParent();
+        MessageTree parent = allMsgs.get(parID);
+        // Scan for insertion position
+        int insertIndex;
+        if (parID == null) {
+            // Top-level message -> employ scanner method
+            insertIndex = rootInsertPosition(mt);
+        } else if (parent == null || parent.isCollapsed() || !isVisible(parent)) {
+            // Message not visible -> nothing to do
+            return;
+        } else {
+            // Visible reply -> employ scanner method
+            insertIndex = insertPosition(mt, parent);
+        }
+        // Check whether message is already there
+        if (insertIndex < msgList.size() && mt.equals(msgList.get(insertIndex)))
+            return;
+        // Insert message along with its visible replies
+        List<MessageTree> toInsert = mt.traverseVisibleReplies();
+        toInsert.add(0, mt);
+        msgList.addAll(insertIndex, toInsert);
+        notifyItemRangeInserted(insertIndex, toInsert.size());
+        // Update the parents' ideas of their replies, now that they are there
+        if (parID != null) {
+            parent.addReply(mt);
+            updateWithParents(parent);
+        }
+    }
+
+    public synchronized void remove(@NonNull MessageTree mt) {
+        // Unlink from data structures
+        String parID = mt.getParent();
+        MessageTree parent = allMsgs.get(mt.getParent());
+        if (parent != null) parent.removeReply(mt);
+        allMsgs.remove(mt.getID());
+        if (! mt.getReplies().isEmpty())
+            orphans.put(mt.getID(), new LinkedList<>(mt.getReplies()));
+        // Remove from display list
+        int index = msgList.indexOf(mt);
+        int replyCount = mt.countVisibleReplies();
+        msgList.subList(index, index + 1 + replyCount).clear();
+        notifyItemRangeRemoved(index, 1 + replyCount);
+        updateWithParents(parent);
     }
 
     public synchronized void toggleCollapse(MessageTree mt) {
@@ -176,4 +205,5 @@ public class MessageListAdapter extends RecyclerView.Adapter<MessageListAdapter.
         }
 
     }
+
 }
