@@ -1,5 +1,6 @@
 package io.euphoria.xkcd.app;
 
+import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -7,6 +8,8 @@ import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.view.LayoutInflater;
+import android.widget.FrameLayout;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -16,6 +19,7 @@ import io.euphoria.xkcd.app.data.Message;
 import io.euphoria.xkcd.app.data.SessionView;
 import io.euphoria.xkcd.app.impl.ui.InputBarView;
 import io.euphoria.xkcd.app.impl.ui.MessageListAdapter;
+import io.euphoria.xkcd.app.impl.ui.MessageTree;
 import io.euphoria.xkcd.app.impl.ui.RoomUIImpl;
 
 public class RoomActivity extends FragmentActivity {
@@ -135,11 +139,9 @@ public class RoomActivity extends FragmentActivity {
         recyclerView = (RecyclerView) findViewById(R.id.message_recycler_view);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
-        /*LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        inputBar = (InputBar) inflater.inflate(R.layout.input_bar, null);
-        FrameLayout topLvlEntryWrp = (FrameLayout) findViewById(R.id.top_lvl_entry);
+        LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        inputBar = (InputBarView) inflater.inflate(R.layout.input_bar, null);
         inputBar.init();
-        topLvlEntryWrp.addView(inputBar);*/
     }
 
     @Override
@@ -152,11 +154,12 @@ public class RoomActivity extends FragmentActivity {
             setTitle("&" + m.group(1));
 
             roomUI = (RoomUIImpl) roomController.getManager().getRoomUI(m.group(1));
-            rmla = new MessageListAdapter();
+            rmla = new MessageListAdapter(inputBar);
             // TODO remove test messages
             for (Message msg : testMessages) {
                 rmla.add(msg);
             }
+            rmla.moveInputBar(null);
             recyclerView.setAdapter(rmla);
         } else {
             Intent chooserIntent = new Intent(this, MainActivity.class);

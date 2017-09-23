@@ -20,7 +20,6 @@ public class RoomUIImpl implements RoomUI {
     // TODO optionally change to ArrayList, if more efficient
     private Set<UIListener> listeners = new LinkedHashSet<>();
     private Map<String, String> activeSessions = new HashMap<>();
-    private MessageListAdapter adapter = new MessageListAdapter();
 
     RoomUIImpl(String roomName) {
         this.roomName = roomName;
@@ -96,7 +95,4 @@ public class RoomUIImpl implements RoomUI {
         listeners.remove(l);
     }
 
-    public MessageListAdapter getAdapter() {
-        return adapter;
-    }
 }

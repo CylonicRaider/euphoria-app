@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <io.euphoria.xkcd.app.impl.ui.InputBarView xmlns:android="http://schemas.android.com/apk/res/android"
                                            android:layout_width="match_parent"
-                                           android:layout_height="wrap_content"
-                                           android:background="@color/white">
+                                           android:layout_height="wrap_content">
 
     <!-- TODO change to button that opens nick changing dialog -->
     <EditText
@@ -13,14 +12,14 @@
         android:layout_alignParentStart="true"
         android:layout_margin="1dp"
         android:background="@drawable/rounded_rect"
-        android:gravity="center"
-        android:hint="@string/nick_entry_hint"
         android:inputType="text"
+        android:minWidth="20dp"
         android:paddingEnd="4dp"
         android:paddingLeft="4dp"
         android:paddingRight="4dp"
         android:paddingStart="4dp"/>
 
+    <!-- TODO test with non-Material themes -->
     <EditText
         android:id="@+id/message_entry"
         android:layout_width="match_parent"
@@ -30,9 +29,9 @@
         android:layout_margin="1dp"
         android:layout_toEndOf="@+id/nick_entry"
         android:layout_toRightOf="@+id/nick_entry"
+        android:background="@null"
         android:hint="@string/message_entry_hint"
-        android:inputType="text"
-        android:padding="4dp"/>
+        android:inputType="text"/>
 
     <View
         android:layout_width="match_parent"

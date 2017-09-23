@@ -21,8 +21,10 @@ import static io.euphoria.xkcd.app.impl.ui.UIUtils.hue;
 import static io.euphoria.xkcd.app.impl.ui.UIUtils.tintDrawable;
 
 public class MessageView extends RelativeLayout {
-    private static final String TAG = "MessageContainer";
-    private static final int PADDING_PER_INDENT = 15;
+
+    private static final String TAG = "MessageView";
+
+    static final int PADDING_PER_INDENT = 15;
 
     private MessageTree message = null;
     private boolean established = false;
@@ -93,4 +95,5 @@ public class MessageView extends RelativeLayout {
         established = false;
         setOnClickListener(null);
     }
+
 }

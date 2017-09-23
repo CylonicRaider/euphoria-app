@@ -41,6 +41,7 @@
         android:layout_below="@+id/content_lbl"
         android:layout_marginLeft="10dp"
         android:layout_marginStart="10dp"
+        android:gravity="start"
         android:text="Show n replies"
         android:textAlignment="textStart"
         android:textColor="@color/secondary_text"

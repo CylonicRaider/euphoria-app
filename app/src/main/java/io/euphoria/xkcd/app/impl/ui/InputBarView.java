@@ -14,6 +14,7 @@ import io.euphoria.xkcd.app.R;
 
 import static io.euphoria.xkcd.app.impl.ui.UIUtils.COLOR_SENDER_LIGHTNESS;
 import static io.euphoria.xkcd.app.impl.ui.UIUtils.COLOR_SENDER_SATURATION;
+import static io.euphoria.xkcd.app.impl.ui.UIUtils.dpToPx;
 import static io.euphoria.xkcd.app.impl.ui.UIUtils.hslToRgbInt;
 import static io.euphoria.xkcd.app.impl.ui.UIUtils.hue;
 import static io.euphoria.xkcd.app.impl.ui.UIUtils.tintDrawable;
@@ -70,4 +71,9 @@ public class InputBarView extends RelativeLayout {
             nickEntry.setBackgroundDrawable(roundedRect);
         }
     }
+
+    public void setIndent(int indent) {
+        this.setPadding(indent * dpToPx(getContext(), MessageView.PADDING_PER_INDENT), 0, 0, 0);
+    }
+
 }

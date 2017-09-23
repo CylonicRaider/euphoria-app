@@ -17,43 +17,79 @@ import io.euphoria.xkcd.app.R;
 import io.euphoria.xkcd.app.data.Message;
 
 // TODO input bar
-public class MessageListAdapter extends RecyclerView.Adapter<MessageListAdapter.MessageViewHolder> {
+public class MessageListAdapter extends RecyclerView.Adapter<MessageListAdapter.ViewHolder> {
 
     // For logging
     private static final String TAG = "MessageListAdapter";
 
-    // Index of all MessageTree objects
-    private Map<String, MessageTree> allMsgs = new HashMap<>();
-    // Index of all MessageTree objects whose parents don't exist (yet)
-    private Map<String, List<MessageTree>> orphans = new HashMap<>();
-    // List of all displayed messages
-    private List<MessageTree> msgList = new ArrayList<>();
+    // For view identification
+    private static final int MESSAGE = 0;
+    private static final int INPUT_BAR = 1;
 
-    @Override
-    public MessageViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        LayoutInflater inflater = (LayoutInflater) parent.getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        MessageView mc = (MessageView) inflater.inflate(R.layout.template_message, null);
-        mc.setVisibility(View.INVISIBLE);
-        return new MessageViewHolder(mc);
+    // Index of all MessageTree objects
+    private final Map<String, MessageTree> allMsgs = new HashMap<>();
+    // Index of all MessageTree objects whose parents don't exist (yet)
+    private final Map<String, List<MessageTree>> orphans = new HashMap<>();
+    // List of all displayed messages
+    private final List<MessageTree> msgList = new ArrayList<>();
+
+    private final InputBarView inputBar;
+    private final MessageTree inputBarTree;
+
+    public MessageListAdapter(InputBarView inputBar) {
+        this.inputBar = inputBar;
+        inputBarTree = new MessageTree(null);
     }
 
     @Override
-    public void onBindViewHolder(final MessageViewHolder holder, int position) {
-        MessageView mc = (MessageView) holder.itemView;
-        mc.recycle();
-        mc.setMessage(msgList.get(position));
-        mc.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                toggleCollapse(msgList.get(holder.getAdapterPosition()));
-            }
-        });
-        mc.setVisibility(View.VISIBLE);
+    public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        LayoutInflater inflater = (LayoutInflater) parent.getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        switch (viewType) {
+            case MESSAGE:
+                MessageView mc = (MessageView) inflater.inflate(R.layout.template_message, null);
+                mc.setVisibility(View.INVISIBLE);
+                return new ViewHolder(mc);
+            case INPUT_BAR:
+                inputBar.setVisibility(View.INVISIBLE);
+                return new ViewHolder(inputBar);
+            default:
+                throw new IllegalArgumentException("Unknown view type: " + viewType);
+        }
+    }
+
+    @Override
+    public void onBindViewHolder(final ViewHolder holder, int position) {
+        switch (holder.getItemViewType()) {
+            case MESSAGE:
+                MessageView mc = (MessageView) holder.itemView;
+                mc.recycle();
+                mc.setMessage(msgList.get(position));
+                mc.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        //toggleCollapse(msgList.get(holder.getAdapterPosition()));
+                        moveInputBar(msgList.get(holder.getAdapterPosition()).getID());
+                    }
+                });
+                mc.setVisibility(View.VISIBLE);
+                break;
+            case INPUT_BAR:
+                InputBarView ib = (InputBarView) holder.itemView;
+                ib.setIndent(msgList.get(position).getIndent());
+                ib.setVisibility(View.VISIBLE);
+                break;
+        }
     }
 
     @Override
     public int getItemCount() {
         return msgList.size();
+    }
+
+    @Override
+    public int getItemViewType(int position) {
+        MessageTree mt = msgList.get(position);
+        return (mt.getMessage() == null) ? INPUT_BAR : MESSAGE;
     }
 
     private boolean isVisible(MessageTree mt) {
@@ -65,7 +101,7 @@ public class MessageListAdapter extends RecyclerView.Adapter<MessageListAdapter.
 
     private MessageTree importNewMessage(Message message) {
         MessageTree mt = new MessageTree(message);
-        allMsgs.put(mt.getID(), mt);
+        if (mt.getID() != null) allMsgs.put(mt.getID(), mt);
         String parID = mt.getParent();
         if (parID != null && allMsgs.get(parID) == null) {
             List<MessageTree> group = orphans.get(parID);
@@ -171,10 +207,53 @@ public class MessageListAdapter extends RecyclerView.Adapter<MessageListAdapter.
             orphans.put(mt.getID(), new LinkedList<>(mt.getReplies()));
         // Remove from display list
         int index = msgList.indexOf(mt);
-        int replyCount = mt.countVisibleReplies();
-        msgList.subList(index, index + 1 + replyCount).clear();
-        notifyItemRangeRemoved(index, 1 + replyCount);
+        if (index != -1) {
+            int replyCount = mt.countVisibleReplies();
+            msgList.subList(index, index + 1 + replyCount).clear();
+            notifyItemRangeRemoved(index, 1 + replyCount);
+            updateWithParents(parent);
+        }
+    }
+
+    public synchronized void moveInputBar(final String newParentID) {
+        // Already there -> nothing to do
+        if (newParentID == null ? inputBarTree.getParent() == null : newParentID.equals(inputBarTree.getParent()))
+            return;
+        // Input bar not present -> use normal insertion logic
+        int index = msgList.indexOf(inputBarTree);
+        if (index == -1) {
+            inputBarTree.setParent(newParentID);
+            add(inputBarTree);
+            return;
+        }
+        // Unlink from old parent
+        MessageTree parent = allMsgs.get(inputBarTree.getParent());
+        if (parent != null) parent.removeReply(inputBarTree);
+        msgList.remove(index);
+        // Assign new parent for both branches
+        inputBarTree.setParent(newParentID);
+        // New parent not present -> schedule for re-addition
+        MessageTree newParent = allMsgs.get(newParentID);
+        if (newParent == null) {
+            add(inputBarTree);
+            notifyItemRemoved(index);
+            return;
+        }
+        // Else -> Link it again
+        int insertIndex;
+        if (newParentID == null) {
+            // ...Does it count as constant folding if it is manual and makes tons of assumptions?
+            insertIndex = msgList.size();
+        } else {
+            insertIndex = msgList.indexOf(newParent) + 1 + newParent.countVisibleReplies();
+        }
+        msgList.add(insertIndex, inputBarTree);
+        newParent.addReply(inputBarTree);
+        notifyItemMoved(index, insertIndex);
         updateWithParents(parent);
+        updateWithParents(newParent);
+        // TODO animate
+        inputBar.setIndent(inputBarTree.getIndent());
     }
 
     public synchronized void toggleCollapse(MessageTree mt) {
@@ -198,10 +277,10 @@ public class MessageListAdapter extends RecyclerView.Adapter<MessageListAdapter.
         updateWithParents(mt);
     }
 
-    class MessageViewHolder extends RecyclerView.ViewHolder {
+    class ViewHolder extends RecyclerView.ViewHolder {
 
-        public MessageViewHolder(MessageView mc) {
-            super(mc);
+        public ViewHolder(View v) {
+            super(v);
         }
 
     }
