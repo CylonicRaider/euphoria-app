@@ -5,14 +5,14 @@
                 android:layout_height="match_parent"
                 android:fitsSystemWindows="true"
                 android:orientation="vertical"
-                android:padding="16sp"
                 tools:context="io.euphoria.xkcd.app.RoomActivity">
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/message_recycler_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:foregroundGravity="bottom">
+        android:foregroundGravity="bottom"
+        android:padding="4dp">
 
     </android.support.v7.widget.RecyclerView>
 

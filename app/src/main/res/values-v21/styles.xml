@@ -1,5 +1,5 @@
-<?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <!-- Material override of the theme. -->
     <style name="AppTheme" parent="android:Theme.Material.Light">
         <!-- Material colors
              TODO: Find out whether there are any "official" ones. -->
