@@ -2,8 +2,6 @@
     <string name="app_name">Euphoria</string>
     <string name="select_room_hint">Room name</string>
     <string name="join_room_text">Join room</string>
-
-    <!-- Not-yet-cleansed UI fragments -->
-    <string name="nickname">Nickname</string>
-    <string name="message">Message</string>
+    <string name="nick_entry_hint">Nickname</string>
+    <string name="message_entry_hint">Message</string>
 </resources>
