@@ -87,7 +87,7 @@ public class MessageTree implements Comparable<MessageTree> {
 
     /** Add every MessageTree in the list as a reply. */
     public void addReplies(@NonNull Collection<MessageTree> list) {
-        // TODO replace with bulk insert, sort, and dedplication?
+        // TODO replace with bulk insert, sort, and deduplication?
         for (MessageTree t : list) addReply(t);
     }
 
