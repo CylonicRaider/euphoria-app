@@ -7,6 +7,7 @@ import android.os.Build.VERSION_CODES;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.AttributeSet;
+import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.RelativeLayout;
 
@@ -14,7 +15,6 @@ import io.euphoria.xkcd.app.R;
 
 import static io.euphoria.xkcd.app.impl.ui.UIUtils.COLOR_SENDER_LIGHTNESS;
 import static io.euphoria.xkcd.app.impl.ui.UIUtils.COLOR_SENDER_SATURATION;
-import static io.euphoria.xkcd.app.impl.ui.UIUtils.dpToPx;
 import static io.euphoria.xkcd.app.impl.ui.UIUtils.hslToRgbInt;
 import static io.euphoria.xkcd.app.impl.ui.UIUtils.hue;
 import static io.euphoria.xkcd.app.impl.ui.UIUtils.tintDrawable;
@@ -73,7 +73,18 @@ public class InputBarView extends RelativeLayout {
     }
 
     public void setIndent(int indent) {
-        this.setPadding(MessageView.computeIndentWidth(getContext(), indent), 0, 0, 0);
+        MarginLayoutParams lp = (MarginLayoutParams) getLayoutParams();
+        if (lp == null) {
+            // HACK: Ignoring anything defined in the XML file...
+            lp = new MarginLayoutParams(new ViewGroup.LayoutParams(LayoutParams.WRAP_CONTENT,
+                    LayoutParams.WRAP_CONTENT));
+            setLayoutParams(lp);
+        }
+        int margin = MessageView.computeIndentWidth(getContext(), indent);
+        lp.setMargins(margin, 0, 0, 0);
+        if (VERSION.SDK_INT >= VERSION_CODES.JELLY_BEAN_MR1) {
+            lp.setMarginStart(margin);
+        }
     }
 
 }

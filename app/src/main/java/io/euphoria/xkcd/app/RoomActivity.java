@@ -9,7 +9,6 @@ import android.support.v4.app.FragmentManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
-import android.widget.FrameLayout;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -19,7 +18,6 @@ import io.euphoria.xkcd.app.data.Message;
 import io.euphoria.xkcd.app.data.SessionView;
 import io.euphoria.xkcd.app.impl.ui.InputBarView;
 import io.euphoria.xkcd.app.impl.ui.MessageListAdapter;
-import io.euphoria.xkcd.app.impl.ui.MessageTree;
 import io.euphoria.xkcd.app.impl.ui.RoomUIImpl;
 
 public class RoomActivity extends FragmentActivity {
