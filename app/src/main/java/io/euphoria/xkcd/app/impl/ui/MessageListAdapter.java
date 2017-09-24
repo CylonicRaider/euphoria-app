@@ -236,28 +236,37 @@ public class MessageListAdapter extends RecyclerView.Adapter<MessageListAdapter.
         MessageTree parent = allMsgs.get(inputBarTree.getParent());
         if (parent != null) parent.removeReply(inputBarTree);
         msgList.remove(index);
-        // Assign new parent for both branches
+        // Assign new parent ID
         inputBarTree.setParent(newParentID);
-        // New parent not present -> schedule for re-addition
         MessageTree newParent = allMsgs.get(newParentID);
-        if (newParent == null) {
+        if (newParentID == null) {
+            // Outside any thread -> move to bottom
+            inputBarTree.updateIndent(0);
+            msgList.add(inputBarTree);
+            notifyItemMoved(index, msgList.size() - 1);
+            updateWithParents(parent);
+        } else if (newParent == null) {
+            // New parent not present -> schedule for re-addition
             add(inputBarTree);
             notifyItemRemoved(index);
-            return;
-        }
-        // Else -> Link it again
-        int insertIndex;
-        if (newParentID == null) {
-            // ...Does it count as constant folding if it is manual and makes tons of assumptions?
-            insertIndex = msgList.size();
+        } else if (newParent.isCollapsed()) {
+            // New parent collapsed -> uncollapse and insert
+            newParent.setCollapsed(false);
+            int parIndex = msgList.indexOf(newParent);
+            List<MessageTree> toInsert = newParent.traverseVisibleReplies();
+            toInsert.add(inputBarTree);
+            msgList.addAll(parIndex + 1, toInsert);
+            newParent.addReply(inputBarTree);
+            notifyItemRangeInserted(parIndex + 1, toInsert.size() - 1);
+            notifyItemMoved(index, parIndex + toInsert.size());
         } else {
-            insertIndex = msgList.indexOf(newParent) + 1 + newParent.countVisibleReplies();
+            // New parent properly present -> add to its children
+            int insertIndex = msgList.indexOf(newParent) + 1 + newParent.countVisibleReplies();
+            msgList.add(insertIndex, inputBarTree);
+            newParent.addReply(inputBarTree);
+            notifyItemMoved(index, insertIndex);
+            updateWithParents(newParent);
         }
-        msgList.add(insertIndex, inputBarTree);
-        newParent.addReply(inputBarTree);
-        notifyItemMoved(index, insertIndex);
-        updateWithParents(parent);
-        updateWithParents(newParent);
         inputBar.setIndent(inputBarTree.getIndent());
     }
 
