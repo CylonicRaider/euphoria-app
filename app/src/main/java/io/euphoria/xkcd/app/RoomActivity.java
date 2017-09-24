@@ -137,7 +137,9 @@ public class RoomActivity extends FragmentActivity {
 
         // View setup
         recyclerView = (RecyclerView) findViewById(R.id.message_recycler_view);
-        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        LinearLayoutManager lm = new LinearLayoutManager(this);
+        lm.setStackFromEnd(true);
+        recyclerView.setLayoutManager(lm);
 
         LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         inputBar = (InputBarView) inflater.inflate(R.layout.input_bar, null);
