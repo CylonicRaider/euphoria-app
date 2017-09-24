@@ -58,17 +58,23 @@ public class MessageListAdapter extends RecyclerView.Adapter<MessageListAdapter.
     }
 
     @Override
-    public void onBindViewHolder(final ViewHolder holder, int position) {
+    public void onBindViewHolder(ViewHolder holder, int position) {
         switch (holder.getItemViewType()) {
             case MESSAGE:
                 MessageView mc = (MessageView) holder.itemView;
                 mc.recycle();
-                mc.setMessage(msgList.get(position));
-                // TODO input bar navigation
-                mc.setOnClickListener(new View.OnClickListener() {
+                final MessageTree mt = msgList.get(position);
+                mc.setMessage(mt);
+                mc.setTextClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        toggleCollapse(msgList.get(holder.getAdapterPosition()));
+                        moveInputBar(mt.getID());
+                    }
+                });
+                mc.setCollapserClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        toggleCollapse(mt);
                     }
                 });
                 mc.setVisibility(View.VISIBLE);
