@@ -76,7 +76,7 @@ public class InputBarView extends RelativeLayout {
         MarginLayoutParams lp = (MarginLayoutParams) getLayoutParams();
         if (lp == null) {
             // HACK: Ignoring anything defined in the XML file...
-            lp = new MarginLayoutParams(new ViewGroup.LayoutParams(LayoutParams.WRAP_CONTENT,
+            lp = new MarginLayoutParams(new ViewGroup.LayoutParams(LayoutParams.MATCH_PARENT,
                     LayoutParams.WRAP_CONTENT));
             setLayoutParams(lp);
         }
