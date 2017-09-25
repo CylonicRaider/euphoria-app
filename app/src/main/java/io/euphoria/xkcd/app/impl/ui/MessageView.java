@@ -98,6 +98,7 @@ public class MessageView extends RelativeLayout {
         message = null;
         established = false;
         setTextClickListener(null);
+        setCollapserClickListener(null);
     }
 
     public void setTextClickListener(OnClickListener l) {
