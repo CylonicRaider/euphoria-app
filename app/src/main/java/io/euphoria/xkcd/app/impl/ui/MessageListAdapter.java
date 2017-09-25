@@ -37,7 +37,7 @@ public class MessageListAdapter extends RecyclerView.Adapter<MessageListAdapter.
     private final InputBarView inputBar;
     // MessageTree representation of the input bar
     private final MessageTree inputBarTree;
-    // The bar is linked in upon the first moveInputBar and then present forever
+    // The bar is linked in upon the first moveInputBar and then present until removed manually
     private boolean inputBarPresent;
 
     public MessageListAdapter(InputBarView inputBar) {
@@ -48,7 +48,8 @@ public class MessageListAdapter extends RecyclerView.Adapter<MessageListAdapter.
 
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        LayoutInflater inflater = (LayoutInflater) parent.getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        LayoutInflater inflater = (LayoutInflater) parent.getContext().getSystemService(
+                Context.LAYOUT_INFLATER_SERVICE);
         switch (viewType) {
             case MESSAGE:
                 MessageView mc = (MessageView) inflater.inflate(R.layout.template_message, null);
@@ -152,7 +153,7 @@ public class MessageListAdapter extends RecyclerView.Adapter<MessageListAdapter.
 
     private int insertPosition(MessageTree mt, MessageTree parent) {
         int ret = msgList.indexOf(parent);
-        assert ret != -1 : "Scanning for index of message without visible parent";
+        assert ret != -1 : "Scanning for index for message without visible parent";
         // Skip parent.
         ret++;
         for (MessageTree t : parent.getReplies()) {
@@ -170,10 +171,27 @@ public class MessageListAdapter extends RecyclerView.Adapter<MessageListAdapter.
         }
     }
 
-    public synchronized void add(@NonNull Message message) {
-        if (allMsgs.containsKey(message.getID())) {
+    private void notifyItemMovedLenient(int from, int to) {
+        if (from == -1 && to == -1) {
+            /* NOP */
+        } else if (from == -1) {
+            notifyItemInserted(to);
+        } else if (to == -1) {
+            notifyItemRemoved(from);
+        } else {
+            notifyItemMoved(from, to);
+        }
+    }
+
+    public MessageTree getTree(Message message) {
+        if (message == null) return inputBarTree;
+        return allMsgs.get(message.getID());
+    }
+
+    public synchronized MessageTree add(@NonNull Message message) {
+        MessageTree mt = allMsgs.get(message.getID());
+        if (mt != null) {
             // Message already registered -> might get away with an in-place update
-            MessageTree mt = allMsgs.get(message.getID());
             mt.setMessage(message);
             int index = msgList.indexOf(mt);
             if (index != -1) {
@@ -185,11 +203,13 @@ public class MessageListAdapter extends RecyclerView.Adapter<MessageListAdapter.
             }
         } else {
             // Message not registered -> perform full import
-            add(importNewMessage(message));
+            mt = importNewMessage(message);
+            add(mt);
         }
+        return mt;
     }
 
-    public synchronized void add(@NonNull MessageTree mt) {
+    private synchronized void add(MessageTree mt) {
         String parID = mt.getParent();
         MessageTree parent = allMsgs.get(parID);
         // Scan for insertion position
@@ -235,18 +255,8 @@ public class MessageListAdapter extends RecyclerView.Adapter<MessageListAdapter.
             notifyItemRangeRemoved(index, 1 + replyCount);
             updateWithParents(parent);
         }
-    }
-
-    private void notifyItemMovedLenient(int from, int to) {
-        if (from == -1 && to == -1) {
-            /* NOP */
-        } else if (from == -1) {
-            notifyItemInserted(to);
-        } else if (to == -1) {
-            notifyItemRemoved(from);
-        } else {
-            notifyItemMoved(from, to);
-        }
+        // Special case
+        if (mt == inputBarTree) inputBarPresent = false;
     }
 
     public synchronized void moveInputBarAround(@NonNull MessageTree mt) {
@@ -339,12 +349,12 @@ public class MessageListAdapter extends RecyclerView.Adapter<MessageListAdapter.
         return true;
     }
 
-    public synchronized void toggleCollapse(MessageTree mt, boolean newState) {
+    public synchronized void toggleCollapse(@NonNull MessageTree mt, boolean newState) {
         if (mt.isCollapsed() != newState)
             toggleCollapse(mt);
     }
 
-    public synchronized void toggleCollapse(MessageTree mt) {
+    public synchronized void toggleCollapse(@NonNull MessageTree mt) {
         int index = msgList.indexOf(mt);
         assert index != -1 : "Attempting to toggle invisible message";
         if (mt.isCollapsed()) {
