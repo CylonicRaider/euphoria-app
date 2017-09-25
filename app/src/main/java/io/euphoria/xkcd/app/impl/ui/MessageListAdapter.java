@@ -73,7 +73,7 @@ public class MessageListAdapter extends RecyclerView.Adapter<MessageListAdapter.
                 mc.setTextClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        moveInputBar(mt.getID());
+                        moveInputBarAround(mt);
                     }
                 });
                 mc.setCollapserClickListener(new View.OnClickListener() {
@@ -249,6 +249,22 @@ public class MessageListAdapter extends RecyclerView.Adapter<MessageListAdapter.
         }
     }
 
+    public synchronized void moveInputBarAround(@NonNull MessageTree mt) {
+        String preferredID, alternateID;
+        if (mt.getParent() == null) {
+            preferredID = mt.getID();
+            alternateID = null;
+        } else {
+            preferredID = mt.getParent();
+            alternateID = mt.getID();
+        }
+        if (!inputBarPresent || !preferredID.equals(inputBarTree.getParent())) {
+            moveInputBar(preferredID);
+        } else {
+            moveInputBar(alternateID);
+        }
+    }
+
     public synchronized void moveInputBar(String newParentID) {
         // Already there -> nothing to do
         if (inputBarPresent && (newParentID == null ? inputBarTree.getParent() == null :
@@ -270,6 +286,7 @@ public class MessageListAdapter extends RecyclerView.Adapter<MessageListAdapter.
         if (newParentID == null) {
             // No parent -> top-level
             notifyItemMovedLenient(oldIndex, msgList.size());
+            inputBarTree.updateIndent(0);
             msgList.add(inputBarTree);
         } else if (newParent == null) {
             // Parent absent -> orphaned
