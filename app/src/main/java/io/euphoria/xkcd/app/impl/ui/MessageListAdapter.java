@@ -270,6 +270,11 @@ public class MessageListAdapter extends RecyclerView.Adapter<MessageListAdapter.
         inputBar.setIndent(inputBarTree.getIndent());
     }
 
+    public synchronized void toggleCollapse(MessageTree mt, boolean newState) {
+        if (mt.isCollapsed() != newState)
+            toggleCollapse(mt);
+    }
+
     public synchronized void toggleCollapse(MessageTree mt) {
         int index = msgList.indexOf(mt);
         assert index != -1 : "Attempting to toggle invisible message";
