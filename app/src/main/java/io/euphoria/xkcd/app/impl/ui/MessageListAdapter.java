@@ -98,6 +98,17 @@ public class MessageListAdapter extends RecyclerView.Adapter<MessageListAdapter.
         return (mt.getMessage() == null) ? INPUT_BAR : MESSAGE;
     }
 
+    private List<MessageTree> getParents(@NonNull MessageTree mt) {
+        List<MessageTree> ret = new ArrayList<>();
+        while (mt.getParent() != null) {
+            MessageTree parent = allMsgs.get(mt.getParent());
+            ret.add(parent);
+            if (parent == null) break;
+            mt = parent;
+        }
+        return ret;
+    }
+
     private boolean isVisible(MessageTree mt) {
         String parID = mt.getParent();
         if (parID == null) return !mt.isCollapsed();
@@ -209,7 +220,7 @@ public class MessageListAdapter extends RecyclerView.Adapter<MessageListAdapter.
         MessageTree parent = allMsgs.get(mt.getParent());
         if (parent != null) parent.removeReply(mt);
         allMsgs.remove(mt.getID());
-        if (! mt.getReplies().isEmpty())
+        if (!mt.getReplies().isEmpty())
             orphans.put(mt.getID(), new LinkedList<>(mt.getReplies()));
         // Remove from display list
         int index = msgList.indexOf(mt);
@@ -268,6 +279,28 @@ public class MessageListAdapter extends RecyclerView.Adapter<MessageListAdapter.
             updateWithParents(newParent);
         }
         inputBar.setIndent(inputBarTree.getIndent());
+    }
+
+    public synchronized boolean tryEnsureVisible(@NonNull MessageTree mt, boolean expand) {
+        // Determine whether mt is an orphan
+        List<MessageTree> parents = getParents(mt);
+        int last = parents.size() - 1;
+        if (last != -1 && parents.get(last) == null) return false;
+        // Find the outermost collapsed parent
+        int collapsed;
+        for (collapsed = last; collapsed >= 0; collapsed--) {
+            if (parents.get(collapsed).isCollapsed()) break;
+        }
+        // No collapsed parents -> already done
+        if (collapsed == -1) {
+            if (expand) toggleCollapse(mt, false);
+            return true;
+        }
+        // Expand the nodes
+        if (expand) mt.setCollapsed(false);
+        for (int i = 0; i < collapsed; i++) parents.get(i).setCollapsed(false);
+        toggleCollapse(parents.get(collapsed), false);
+        return true;
     }
 
     public synchronized void toggleCollapse(MessageTree mt, boolean newState) {
