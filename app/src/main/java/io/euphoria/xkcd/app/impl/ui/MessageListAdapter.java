@@ -33,12 +33,17 @@ public class MessageListAdapter extends RecyclerView.Adapter<MessageListAdapter.
     // List of all displayed messages
     private final List<MessageTree> msgList = new ArrayList<>();
 
+    // View of the input bar
     private final InputBarView inputBar;
+    // MessageTree representation of the input bar
     private final MessageTree inputBarTree;
+    // The bar is linked in upon the first moveInputBar and then present forever
+    private boolean inputBarPresent;
 
     public MessageListAdapter(InputBarView inputBar) {
         this.inputBar = inputBar;
         inputBarTree = new MessageTree(null);
+        inputBarPresent = false;
     }
 
     @Override
@@ -232,52 +237,66 @@ public class MessageListAdapter extends RecyclerView.Adapter<MessageListAdapter.
         }
     }
 
-    public synchronized void moveInputBar(final String newParentID) {
-        // Input bar not present -> use normal insertion logic
-        int index = msgList.indexOf(inputBarTree);
-        if (index == -1) {
-            inputBarTree.setParent(newParentID);
-            add(inputBarTree);
-            return;
-        }
-        // Already there -> nothing to do
-        if (newParentID == null ? inputBarTree.getParent() == null : newParentID.equals(inputBarTree.getParent()))
-            return;
-        // Unlink from old parent
-        MessageTree parent = allMsgs.get(inputBarTree.getParent());
-        if (parent != null) parent.removeReply(inputBarTree);
-        msgList.remove(index);
-        // Assign new parent ID
-        inputBarTree.setParent(newParentID);
-        MessageTree newParent = allMsgs.get(newParentID);
-        if (newParentID == null) {
-            // Outside any thread -> move to bottom
-            inputBarTree.updateIndent(0);
-            msgList.add(inputBarTree);
-            notifyItemMoved(index, msgList.size() - 1);
-            updateWithParents(parent);
-        } else if (newParent == null) {
-            // New parent not present -> schedule for re-addition
-            add(inputBarTree);
-            notifyItemRemoved(index);
-        } else if (newParent.isCollapsed()) {
-            // New parent collapsed -> uncollapse and insert
-            newParent.setCollapsed(false);
-            int parIndex = msgList.indexOf(newParent);
-            List<MessageTree> toInsert = newParent.traverseVisibleReplies();
-            toInsert.add(inputBarTree);
-            msgList.addAll(parIndex + 1, toInsert);
-            newParent.addReply(inputBarTree);
-            notifyItemRangeInserted(parIndex + 1, toInsert.size() - 1);
-            notifyItemMoved(index, parIndex + toInsert.size());
+    private void notifyItemMovedLenient(int from, int to) {
+        if (from == -1 && to == -1) {
+            /* NOP */
+        } else if (from == -1) {
+            notifyItemInserted(to);
+        } else if (to == -1) {
+            notifyItemRemoved(from);
         } else {
-            // New parent properly present -> add to its children
-            int insertIndex = msgList.indexOf(newParent) + 1 + newParent.countVisibleReplies();
-            msgList.add(insertIndex, inputBarTree);
-            newParent.addReply(inputBarTree);
-            notifyItemMoved(index, insertIndex);
-            updateWithParents(newParent);
+            notifyItemMoved(from, to);
         }
+    }
+
+    public synchronized void moveInputBar(String newParentID) {
+        // Already there -> nothing to do
+        if (inputBarPresent && (newParentID == null ? inputBarTree.getParent() == null :
+                newParentID.equals(inputBarTree.getParent())))
+            return;
+        inputBarPresent = true;
+        // Attempt to make the new parent visible
+        MessageTree newParent = allMsgs.get(newParentID);
+        if (newParent != null) tryEnsureVisible(newParent, true);
+        // Remove input bar from data structures
+        MessageTree oldParent = allMsgs.get(inputBarTree.getParent());
+        if (oldParent != null) oldParent.removeReply(inputBarTree);
+        List<MessageTree> group = orphans.get(inputBarTree.getParent());
+        if (group != null) group.remove(inputBarTree);
+        int oldIndex = msgList.indexOf(inputBarTree);
+        if (oldIndex != -1) msgList.remove(inputBarTree);
+        // Link it back in
+        inputBarTree.setParent(newParentID);
+        if (newParentID == null) {
+            // No parent -> top-level
+            notifyItemMovedLenient(oldIndex, msgList.size());
+            msgList.add(inputBarTree);
+        } else if (newParent == null) {
+            // Parent absent -> orphaned
+            notifyItemMovedLenient(oldIndex, -1);
+            group = orphans.get(newParentID);
+            if (group == null) {
+                group = new LinkedList<>();
+                orphans.put(newParentID, group);
+            }
+            group.add(inputBarTree);
+            updateWithParents(oldParent);
+            return;
+        } else if (!isVisible(newParent)) {
+            // Parent not visible -> link in but do not move
+            notifyItemMovedLenient(oldIndex, -1);
+            newParent.addReply(inputBarTree);
+        } else {
+            // Parent there and visible -> all fine
+            assert !newParent.isCollapsed() : "Failed to uncollapse visible input bar parent?!";
+            newParent.addReply(inputBarTree);
+            int insertIndex = msgList.indexOf(newParent) + newParent.countVisibleReplies();
+            msgList.add(insertIndex, inputBarTree);
+            notifyItemMovedLenient(oldIndex, insertIndex);
+        }
+        // Here be dragons
+        updateWithParents(oldParent);
+        updateWithParents(newParent);
         inputBar.setIndent(inputBarTree.getIndent());
     }
 
