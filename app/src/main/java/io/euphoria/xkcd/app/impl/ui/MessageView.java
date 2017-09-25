@@ -60,8 +60,8 @@ public class MessageView extends RelativeLayout {
             // Color the background of the sender's nick
             Drawable roundedRect = tintDrawable(getContext(), R.drawable.rounded_rect,
                     hslToRgbInt(hue(sender.getName()),
-                                    COLOR_SENDER_SATURATION,
-                                    COLOR_SENDER_LIGHTNESS));
+                            COLOR_SENDER_SATURATION,
+                            COLOR_SENDER_LIGHTNESS));
             if (VERSION.SDK_INT >= VERSION_CODES.JELLY_BEAN) {
                 nickLbl.setBackground(roundedRect);
             } else {
@@ -85,11 +85,15 @@ public class MessageView extends RelativeLayout {
             collapseLbl.setText("");
             collapseLbl.setVisibility(GONE);
         } else {
-            collapseLbl.setVisibility(VISIBLE);
-            int replies = message.countVisibleReplies(true);
-            String pref = message.isCollapsed() ? "Show" : "Hide";
-            String suff = replies == 1 ? "reply" : "replies";
-            collapseLbl.setText(pref + " " + replies + " " + suff);
+            int replies = message.countVisibleUserReplies(true);
+            if (replies == 0) {
+                collapseLbl.setVisibility(GONE);
+            } else {
+                collapseLbl.setVisibility(VISIBLE);
+                String pref = message.isCollapsed() ? "Show" : "Hide";
+                String suff = replies == 1 ? "reply" : "replies";
+                collapseLbl.setText(pref + " " + replies + " " + suff);
+            }
         }
     }
 
