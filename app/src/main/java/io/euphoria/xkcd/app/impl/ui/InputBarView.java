@@ -26,6 +26,8 @@ public class InputBarView extends RelativeLayout {
 
     public void init() {
         final EditText nickEntry = (EditText) findViewById(R.id.nick_entry);
+        // Color nick-background with unsaturated nickname color as default
+        final int defaultColor = hslToRgbInt(0, 0, COLOR_SENDER_LIGHTNESS);
         nickEntry.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -44,11 +46,12 @@ public class InputBarView extends RelativeLayout {
                     s.replace(0, s.length() - 1, s.toString().trim());
                 }
                 // Recolor background
-                Drawable roundedRect = tintDrawable(getContext(), R.drawable.rounded_rect,
-                        hslToRgbInt(hue(s.toString()),
+                int color = defaultColor;
+                if (s.length() != 0)
+                    color = hslToRgbInt(hue(s.toString()),
                                         COLOR_SENDER_SATURATION,
-                                        COLOR_SENDER_LIGHTNESS));
-
+                            COLOR_SENDER_LIGHTNESS);
+                Drawable roundedRect = tintDrawable(getContext(), R.drawable.rounded_rect, color);
                 if (VERSION.SDK_INT >= VERSION_CODES.JELLY_BEAN) {
                     nickEntry.setBackground(roundedRect);
                 } else {
@@ -56,15 +59,7 @@ public class InputBarView extends RelativeLayout {
                 }
             }
         });
-        // Color nick-background with base color from res/values/colors.xml
-        int color;
-        if (VERSION.SDK_INT >= VERSION_CODES.M) {
-            color = getResources().getColor(R.color.nick_entry, getContext().getTheme());
-        } else {
-            color = getResources().getColor(R.color.nick_entry);
-        }
-        Drawable roundedRect = tintDrawable(getContext(), R.drawable.rounded_rect, color);
-
+        Drawable roundedRect = tintDrawable(getContext(), R.drawable.rounded_rect, defaultColor);
         if (VERSION.SDK_INT >= VERSION_CODES.JELLY_BEAN) {
             nickEntry.setBackground(roundedRect);
         } else {
