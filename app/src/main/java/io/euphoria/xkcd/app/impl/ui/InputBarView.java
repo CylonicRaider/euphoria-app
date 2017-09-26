@@ -7,6 +7,7 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.AttributeSet;
 import android.view.ViewGroup;
+import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
 import android.widget.RelativeLayout;
 
@@ -15,15 +16,31 @@ import io.euphoria.xkcd.app.R;
 import static io.euphoria.xkcd.app.impl.ui.UIUtils.COLOR_SENDER_LIGHTNESS;
 import static io.euphoria.xkcd.app.impl.ui.UIUtils.hslToRgbInt;
 import static io.euphoria.xkcd.app.impl.ui.UIUtils.nickColor;
+import static io.euphoria.xkcd.app.impl.ui.UIUtils.setEnterKeyListener;
 import static io.euphoria.xkcd.app.impl.ui.UIUtils.setRoundedRectBackground;
 
 public class InputBarView extends RelativeLayout {
+
+    public interface SubmitListener {
+
+        boolean onSubmit(InputBarView view);
+
+    }
+
+    private EditText nickEntry;
+    private EditText messageEntry;
+    private MessageTree tree;
+    private SubmitListener submitListener;
+
     public InputBarView(Context context, AttributeSet attrs) {
         super(context, attrs);
     }
 
-    public void init() {
-        final EditText nickEntry = (EditText) findViewById(R.id.nick_entry);
+    @Override
+    protected void onFinishInflate() {
+        super.onFinishInflate();
+        nickEntry = (EditText) findViewById(R.id.nick_entry);
+        messageEntry = (EditText) findViewById(R.id.message_entry);
         // Color nick-background with unsaturated nickname color as default
         final int defaultColor = hslToRgbInt(0, 0, COLOR_SENDER_LIGHTNESS);
         nickEntry.addTextChangedListener(new TextWatcher() {
@@ -50,7 +67,52 @@ public class InputBarView extends RelativeLayout {
                 setRoundedRectBackground(nickEntry, color);
             }
         });
+        setEnterKeyListener(nickEntry, EditorInfo.IME_ACTION_NEXT, new Runnable() {
+            @Override
+            public void run() {
+                messageEntry.requestFocus();
+            }
+        });
+        setEnterKeyListener(messageEntry, EditorInfo.IME_ACTION_DONE, new Runnable() {
+            @Override
+            public void run() {
+                if (submitListener == null || submitListener.onSubmit(InputBarView.this))
+                    messageEntry.setText("");
+            }
+        });
         setRoundedRectBackground(nickEntry, defaultColor);
+    }
+
+    public MessageTree getTree() {
+        return tree;
+    }
+
+    void setTree(MessageTree tree) {
+        this.tree = tree;
+    }
+
+    public EditText getNickEntry() {
+        return nickEntry;
+    }
+
+    public EditText getMessageEntry() {
+        return messageEntry;
+    }
+
+    public SubmitListener getSubmitListener() {
+        return submitListener;
+    }
+
+    public void setSubmitListener(SubmitListener submitListener) {
+        this.submitListener = submitListener;
+    }
+
+    public String getNick() {
+        return nickEntry.getText().toString();
+    }
+
+    public String getMessage() {
+        return messageEntry.getText().toString();
     }
 
     public void setIndent(int indent) {

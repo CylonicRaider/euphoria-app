@@ -23,6 +23,7 @@
         android:layout_height="wrap_content"
         android:ems="10"
         android:hint="@string/select_room_hint"
+        android:imeOptions="actionGo"
         android:inputType="text"/>
 
     <Button

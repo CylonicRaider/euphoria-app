@@ -6,17 +6,16 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.text.InputFilter;
 import android.text.Spanned;
-import android.view.KeyEvent;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.Window;
 import android.view.inputmethod.EditorInfo;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.regex.Pattern;
+
+import static io.euphoria.xkcd.app.impl.ui.UIUtils.setEnterKeyListener;
 
 public class MainActivity extends Activity {
 
@@ -52,18 +51,13 @@ public class MainActivity extends Activity {
                 return changed ? corrected : null;
             }
         };
-        roomField.setFilters(new InputFilter[]{inputFilter});
-        roomField.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+        roomField.setFilters(new InputFilter[] {inputFilter});
+        setEnterKeyListener(roomField, EditorInfo.IME_ACTION_GO, new Runnable() {
             @Override
-            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-                if (actionId == EditorInfo.IME_ACTION_GO) {
-                    showRoom(roomField.getText().toString());
-                    return true;
-                }
-                return false;
+            public void run() {
+                MainActivity.this.showRoom(roomField.getText().toString());
             }
         });
-
         enterBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -75,7 +69,7 @@ public class MainActivity extends Activity {
     private void showRoom(String roomName) {
         if (ROOM_NAME_RE.matcher(roomName).matches()) {
             Intent roomIntent = new Intent(this, RoomActivity.class);
-            Uri roomURI = Uri.parse("https://euphoria.io/room/"+roomName+"/");
+            Uri roomURI = Uri.parse("https://euphoria.io/room/" + roomName + "/");
             roomIntent.setData(roomURI);
             roomIntent.setAction(Intent.ACTION_VIEW);
             startActivity(roomIntent);

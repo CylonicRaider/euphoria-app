@@ -10,8 +10,10 @@ import android.support.annotation.DrawableRes;
 import android.support.v4.view.GestureDetectorCompat;
 import android.util.TypedValue;
 import android.view.GestureDetector;
+import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.TextView;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -262,6 +264,21 @@ public class UIUtils {
             public boolean onTouch(View v, MotionEvent event) {
                 d.onTouchEvent(event);
                 return false;
+            }
+        });
+    }
+
+    public static void setEnterKeyListener(final TextView v, final int expectedActionId, final Runnable r) {
+        v.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                if (actionId == expectedActionId || event.getKeyCode() == KeyEvent.KEYCODE_ENTER &&
+                        event.getAction() == KeyEvent.ACTION_DOWN) {
+                    r.run();
+                    return true;
+                } else {
+                    return false;
+                }
             }
         });
     }

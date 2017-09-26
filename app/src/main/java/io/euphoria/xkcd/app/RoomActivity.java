@@ -10,6 +10,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 
+import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -25,6 +26,7 @@ public class RoomActivity extends FragmentActivity {
     private class TestMessage implements Message {
 
         private final String id;
+        private final String nick;
         private final String parent;
         private final String content;
 
@@ -41,7 +43,7 @@ public class RoomActivity extends FragmentActivity {
 
             @Override
             public String getName() {
-                return "TestBot";
+                return nick;
             }
 
             @Override
@@ -55,10 +57,15 @@ public class RoomActivity extends FragmentActivity {
             }
         };
 
-        public TestMessage(String parent, String id, String content) {
+        public TestMessage(String parent, String id, String nick, String content) {
             this.id = id;
             this.parent = parent;
+            this.nick = nick;
             this.content = content;
+        }
+
+        public TestMessage(String parent, String id, String content) {
+            this(parent, id, "test", content);
         }
 
         @Override
@@ -104,6 +111,8 @@ public class RoomActivity extends FragmentActivity {
     private InputBarView inputBar;
     private MessageListAdapter rmla;
 
+    private int testID = 0;
+
     // Test handling of out-of-order messages.
     private Message[] testMessages = new Message[] {
             new TestMessage("a", "b", "Test message A/B"),
@@ -141,7 +150,6 @@ public class RoomActivity extends FragmentActivity {
 
         LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         inputBar = (InputBarView) inflater.inflate(R.layout.input_bar, null);
-        inputBar.init();
     }
 
     @Override
@@ -161,6 +169,15 @@ public class RoomActivity extends FragmentActivity {
             }
             rmla.moveInputBar(null);
             recyclerView.setAdapter(rmla);
+            inputBar.getNickEntry().requestFocus();
+            inputBar.setSubmitListener(new InputBarView.SubmitListener() {
+                @Override
+                public boolean onSubmit(InputBarView view) {
+                    String id = String.format((Locale) null, "z%05d", testID++);
+                    rmla.add(new TestMessage(view.getTree().getParent(), id, view.getNick(), view.getMessage()));
+                    return true;
+                }
+            });
         } else {
             Intent chooserIntent = new Intent(this, MainActivity.class);
             startActivity(chooserIntent);
