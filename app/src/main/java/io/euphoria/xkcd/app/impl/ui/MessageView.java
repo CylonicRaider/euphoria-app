@@ -2,12 +2,8 @@ package io.euphoria.xkcd.app.impl.ui;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
-import android.support.v4.view.GestureDetectorCompat;
 import android.util.AttributeSet;
 import android.util.Log;
-import android.view.GestureDetector;
-import android.view.MotionEvent;
-import android.view.View;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -87,8 +83,8 @@ public class MessageView extends RelativeLayout {
     }
 
     public void setTextClickListener(OnClickListener l) {
-        setSelectableOnClickListener(findViewById(R.id.nick_lbl), l);
-        setSelectableOnClickListener(findViewById(R.id.content_lbl), l);
+        UIUtils.setSelectableOnClickListener(findViewById(R.id.nick_lbl), l);
+        UIUtils.setSelectableOnClickListener(findViewById(R.id.content_lbl), l);
     }
     public void setCollapserClickListener(OnClickListener l) {
         findViewById(R.id.collapse_lbl).setOnClickListener(l);
@@ -96,28 +92,6 @@ public class MessageView extends RelativeLayout {
 
     public static int computeIndentWidth(Context ctx, int indent) {
         return indent * dpToPx(ctx, PADDING_PER_INDENT);
-    }
-
-    public static void setSelectableOnClickListener(final View v, final OnClickListener l) {
-        if (l == null) {
-            v.setOnTouchListener(null);
-            return;
-        }
-        final GestureDetector.OnGestureListener g = new GestureDetector.SimpleOnGestureListener() {
-            @Override
-            public boolean onSingleTapUp(MotionEvent e) {
-                l.onClick(v);
-                return true;
-            }
-        };
-        final GestureDetectorCompat d = new GestureDetectorCompat(v.getContext(), g);
-        v.setOnTouchListener(new OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                d.onTouchEvent(event);
-                return false;
-            }
-        });
     }
 
 }
