@@ -2,17 +2,19 @@ package io.euphoria.xkcd.app.impl.ui;
 
 import android.content.Context;
 import android.graphics.drawable.Drawable;
+import android.graphics.drawable.GradientDrawable;
 import android.os.Build.VERSION;
 import android.os.Build.VERSION_CODES;
 import android.support.annotation.ColorInt;
 import android.support.annotation.DrawableRes;
-import android.support.annotation.Nullable;
-import android.support.v4.graphics.drawable.DrawableCompat;
 import android.util.TypedValue;
+import android.view.View;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Pattern;
+
+import io.euphoria.xkcd.app.R;
 
 public class UIUtils {
 
@@ -20,33 +22,39 @@ public class UIUtils {
     public static final float COLOR_SENDER_SATURATION = 0.65f;
     public static final float COLOR_SENDER_LIGHTNESS = 0.85f;
     // Color saturation and lightness for @mentions
-    public static final float COLOR_AT_SAT = 0.42f;
+    public static final float COLOR_AT_SATURATION = 0.42f;
     public static final float COLOR_AT_LIGHTNESS = 0.50f;
     // TODO possibly check againts actual list of valid emoji
     private static final Pattern EMOJI_RE = Pattern.compile(":[a-zA-Z!?\\-]+?:");
-    // Cache for hue-hashes
+    // Cache for hue hashes
     private static final Map<String, Double> HUE_CACHE = new HashMap<>();
 
     public static int dpToPx(Context ctx, int dp) {
-        return (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp, ctx.getResources().getDisplayMetrics());
+        return (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp,
+                ctx.getResources().getDisplayMetrics());
     }
 
-    // Deal with the tinting drawables, either with the API for v21+ or with appcompat
-    public static @Nullable Drawable tintDrawable(Context ctx, @DrawableRes int drawable, @ColorInt int color) {
-        Drawable tintedDrawable;
+    // Obtain an instance of the drawable resource with the given color applied
+    public static Drawable colorDrawable(Context ctx, @DrawableRes int drawable, @ColorInt int color) {
+        GradientDrawable ret;
         if (VERSION.SDK_INT >= VERSION_CODES.LOLLIPOP) {
-            tintedDrawable = ctx.getDrawable(drawable);
-            if (tintedDrawable != null) {
-                tintedDrawable.mutate().setTint(color);
-            }
+            ret = (GradientDrawable) ctx.getDrawable(drawable);
         } else {
-            tintedDrawable = ctx.getResources().getDrawable(drawable);
-            if (tintedDrawable != null) {
-                tintedDrawable = DrawableCompat.wrap(tintedDrawable);
-                DrawableCompat.setTint(tintedDrawable.mutate(), color);
-            }
+            ret = (GradientDrawable) ctx.getResources().getDrawable(drawable);
         }
-        return tintedDrawable;
+        if (ret != null)
+            ret.setColor(color);
+        return ret;
+    }
+
+    public static Drawable setRoundedRectBackground(View v, @ColorInt int color) {
+        Drawable ret = colorDrawable(v.getContext(), R.drawable.rounded_rect, color);
+        if (VERSION.SDK_INT >= VERSION_CODES.JELLY_BEAN) {
+            v.setBackground(ret);
+        } else {
+            v.setBackgroundDrawable(ret);
+        }
+        return ret;
     }
 
     /*                                                                       *
@@ -106,12 +114,6 @@ public class UIUtils {
         return val;
     }
 
-    private static String normalize(String text) {
-        return EMOJI_RE.matcher(text).replaceAll("")
-                .replaceAll("[^\\w_\\-]", "")
-                .toLowerCase();
-    }
-
     /**
      * Converts hsla color values to an integer representing the color in 0xAARRGGBB format
      * if h > 360 or h < 0: h = h%360
@@ -125,7 +127,8 @@ public class UIUtils {
      * @param a Opacity
      * @return RGB-ColorInt
      */
-    public static @ColorInt int hslaToRgbaInt(double h, double s, double l, double a) {
+    @ColorInt
+    public static int hslaToRgbaInt(double h, double s, double l, double a) {
         // ensure proper values
         h = (h % 360 + 360) % 360; // real modulus not just remainder
         s = Math.max(Math.min(s, 1f), 0f);
@@ -164,10 +167,13 @@ public class UIUtils {
         r = Math.max(Math.min((r + m) * 255, 255f), 0f);
         g = Math.max(Math.min((g + m) * 255, 255f), 0f);
         b = Math.max(Math.min((b + m) * 255, 255f), 0f);
-        a = Math.max(Math.min(a*255, 255f), 0f);
+        a = Math.max(Math.min(a * 255, 255f), 0f);
         return ((int) a << 8 * 3) + ((int) r << 8 * 2) + ((int) g << 8) + (int) b;
     }
 
+    private static String normalize(String text) {
+        return EMOJI_RE.matcher(text).replaceAll("").replaceAll("[^\\w_\\-]", "").toLowerCase();
+    }
 
     /**
      * Converts hsl color values to an integer representing the color in 0xFFRRGGBB format
@@ -180,7 +186,19 @@ public class UIUtils {
      * @param l Lightness
      * @return RGB-ColorInt
      */
-    public static @ColorInt int hslToRgbInt(double h, double s, double l) {
+    @ColorInt
+    public static int hslToRgbInt(double h, double s, double l) {
         return hslaToRgbaInt(h, s, l, 1f);
     }
+
+    @ColorInt
+    public static int nickColor(String name) {
+        return hslToRgbInt(hue(name), COLOR_SENDER_SATURATION, COLOR_SENDER_LIGHTNESS);
+    }
+
+    @ColorInt
+    public static int mentionColor(String name) {
+        return hslToRgbInt(hue(name), COLOR_AT_SATURATION, COLOR_AT_LIGHTNESS);
+    }
+
 }

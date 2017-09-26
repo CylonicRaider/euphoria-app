@@ -1,7 +1,6 @@
 package io.euphoria.xkcd.app.impl.ui;
 
 import android.content.Context;
-import android.graphics.drawable.Drawable;
 import android.os.Build.VERSION;
 import android.os.Build.VERSION_CODES;
 import android.text.Editable;
@@ -14,10 +13,9 @@ import android.widget.RelativeLayout;
 import io.euphoria.xkcd.app.R;
 
 import static io.euphoria.xkcd.app.impl.ui.UIUtils.COLOR_SENDER_LIGHTNESS;
-import static io.euphoria.xkcd.app.impl.ui.UIUtils.COLOR_SENDER_SATURATION;
 import static io.euphoria.xkcd.app.impl.ui.UIUtils.hslToRgbInt;
-import static io.euphoria.xkcd.app.impl.ui.UIUtils.hue;
-import static io.euphoria.xkcd.app.impl.ui.UIUtils.tintDrawable;
+import static io.euphoria.xkcd.app.impl.ui.UIUtils.nickColor;
+import static io.euphoria.xkcd.app.impl.ui.UIUtils.setRoundedRectBackground;
 
 public class InputBarView extends RelativeLayout {
     public InputBarView(Context context, AttributeSet attrs) {
@@ -41,30 +39,18 @@ public class InputBarView extends RelativeLayout {
 
             @Override
             public void afterTextChanged(Editable s) {
-                // If entered String has padding whitespace, remove it
+                // Strip whitespace
                 if (!s.toString().equals(s.toString().trim())) {
-                    s.replace(0, s.length() - 1, s.toString().trim());
+                    s.replace(0, s.length(), s.toString().trim());
                 }
                 // Recolor background
                 int color = defaultColor;
                 if (s.length() != 0)
-                    color = hslToRgbInt(hue(s.toString()),
-                                        COLOR_SENDER_SATURATION,
-                            COLOR_SENDER_LIGHTNESS);
-                Drawable roundedRect = tintDrawable(getContext(), R.drawable.rounded_rect, color);
-                if (VERSION.SDK_INT >= VERSION_CODES.JELLY_BEAN) {
-                    nickEntry.setBackground(roundedRect);
-                } else {
-                    nickEntry.setBackgroundDrawable(roundedRect);
-                }
+                    color = nickColor(s.toString());
+                setRoundedRectBackground(nickEntry, color);
             }
         });
-        Drawable roundedRect = tintDrawable(getContext(), R.drawable.rounded_rect, defaultColor);
-        if (VERSION.SDK_INT >= VERSION_CODES.JELLY_BEAN) {
-            nickEntry.setBackground(roundedRect);
-        } else {
-            nickEntry.setBackgroundDrawable(roundedRect);
-        }
+        setRoundedRectBackground(nickEntry, defaultColor);
     }
 
     public void setIndent(int indent) {

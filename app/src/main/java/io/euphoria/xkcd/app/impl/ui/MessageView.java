@@ -1,9 +1,6 @@
 package io.euphoria.xkcd.app.impl.ui;
 
 import android.content.Context;
-import android.graphics.drawable.Drawable;
-import android.os.Build.VERSION;
-import android.os.Build.VERSION_CODES;
 import android.support.annotation.NonNull;
 import android.support.v4.view.GestureDetectorCompat;
 import android.util.AttributeSet;
@@ -17,12 +14,10 @@ import android.widget.TextView;
 import io.euphoria.xkcd.app.R;
 import io.euphoria.xkcd.app.data.SessionView;
 
-import static io.euphoria.xkcd.app.impl.ui.UIUtils.COLOR_SENDER_LIGHTNESS;
-import static io.euphoria.xkcd.app.impl.ui.UIUtils.COLOR_SENDER_SATURATION;
 import static io.euphoria.xkcd.app.impl.ui.UIUtils.dpToPx;
 import static io.euphoria.xkcd.app.impl.ui.UIUtils.hslToRgbInt;
-import static io.euphoria.xkcd.app.impl.ui.UIUtils.hue;
-import static io.euphoria.xkcd.app.impl.ui.UIUtils.tintDrawable;
+import static io.euphoria.xkcd.app.impl.ui.UIUtils.nickColor;
+import static io.euphoria.xkcd.app.impl.ui.UIUtils.setRoundedRectBackground;
 
 public class MessageView extends RelativeLayout {
 
@@ -58,26 +53,12 @@ public class MessageView extends RelativeLayout {
             SessionView sender = message.getMessage().getSender();
             nickLbl.setText(sender.getName());
             // Color the background of the sender's nick
-            Drawable roundedRect = tintDrawable(getContext(), R.drawable.rounded_rect,
-                    hslToRgbInt(hue(sender.getName()),
-                            COLOR_SENDER_SATURATION,
-                            COLOR_SENDER_LIGHTNESS));
-            if (VERSION.SDK_INT >= VERSION_CODES.JELLY_BEAN) {
-                nickLbl.setBackground(roundedRect);
-            } else {
-                nickLbl.setBackgroundDrawable(roundedRect);
-            }
+            setRoundedRectBackground(nickLbl, nickColor(sender.getName()));
         } else {
             nickLbl.setText("N/A");
             contentLbl.setText("N/A");
             // Make nick background red
-            Drawable roundedRect = tintDrawable(getContext(), R.drawable.rounded_rect,
-                    hslToRgbInt(0, 1, 0.5f));
-            if (VERSION.SDK_INT >= VERSION_CODES.JELLY_BEAN) {
-                nickLbl.setBackground(roundedRect);
-            } else {
-                nickLbl.setBackgroundDrawable(roundedRect);
-            }
+            setRoundedRectBackground(nickLbl, hslToRgbInt(0, 1, 0.5f));
             Log.e(TAG, "updateDisplay: MessageView message is null!",
                     new RuntimeException("MessageView message is null!"));
         }
