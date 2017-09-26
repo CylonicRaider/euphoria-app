@@ -3,4 +3,6 @@
     <string name="select_room_hint">Room name</string>
     <string name="join_room_text">Join room</string>
     <string name="message_entry_hint">Message</string>
+    <string name="not_available">N/A</string>
+    <string name="collapser_fallback">Collapse/uncollapse</string>
 </resources>

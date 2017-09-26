@@ -13,8 +13,8 @@
         android:paddingLeft="4dp"
         android:paddingRight="4dp"
         android:paddingStart="4dp"
-        android:text="N/A"
-        android:textColor="@color/black"
+        android:text="@string/not_available"
+        android:textColor="@color/text_message"
         android:textIsSelectable="true"
         android:textSize="18sp"/>
 
@@ -27,8 +27,8 @@
         android:layout_toEndOf="@+id/nick_lbl"
         android:layout_toRightOf="@+id/nick_lbl"
         android:autoLink="web|email"
-        android:text="N/A"
-        android:textColor="@color/primary_text"
+        android:text="@string/not_available"
+        android:textColor="@color/text_message"
         android:textIsSelectable="true"
         android:textSize="18sp"/>
 
@@ -42,9 +42,9 @@
         android:layout_marginLeft="10dp"
         android:layout_marginStart="10dp"
         android:gravity="start"
-        android:text="Show n replies"
+        android:text="@string/collapser_fallback"
         android:textAlignment="textStart"
-        android:textColor="@color/secondary_text"
+        android:textColor="@color/text_collapser"
         android:textIsSelectable="false"
         android:textSize="12sp"/>
 

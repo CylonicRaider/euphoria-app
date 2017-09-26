@@ -3,4 +3,6 @@
     <style name="AppTheme">
         <!-- No customizations -->
     </style>
+
+    <style name="AppTheme.Title"/>
 </resources>

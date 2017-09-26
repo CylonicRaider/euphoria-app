@@ -1,22 +1,9 @@
 <resources>
-    <color name="black">#000000</color>
-    <color name="grey_900">#212121</color>
-    <color name="grey_400">#bdbdbd</color>
-    <color name="grey_300">#e0e0e0</color>
-    <color name="grey_100">#f5f5f5</color>
-    <color name="grey_50">#fafafa</color>
-    <color name="base_green">#008000</color>
-    <color name="white">#ffffff</color>
-    <color name="transparent">#00000000</color>
+    <color name="primary">#00a000</color>
+    <color name="primary_dark">#009000</color>
+    <color name="accent">#806000</color>
 
-    <color name="primary_text">@color/black</color>
-    <color name="secondary_text">#46000000</color>
-    <color name="disabled_text">#32000000</color>
-    <color name="hint_text">@color/disabled_text</color>
-
-    <color name="title_bar">@color/grey_300</color>
-    <color name="toolbar_bg">@color/grey_100</color>
-    <color name="activity_bg">@color/grey_50</color>
-    <color name="nick_entry">@color/grey_400</color>
-    <color name="collapse_toggle">@color/secondary_text</color>
+    <color name="text_message">@android:color/black</color>
+    <color name="text_collapser">@android:color/tertiary_text_light</color>
+    <color name="background_input">@android:color/white</color>
 </resources>
