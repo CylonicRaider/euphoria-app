@@ -278,7 +278,7 @@ public class UIUtils {
         v.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-                if (actionId == expectedActionId || event.getKeyCode() == KeyEvent.KEYCODE_ENTER &&
+                if (actionId == expectedActionId || event != null && event.getKeyCode() == KeyEvent.KEYCODE_ENTER &&
                         event.getAction() == KeyEvent.ACTION_DOWN) {
                     r.run();
                     return true;
