@@ -253,6 +253,13 @@ public class UIUtils {
         }
         final GestureDetector.OnGestureListener g = new GestureDetector.SimpleOnGestureListener() {
             @Override
+            public boolean onDown(MotionEvent e) {
+                // HACK: Gingerbread does not deliver the ACTION_UP event unless the ACTION_DOWN one has been
+                //       consumed.
+                return true;
+            }
+
+            @Override
             public boolean onSingleTapUp(MotionEvent e) {
                 l.onClick(v);
                 return true;
@@ -262,8 +269,7 @@ public class UIUtils {
         v.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
-                d.onTouchEvent(event);
-                return false;
+                return d.onTouchEvent(event);
             }
         });
     }

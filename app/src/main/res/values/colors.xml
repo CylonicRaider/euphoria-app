@@ -1,6 +1,6 @@
 <resources>
     <color name="primary">#00a000</color>
-    <color name="primary_dark">#009000</color>
+    <color name="primary_dark">#008000</color>
     <color name="accent">#806000</color>
 
     <color name="text_message">@android:color/black</color>

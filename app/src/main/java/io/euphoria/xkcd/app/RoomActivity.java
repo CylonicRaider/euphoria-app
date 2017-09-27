@@ -216,4 +216,5 @@ public class RoomActivity extends FragmentActivity {
     private boolean isEuphoriaURI(Uri uri) {
         return uri.getHost().toLowerCase().equals("euphoria.io");
     }
+
 }

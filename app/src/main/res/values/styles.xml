@@ -1,6 +1,6 @@
 <resources>
     <!-- Deriving from whatever default theme there was -->
     <style name="AppTheme" parent="android:Theme.Light"/>
-    <!-- No customizations, either -->
-    <style name="AppTheme.Title"/>
+    <!-- Dark theme for title screen -->
+    <style name="AppTheme.Title" parent="android:Theme"/>
 </resources>
