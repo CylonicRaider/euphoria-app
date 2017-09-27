@@ -73,7 +73,7 @@ public class InputBarView extends RelativeLayout {
                 messageEntry.requestFocus();
             }
         });
-        setEnterKeyListener(messageEntry, EditorInfo.IME_ACTION_DONE, new Runnable() {
+        setEnterKeyListener(messageEntry, EditorInfo.IME_ACTION_SEND, new Runnable() {
             @Override
             public void run() {
                 if (submitListener == null || submitListener.onSubmit(InputBarView.this))

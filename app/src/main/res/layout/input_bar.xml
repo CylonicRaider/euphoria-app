@@ -33,7 +33,7 @@
         android:layout_toRightOf="@+id/nick_entry"
         android:background="@null"
         android:hint="@string/message_entry_hint"
-        android:imeOptions="actionDone"
+        android:imeOptions="actionSend"
         android:inputType="text"/>
 
     <View
