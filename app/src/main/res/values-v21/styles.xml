@@ -14,7 +14,7 @@
         <!-- Material colors -->
         <item name="android:colorPrimary">@color/primary</item>
         <item name="android:colorPrimaryDark">@color/primary_dark</item>
-        <item name="android:colorAccent">@color/accent</item>
+        <item name="android:colorAccent">@color/accent_dark</item>
         <!-- Ancillary Material colors -->
         <item name="android:windowBackground">@color/primary</item>
         <item name="android:statusBarColor">@color/primary_dark</item>
