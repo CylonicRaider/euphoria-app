@@ -188,7 +188,10 @@ public class RoomActivity extends FragmentActivity {
                 @Override
                 public boolean onSubmit(InputBarView view) {
                     String id = String.format((Locale) null, "z%05d", testID++);
-                    rmla.add(new TestMessage(view.getTree().getParent(), id, view.getNick(), view.getMessage()));
+                    String parent = view.getTree().getParent();
+                    rmla.add(new TestMessage(parent, id, view.getNick(), view.getMessage()));
+                    if (parent == null)
+                        rmla.moveInputBar(id);
                     return true;
                 }
             });
