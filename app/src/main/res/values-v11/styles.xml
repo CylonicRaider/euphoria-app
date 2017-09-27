@@ -1,0 +1,6 @@
+<resources>
+    <!-- Post-Honeycomb override of the theme -->
+    <style name="AppTheme" parent="android:Theme.Holo.Light"/>
+    <!-- No customizations -->
+    <style name="AppTheme.Title"/>
+</resources>

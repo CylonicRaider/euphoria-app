@@ -9,7 +9,7 @@
         <!-- Ancillary Material colors -->
         <item name="android:statusBarColor">@color/primary_dark</item>
     </style>
-
+    <!-- Title screen variation (puffing up feathers) -->
     <style name="AppTheme.Title" parent="android:Theme.Material.NoActionBar">
         <!-- Material colors -->
         <item name="android:colorPrimary">@color/primary</item>

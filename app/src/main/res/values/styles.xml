@@ -1,8 +1,6 @@
 <resources>
-    <!-- No parent to make Android choose the default theme -->
-    <style name="AppTheme">
-        <!-- No customizations -->
-    </style>
-
+    <!-- Deriving from whatever default theme there was -->
+    <style name="AppTheme" parent="android:Theme.Light"/>
+    <!-- No customizations, either -->
     <style name="AppTheme.Title"/>
 </resources>
