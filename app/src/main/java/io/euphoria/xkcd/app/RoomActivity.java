@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.widget.LinearLayoutManager;
@@ -99,6 +100,8 @@ public class RoomActivity extends FragmentActivity {
         }
     }
 
+    private final String TAG = "RoomActivity";
+
     // Tag for finding RoomControllerFragment
     private static final String TAG_ROOM_CONTROLLER_FRAGMENT = RoomControllerFragment.class.getSimpleName();
     private static final Pattern ROOM_PATH_RE = Pattern.compile("^/room/([A-Za-z0-9:]+)/?$");
@@ -169,7 +172,18 @@ public class RoomActivity extends FragmentActivity {
             }
             rmla.moveInputBar(null);
             recyclerView.setAdapter(rmla);
-            inputBar.getNickEntry().requestFocus();
+            rmla.setInputBarListener(new MessageListAdapter.InputBarListener() {
+                @Override
+                public void onInputBarMoved(String oldParent, String newParent) {
+                    new Handler(getMainLooper()).post(new Runnable() {
+                        @Override
+                        public void run() {
+                            inputBar.requestEntryFocus();
+                        }
+                    });
+                }
+            });
+            inputBar.requestEntryFocus();
             inputBar.setSubmitListener(new InputBarView.SubmitListener() {
                 @Override
                 public boolean onSubmit(InputBarView view) {

@@ -19,6 +19,12 @@ import io.euphoria.xkcd.app.data.Message;
 // TODO input bar
 public class MessageListAdapter extends RecyclerView.Adapter<MessageListAdapter.ViewHolder> {
 
+    public interface InputBarListener {
+
+        void onInputBarMoved(String oldParent, String newParent);
+
+    }
+
     // For logging
     private static final String TAG = "MessageListAdapter";
 
@@ -39,6 +45,8 @@ public class MessageListAdapter extends RecyclerView.Adapter<MessageListAdapter.
     private final MessageTree inputBarTree;
     // The bar is linked in upon the first moveInputBar and then present until removed manually
     private boolean inputBarPresent;
+
+    private InputBarListener inputBarListener;
 
     public MessageListAdapter(InputBarView inputBar) {
         this.inputBar = inputBar;
@@ -103,6 +111,18 @@ public class MessageListAdapter extends RecyclerView.Adapter<MessageListAdapter.
     public int getItemViewType(int position) {
         MessageTree mt = msgList.get(position);
         return (mt.getMessage() == null) ? INPUT_BAR : MESSAGE;
+    }
+
+    public InputBarListener getInputBarListener() {
+        return inputBarListener;
+    }
+
+    public void setInputBarListener(InputBarListener listener) {
+        this.inputBarListener = listener;
+    }
+
+    private void dispatchInputBarMoved(String oldParentID, String newParentID) {
+        if (inputBarListener != null) inputBarListener.onInputBarMoved(oldParentID, newParentID);
     }
 
     private List<MessageTree> getParents(@NonNull MessageTree mt) {
@@ -184,7 +204,7 @@ public class MessageListAdapter extends RecyclerView.Adapter<MessageListAdapter.
         }
     }
 
-    public MessageTree getTree(Message message) {
+    public synchronized MessageTree getTree(Message message) {
         if (message == null) return inputBarTree;
         return allMsgs.get(message.getID());
     }
@@ -286,7 +306,8 @@ public class MessageListAdapter extends RecyclerView.Adapter<MessageListAdapter.
         MessageTree newParent = allMsgs.get(newParentID);
         if (newParent != null) tryEnsureVisible(newParent, true);
         // Remove input bar from data structures
-        MessageTree oldParent = allMsgs.get(inputBarTree.getParent());
+        String oldParentID = inputBarTree.getParent();
+        MessageTree oldParent = allMsgs.get(oldParentID);
         if (oldParent != null) oldParent.removeReply(inputBarTree);
         List<MessageTree> group = orphans.get(inputBarTree.getParent());
         if (group != null) group.remove(inputBarTree);
@@ -309,6 +330,7 @@ public class MessageListAdapter extends RecyclerView.Adapter<MessageListAdapter.
             }
             group.add(inputBarTree);
             updateWithParents(oldParent);
+            dispatchInputBarMoved(oldParentID, newParentID);
             return;
         } else if (!isVisible(newParent)) {
             // Parent not visible -> link in but do not move
@@ -326,6 +348,7 @@ public class MessageListAdapter extends RecyclerView.Adapter<MessageListAdapter.
         updateWithParents(oldParent);
         updateWithParents(newParent);
         inputBar.setIndent(inputBarTree.getIndent());
+        dispatchInputBarMoved(oldParentID, newParentID);
     }
 
     public synchronized boolean tryEnsureVisible(@NonNull MessageTree mt, boolean expand) {

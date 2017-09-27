@@ -130,4 +130,12 @@ public class InputBarView extends RelativeLayout {
         }
     }
 
+    public boolean requestEntryFocus() {
+        if (nickEntry.getText().length() == 0) {
+            return nickEntry.requestFocus();
+        } else {
+            return messageEntry.requestFocus();
+        }
+    }
+
 }
