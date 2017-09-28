@@ -21,7 +21,6 @@
         android:paddingRight="4dp"
         android:paddingStart="4dp"/>
 
-    <!-- TODO test with non-Material themes -->
     <EditText
         android:id="@+id/message_entry"
         android:layout_width="match_parent"
