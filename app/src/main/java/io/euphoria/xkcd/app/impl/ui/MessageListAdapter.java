@@ -344,7 +344,6 @@ public class MessageListAdapter extends RecyclerView.Adapter<MessageListAdapter.
             msgList.add(insertIndex, inputBarTree);
             notifyItemMovedLenient(oldIndex, insertIndex);
         }
-        // Here be dragons
         updateWithParents(oldParent);
         updateWithParents(newParent);
         inputBar.setIndent(inputBarTree.getIndent());
