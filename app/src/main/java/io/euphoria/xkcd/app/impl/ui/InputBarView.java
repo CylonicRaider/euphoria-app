@@ -1,13 +1,9 @@
 package io.euphoria.xkcd.app.impl.ui;
 
 import android.content.Context;
-import android.content.res.TypedArray;
-import android.os.Build.VERSION;
-import android.os.Build.VERSION_CODES;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.AttributeSet;
-import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
 import android.widget.RelativeLayout;
@@ -28,7 +24,7 @@ public class InputBarView extends RelativeLayout {
 
     }
 
-    private final MarginLayoutParams defaultParams;
+    private final MarginLayoutParams defaultLayoutParams;
     private EditText nickEntry;
     private EditText messageEntry;
     private MessageTree tree;
@@ -36,19 +32,7 @@ public class InputBarView extends RelativeLayout {
 
     public InputBarView(Context context, AttributeSet attrs) {
         super(context, attrs);
-        // FIXME only resolving some of the attributes; move into custom layout manager?
-        // Here be dragons
-        int[] indices = new int[] {android.R.attr.layout_width, android.R.attr.layout_height,
-                android.R.attr.layout_marginTop, android.R.attr.layout_marginBottom};
-        TypedArray values = context.obtainStyledAttributes(attrs, indices);
-        // Yes, WRAP_CONTENT *is* already in the right domain, thank you.
-        @SuppressWarnings("ResourceType")
-        ViewGroup.LayoutParams core = new ViewGroup.LayoutParams(
-                values.getLayoutDimension(0, LayoutParams.MATCH_PARENT),
-                values.getLayoutDimension(1, LayoutParams.WRAP_CONTENT));
-        defaultParams = new MarginLayoutParams(core);
-        defaultParams.setMargins(0, values.getDimensionPixelSize(2, 0), 0, values.getDimensionPixelSize(3, 0));
-        values.recycle();
+        defaultLayoutParams = MessageView.getDefaultMargins(context, attrs);
     }
 
     @Override
@@ -133,19 +117,16 @@ public class InputBarView extends RelativeLayout {
     public void setIndent(int indent) {
         MarginLayoutParams lp = (MarginLayoutParams) getLayoutParams();
         if (lp == null) {
-            lp = new MarginLayoutParams(defaultParams);
+            lp = new MarginLayoutParams(defaultLayoutParams);
             setLayoutParams(lp);
         }
-        lp.leftMargin = MessageView.computeIndentWidth(getContext(), indent);
-        if (VERSION.SDK_INT >= VERSION_CODES.JELLY_BEAN_MR1) {
-            lp.setMarginStart(lp.leftMargin);
-        }
+        MessageView.setMarginForIndent(getContext(), lp, indent);
         if (indent == 0) {
-            lp.topMargin = defaultParams.topMargin + defaultParams.bottomMargin;
+            lp.topMargin = defaultLayoutParams.topMargin + defaultLayoutParams.bottomMargin;
             lp.bottomMargin = 0;
         } else {
-            lp.topMargin = defaultParams.topMargin;
-            lp.bottomMargin = defaultParams.bottomMargin;
+            lp.topMargin = defaultLayoutParams.topMargin;
+            lp.bottomMargin = defaultLayoutParams.bottomMargin;
         }
     }
 
