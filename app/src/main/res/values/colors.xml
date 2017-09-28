@@ -4,6 +4,8 @@
     <color name="accent">#a08000</color>
     <color name="accent_dark">#806000</color>
 
+    <color name="background_message">#f0f0f0</color>
+
     <color name="text_message">@android:color/black</color>
     <color name="text_collapser">@android:color/tertiary_text_light</color>
     <color name="background_input">@android:color/white</color>
