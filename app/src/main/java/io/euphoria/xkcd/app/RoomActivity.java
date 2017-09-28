@@ -3,6 +3,7 @@ package io.euphoria.xkcd.app;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.FragmentActivity;
@@ -150,6 +151,9 @@ public class RoomActivity extends FragmentActivity {
         LinearLayoutManager lm = new LinearLayoutManager(this);
         lm.setStackFromEnd(true);
         recyclerView.setLayoutManager(lm);
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.HONEYCOMB) {
+            recyclerView.setItemAnimator(null);
+        }
 
         LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         inputBar = (InputBarView) inflater.inflate(R.layout.input_bar, null);
