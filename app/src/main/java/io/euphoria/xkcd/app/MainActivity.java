@@ -15,11 +15,10 @@ import android.widget.Toast;
 
 import java.util.regex.Pattern;
 
+import static io.euphoria.xkcd.app.impl.ui.RoomUIImpl.isValidRoomName;
 import static io.euphoria.xkcd.app.impl.ui.UIUtils.setEnterKeyListener;
 
 public class MainActivity extends Activity {
-
-    Pattern ROOM_NAME_RE = Pattern.compile("^[A-Za-z0-9:]+$");
 
     boolean mDualPane;
     Button enterBtn;
@@ -42,7 +41,7 @@ public class MainActivity extends Activity {
                 StringBuilder corrected = new StringBuilder();
                 boolean changed = false;
                 for (int i = start; i < end; i++) {
-                    if (ROOM_NAME_RE.matcher(Character.toString(source.charAt(i))).matches()) {
+                    if (Pattern.matches("[a-z0-9:]", Character.toString(source.charAt(i)))) {
                         corrected.append(source.charAt(i));
                     } else {
                         changed = true;
@@ -55,7 +54,7 @@ public class MainActivity extends Activity {
         setEnterKeyListener(roomField, EditorInfo.IME_ACTION_GO, new Runnable() {
             @Override
             public void run() {
-                MainActivity.this.showRoom(roomField.getText().toString());
+                showRoom(roomField.getText().toString());
             }
         });
         enterBtn.setOnClickListener(new View.OnClickListener() {
@@ -67,7 +66,7 @@ public class MainActivity extends Activity {
     }
 
     private void showRoom(String roomName) {
-        if (ROOM_NAME_RE.matcher(roomName).matches()) {
+        if (isValidRoomName(roomName)) {
             Intent roomIntent = new Intent(this, RoomActivity.class);
             Uri roomURI = Uri.parse("https://euphoria.io/room/" + roomName + "/");
             roomIntent.setData(roomURI);

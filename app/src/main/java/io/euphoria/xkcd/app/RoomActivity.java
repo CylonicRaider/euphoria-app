@@ -2,7 +2,6 @@ package io.euphoria.xkcd.app;
 
 import android.content.Context;
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -13,8 +12,6 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 
 import java.util.Locale;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import io.euphoria.xkcd.app.control.RoomController;
 import io.euphoria.xkcd.app.data.Message;
@@ -22,6 +19,9 @@ import io.euphoria.xkcd.app.data.SessionView;
 import io.euphoria.xkcd.app.impl.ui.InputBarView;
 import io.euphoria.xkcd.app.impl.ui.MessageListAdapter;
 import io.euphoria.xkcd.app.impl.ui.RoomUIImpl;
+
+import static io.euphoria.xkcd.app.impl.ui.RoomUIImpl.getRoomName;
+import static io.euphoria.xkcd.app.impl.ui.RoomUIImpl.isValidRoomUri;
 
 public class RoomActivity extends FragmentActivity {
 
@@ -105,7 +105,6 @@ public class RoomActivity extends FragmentActivity {
 
     // Tag for finding RoomControllerFragment
     private static final String TAG_ROOM_CONTROLLER_FRAGMENT = RoomControllerFragment.class.getSimpleName();
-    private static final Pattern ROOM_PATH_RE = Pattern.compile("^/room/([A-Za-z0-9:]+)/?$");
 
     private RoomControllerFragment rcf;
     private RoomController roomController;
@@ -164,11 +163,12 @@ public class RoomActivity extends FragmentActivity {
         super.onStart();
         Intent i = getIntent();
         // Check passed path with ROOM_PATH_RE, if it doesn't match return to the MainActivity
-        Matcher m = ROOM_PATH_RE.matcher(i.getData().getPath());
-        if (Intent.ACTION_VIEW.equals(i.getAction()) && isEuphoriaURI(i.getData()) && m.matches()) {
-            setTitle("&" + m.group(1));
+        if (Intent.ACTION_VIEW.equals(i.getAction()) && isValidRoomUri(i.getData())) {
+            String roomName = getRoomName(i.getData());
+            setTitle("&" + roomName);
 
-            roomUI = (RoomUIImpl) roomController.getManager().getRoomUI(m.group(1));
+            roomUI = (RoomUIImpl) roomController.getManager().getRoomUI(roomName);
+
             rmla = new MessageListAdapter(inputBar);
             // TODO remove test messages
             for (Message msg : testMessages) {
@@ -209,16 +209,6 @@ public class RoomActivity extends FragmentActivity {
     protected void onDestroy() {
         super.onDestroy();
         //roomController.shutdown(); //NYI
-    }
-
-    /**
-     * Checks if an URI describes a room of euphoria
-     *
-     * @param uri URI to check
-     * @return True if URI describes an euphoria room
-     */
-    private boolean isEuphoriaURI(Uri uri) {
-        return uri.getHost().toLowerCase().equals("euphoria.io");
     }
 
 }
