@@ -22,7 +22,6 @@ public class MainActivity extends Activity {
     private Button enterBtn;
     private AutoCompleteTextView roomField;
 
-    // TODO comment
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -33,6 +32,7 @@ public class MainActivity extends Activity {
         enterBtn = (Button) findViewById(R.id.join_room);
         roomField = (AutoCompleteTextView) findViewById(R.id.room_name);
 
+        // Filter out definitely invalid characters
         InputFilter inputFilter = new InputFilter() {
             @Override
             public CharSequence filter(CharSequence source, int start, int end, Spanned dest, int dstart, int dend) {
@@ -49,6 +49,8 @@ public class MainActivity extends Activity {
             }
         };
         roomField.setFilters(new InputFilter[] {inputFilter});
+
+        // Go to the selected room when done
         setEnterKeyListener(roomField, EditorInfo.IME_ACTION_GO, new Runnable() {
             @Override
             public void run() {
