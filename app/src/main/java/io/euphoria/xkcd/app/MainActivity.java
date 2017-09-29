@@ -19,9 +19,8 @@ import static io.euphoria.xkcd.app.impl.ui.UIUtils.setEnterKeyListener;
 
 public class MainActivity extends Activity {
 
-    boolean mDualPane;
-    Button enterBtn;
-    AutoCompleteTextView roomField;
+    private Button enterBtn;
+    private AutoCompleteTextView roomField;
 
     // TODO comment
     @Override
