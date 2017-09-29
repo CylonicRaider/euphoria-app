@@ -121,13 +121,6 @@ public class InputBarView extends RelativeLayout {
             setLayoutParams(lp);
         }
         MessageView.setMarginForIndent(getContext(), lp, indent);
-        if (indent == 0) {
-            lp.topMargin = defaultLayoutParams.topMargin + defaultLayoutParams.bottomMargin;
-            lp.bottomMargin = 0;
-        } else {
-            lp.topMargin = defaultLayoutParams.topMargin;
-            lp.bottomMargin = defaultLayoutParams.bottomMargin;
-        }
     }
 
     public boolean requestEntryFocus() {
