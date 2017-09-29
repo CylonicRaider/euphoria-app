@@ -20,6 +20,7 @@ public class RoomUIImpl implements RoomUI {
 
     /* Loosened variations of the patterns in backend/handlers.go as of 097b7da2e0b23e9c5828c0e4831a3de660bb5302.
      * They are lowercase-only indeed. */
+    private static final Pattern ROOM_FRAG_RE = Pattern.compile("[a-z0-9:]*");
     private static final Pattern ROOM_NAME_RE = Pattern.compile("(?:[a-z]+:)?[a-z0-9]+");
     private static final Pattern ROOM_PATH_RE = Pattern.compile("/room/(" + ROOM_NAME_RE.pattern() + ")/?");
 
@@ -100,6 +101,17 @@ public class RoomUIImpl implements RoomUI {
     @Override
     public void removeEventListener(@NonNull UIListener l) {
         listeners.remove(l);
+    }
+
+    /**
+     * Test whether the given characters are a potentially valid component of a room name.
+     * Useful for, e.g., pre-filtering text fields.
+     *
+     * @param chars Characters to test
+     * @return The test result
+     */
+    public static boolean isValidRoomNameFragment(String chars) {
+        return ROOM_FRAG_RE.matcher(chars).matches();
     }
 
     /**

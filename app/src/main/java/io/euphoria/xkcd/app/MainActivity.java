@@ -13,9 +13,8 @@ import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.Toast;
 
-import java.util.regex.Pattern;
-
 import static io.euphoria.xkcd.app.impl.ui.RoomUIImpl.isValidRoomName;
+import static io.euphoria.xkcd.app.impl.ui.RoomUIImpl.isValidRoomNameFragment;
 import static io.euphoria.xkcd.app.impl.ui.UIUtils.setEnterKeyListener;
 
 public class MainActivity extends Activity {
@@ -41,7 +40,7 @@ public class MainActivity extends Activity {
                 StringBuilder corrected = new StringBuilder();
                 boolean changed = false;
                 for (int i = start; i < end; i++) {
-                    if (Pattern.matches("[a-z0-9:]", Character.toString(source.charAt(i)))) {
+                    if (isValidRoomNameFragment(Character.toString(source.charAt(i)))) {
                         corrected.append(source.charAt(i));
                     } else {
                         changed = true;
