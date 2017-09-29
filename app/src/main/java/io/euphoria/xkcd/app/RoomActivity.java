@@ -161,48 +161,49 @@ public class RoomActivity extends FragmentActivity {
     @Override
     protected void onStart() {
         super.onStart();
+
         Intent i = getIntent();
-        // Check passed path with ROOM_PATH_RE, if it doesn't match return to the MainActivity
-        if (Intent.ACTION_VIEW.equals(i.getAction()) && isValidRoomUri(i.getData())) {
-            String roomName = getRoomName(i.getData());
-            setTitle("&" + roomName);
-
-            roomUI = (RoomUIImpl) roomController.getManager().getRoomUI(roomName);
-
-            rmla = new MessageListAdapter(inputBar);
-            // TODO remove test messages
-            for (Message msg : testMessages) {
-                rmla.add(msg);
-            }
-            rmla.moveInputBar(null);
-            recyclerView.setAdapter(rmla);
-            rmla.setInputBarListener(new MessageListAdapter.InputBarListener() {
-                @Override
-                public void onInputBarMoved(String oldParent, String newParent) {
-                    new Handler(getMainLooper()).post(new Runnable() {
-                        @Override
-                        public void run() {
-                            inputBar.requestEntryFocus();
-                        }
-                    });
-                }
-            });
-            inputBar.requestEntryFocus();
-            inputBar.setSubmitListener(new InputBarView.SubmitListener() {
-                @Override
-                public boolean onSubmit(InputBarView view) {
-                    String id = String.format((Locale) null, "z%05d", testID++);
-                    String parent = view.getTree().getParent();
-                    rmla.add(new TestMessage(parent, id, view.getNick(), view.getMessage()));
-                    if (parent == null)
-                        rmla.moveInputBar(id);
-                    return true;
-                }
-            });
-        } else {
+        if (!Intent.ACTION_VIEW.equals(i.getAction()) || !isValidRoomUri(i.getData())) {
             Intent chooserIntent = new Intent(this, MainActivity.class);
             startActivity(chooserIntent);
+            return;
         }
+
+        String roomName = getRoomName(i.getData());
+        setTitle("&" + roomName);
+        roomUI = (RoomUIImpl) roomController.getManager().getRoomUI(roomName);
+
+        rmla = new MessageListAdapter(inputBar);
+        // TODO remove test messages
+        for (Message msg : testMessages) {
+            rmla.add(msg);
+        }
+        rmla.moveInputBar(null);
+        recyclerView.setAdapter(rmla);
+        rmla.setInputBarListener(new MessageListAdapter.InputBarListener() {
+            @Override
+            public void onInputBarMoved(String oldParent, String newParent) {
+                new Handler(getMainLooper()).post(new Runnable() {
+                    @Override
+                    public void run() {
+                        inputBar.requestEntryFocus();
+                    }
+                });
+            }
+        });
+
+        inputBar.requestEntryFocus();
+        inputBar.setSubmitListener(new InputBarView.SubmitListener() {
+            @Override
+            public boolean onSubmit(InputBarView view) {
+                String id = String.format((Locale) null, "z%05d", testID++);
+                String parent = view.getTree().getParent();
+                rmla.add(new TestMessage(parent, id, view.getNick(), view.getMessage()));
+                if (parent == null)
+                    rmla.moveInputBar(id);
+                return true;
+            }
+        });
     }
 
     @Override

@@ -66,14 +66,15 @@ public class MainActivity extends Activity {
     }
 
     private void showRoom(String roomName) {
-        if (isValidRoomName(roomName)) {
-            Intent roomIntent = new Intent(this, RoomActivity.class);
-            Uri roomURI = Uri.parse("https://euphoria.io/room/" + roomName + "/");
-            roomIntent.setData(roomURI);
-            roomIntent.setAction(Intent.ACTION_VIEW);
-            startActivity(roomIntent);
-        } else {
+        if (!isValidRoomName(roomName)) {
             Toast.makeText(MainActivity.this, "Please enter a valid room name", Toast.LENGTH_SHORT).show();
+            return;
         }
+        Intent roomIntent = new Intent(this, RoomActivity.class);
+        Uri roomURI = Uri.parse("https://euphoria.io/room/" + roomName + "/");
+        roomIntent.setData(roomURI);
+        roomIntent.setAction(Intent.ACTION_VIEW);
+        startActivity(roomIntent);
     }
+
 }
