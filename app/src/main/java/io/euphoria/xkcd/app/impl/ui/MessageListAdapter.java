@@ -8,6 +8,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -34,6 +35,8 @@ public class MessageListAdapter extends RecyclerView.Adapter<MessageListAdapter.
 
     // Index of all MessageTree objects
     private final Map<String, MessageTree> allMsgs = new HashMap<>();
+    // Index of all top-level MessageTree objects
+    private final List<MessageTree> rootMsgs = new ArrayList<>();
     // Index of all MessageTree objects whose parents don't exist (yet)
     private final Map<String, List<MessageTree>> orphans = new HashMap<>();
     // List of all displayed messages
@@ -253,10 +256,15 @@ public class MessageListAdapter extends RecyclerView.Adapter<MessageListAdapter.
         toInsert.add(0, mt);
         msgList.addAll(insertIndex, toInsert);
         notifyItemRangeInserted(insertIndex, toInsert.size());
-        // Update the parents' ideas of their replies, now that they are there
         if (parID != null) {
+            // Parent existent -> add to its replies
             parent.addReply(mt);
             updateWithParents(parent);
+        } else {
+            // No parent -> bisect rootMsgs
+            int rootIndex = Collections.binarySearch(rootMsgs, mt);
+            assert rootIndex < 0 : "Adding already-present message again?!";
+            rootMsgs.add(-rootIndex - 1, mt);
         }
     }
 
@@ -268,6 +276,7 @@ public class MessageListAdapter extends RecyclerView.Adapter<MessageListAdapter.
         allMsgs.remove(mt.getID());
         if (!mt.getReplies().isEmpty())
             orphans.put(mt.getID(), new LinkedList<>(mt.getReplies()));
+        rootMsgs.remove(mt);
         // Remove from display list
         int index = msgList.indexOf(mt);
         if (index != -1) {
@@ -280,6 +289,7 @@ public class MessageListAdapter extends RecyclerView.Adapter<MessageListAdapter.
         if (mt == inputBarTree) inputBarPresent = false;
     }
 
+    // FIXME: Needs a better name.
     public synchronized void moveInputBarAround(@NonNull MessageTree mt) {
         String preferredID, alternateID;
         if (mt.getParent() == null) {
@@ -313,6 +323,8 @@ public class MessageListAdapter extends RecyclerView.Adapter<MessageListAdapter.
         if (group != null) group.remove(inputBarTree);
         int oldIndex = msgList.indexOf(inputBarTree);
         if (oldIndex != -1) msgList.remove(inputBarTree);
+        int rml = rootMsgs.size() - 1;
+        if (rml >= 0 && rootMsgs.get(rml) == inputBarTree) rootMsgs.remove(rml);
         // Link it back in
         inputBarTree.setParent(newParentID);
         if (newParentID == null) {
@@ -320,6 +332,7 @@ public class MessageListAdapter extends RecyclerView.Adapter<MessageListAdapter.
             notifyItemMovedLenient(oldIndex, msgList.size());
             inputBarTree.updateIndent(0);
             msgList.add(inputBarTree);
+            rootMsgs.add(inputBarTree);
         } else if (newParent == null) {
             // Parent absent -> orphaned
             notifyItemMovedLenient(oldIndex, -1);
