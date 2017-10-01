@@ -26,6 +26,10 @@ public class MessageListAdapter extends RecyclerView.Adapter<MessageListAdapter.
 
     }
 
+    public enum InputBarDirection {
+        UP, DOWN, LEFT, RIGHT, ROOT
+    }
+
     // For logging
     private static final String TAG = "MessageListAdapter";
 
@@ -417,6 +421,53 @@ public class MessageListAdapter extends RecyclerView.Adapter<MessageListAdapter.
         updateWithParents(newParent);
         inputBar.setIndent(inputBarTree.getIndent());
         dispatchInputBarMoved(oldParentID, newParentID);
+    }
+
+    public synchronized boolean navigateInputBar(@NonNull InputBarDirection dir) {
+        if (!inputBarPresent) throw new IllegalStateException("Input bar not mounted");
+        switch (dir) {
+            case UP: // Predecessor of input bar or of closest parent to have one
+                MessageTree node = inputBarTree;
+                do {
+                    MessageTree pred = getPredecessor(node);
+                    if (pred != null) {
+                        moveInputBar(pred.getID());
+                        return true;
+                    }
+                    node = getParent(node);
+                } while (node != null);
+                return false;
+            case DOWN: // Most deeply nested first child of parent's successor, else parent
+                if (inputBarTree.getParent() == null) return false;
+                MessageTree par = getParent(inputBarTree);
+                MessageTree succ = getSuccessor(par);
+                if (succ != null) {
+                    // <n00b> cannot use infinite for loop idiom because of auto-formatter ;-; </noob>
+                    while (true) {
+                        MessageTree child = getFirstReply(succ);
+                        if (child == null) break;
+                        succ = child;
+                    }
+                    moveInputBar(succ.getID());
+                } else {
+                    moveInputBar(par.getParent());
+                }
+                return true;
+            case LEFT: // The parent's parent
+                if (inputBarTree.getParent() == null) return false;
+                MessageTree parent = getParent(inputBarTree);
+                moveInputBar(parent.getParent());
+                return true;
+            case RIGHT: // The immediate predecessor
+                MessageTree pred = getPredecessor(inputBarTree);
+                if (pred == null) return false;
+                moveInputBar(pred.getID());
+                return true;
+            case ROOT: // Just the root thread
+                moveInputBar(null);
+                return true;
+        }
+        return false;
     }
 
     public synchronized boolean tryEnsureVisible(@NonNull MessageTree mt, boolean expand) {
