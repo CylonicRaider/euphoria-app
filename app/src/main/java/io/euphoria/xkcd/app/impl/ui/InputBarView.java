@@ -9,6 +9,7 @@ import android.widget.EditText;
 import android.widget.RelativeLayout;
 
 import io.euphoria.xkcd.app.R;
+import io.euphoria.xkcd.app.impl.ui.MessageListAdapter.InputBarDirection;
 
 import static io.euphoria.xkcd.app.impl.ui.UIUtils.COLOR_SENDER_LIGHTNESS;
 import static io.euphoria.xkcd.app.impl.ui.UIUtils.hslToRgbInt;
@@ -129,6 +130,14 @@ public class InputBarView extends RelativeLayout {
         } else {
             return messageEntry.requestFocus();
         }
+    }
+
+    public boolean mayNavigateInput(InputBarDirection dir) {
+        String text = messageEntry.getText().toString();
+        if (dir == InputBarDirection.ROOT || text.isEmpty()) return true;
+        int index = messageEntry.getSelectionStart(), indexEnd = messageEntry.getSelectionEnd();
+        return index == indexEnd && (dir == InputBarDirection.UP || dir == InputBarDirection.DOWN) &&
+                !text.contains("\n");
     }
 
 }

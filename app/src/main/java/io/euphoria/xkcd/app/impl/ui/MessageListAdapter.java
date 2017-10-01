@@ -223,7 +223,7 @@ public class MessageListAdapter extends RecyclerView.Adapter<MessageListAdapter.
         return parent;
     }
 
-    public synchronized MessageTree getSuccessor(@NonNull MessageTree tree, int offset) {
+    public synchronized MessageTree getSibling(@NonNull MessageTree tree, int offset) {
         List<MessageTree> l;
         if (tree.getParent() == null) {
             l = rootMsgs;
@@ -246,15 +246,15 @@ public class MessageListAdapter extends RecyclerView.Adapter<MessageListAdapter.
                                     "Retrieving orphaned message");
         idx += offset;
         if (idx < 0 || idx >= l.size()) return null;
-        return l.get(idx - 1);
+        return l.get(idx);
     }
 
     public MessageTree getPredecessor(@NonNull MessageTree tree) {
-        return getSuccessor(tree, -1);
+        return getSibling(tree, -1);
     }
 
     public MessageTree getSuccessor(@NonNull MessageTree tree) {
-        return getSuccessor(tree, 1);
+        return getSibling(tree, 1);
     }
 
     public MessageTree getReply(@NonNull MessageTree tree, int index) {

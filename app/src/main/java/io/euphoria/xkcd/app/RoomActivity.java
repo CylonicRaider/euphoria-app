@@ -9,7 +9,9 @@ import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
+import android.view.View;
 
 import java.util.Locale;
 
@@ -18,6 +20,7 @@ import io.euphoria.xkcd.app.data.Message;
 import io.euphoria.xkcd.app.data.SessionView;
 import io.euphoria.xkcd.app.impl.ui.InputBarView;
 import io.euphoria.xkcd.app.impl.ui.MessageListAdapter;
+import io.euphoria.xkcd.app.impl.ui.MessageListAdapter.InputBarDirection;
 import io.euphoria.xkcd.app.impl.ui.RoomUIImpl;
 
 import static io.euphoria.xkcd.app.impl.ui.RoomUIImpl.getRoomName;
@@ -193,6 +196,34 @@ public class RoomActivity extends FragmentActivity {
         });
 
         inputBar.requestEntryFocus();
+        inputBar.getMessageEntry().setOnKeyListener(new View.OnKeyListener() {
+            @Override
+            public boolean onKey(View v, int keyCode, KeyEvent event) {
+                if (event.getAction() != KeyEvent.ACTION_DOWN) return false;
+                InputBarDirection dir;
+                switch (keyCode) {
+                    case KeyEvent.KEYCODE_DPAD_UP:
+                        dir = InputBarDirection.UP;
+                        break;
+                    case KeyEvent.KEYCODE_DPAD_DOWN:
+                        dir = InputBarDirection.DOWN;
+                        break;
+                    case KeyEvent.KEYCODE_DPAD_LEFT:
+                        dir = InputBarDirection.LEFT;
+                        break;
+                    case KeyEvent.KEYCODE_DPAD_RIGHT:
+                        dir = InputBarDirection.RIGHT;
+                        break;
+                    case KeyEvent.KEYCODE_ESCAPE:
+                        dir = InputBarDirection.ROOT;
+                        break;
+                    default:
+                        return false;
+                }
+                return inputBar.mayNavigateInput(dir) && rmla.navigateInputBar(dir);
+            }
+        });
+        // TODO remove test submission
         inputBar.setSubmitListener(new InputBarView.SubmitListener() {
             @Override
             public boolean onSubmit(InputBarView view) {
