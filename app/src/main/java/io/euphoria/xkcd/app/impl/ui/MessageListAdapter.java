@@ -212,6 +212,62 @@ public class MessageListAdapter extends RecyclerView.Adapter<MessageListAdapter.
         return allMsgs.get(message.getID());
     }
 
+    public synchronized MessageTree getParent(@NonNull MessageTree tree) {
+        if (tree.getParent() == null) return null;
+        MessageTree parent = allMsgs.get(tree.getParent());
+        if (parent == null) throw new IllegalArgumentException("Retrieving parent of orphaned message");
+        return parent;
+    }
+
+    public synchronized MessageTree getSuccessor(@NonNull MessageTree tree, int offset) {
+        List<MessageTree> l;
+        if (tree.getParent() == null) {
+            l = rootMsgs;
+        } else {
+            String parID = tree.getParent();
+            MessageTree parent = allMsgs.get(parID);
+            if (parent != null) {
+                l = parent.getReplies();
+            } else {
+                l = orphans.get(tree.getParent());
+                // Ensure the code below fails with the right exception
+                if (l == null) l = Collections.emptyList();
+            }
+        }
+        int idx = l.indexOf(tree);
+        if (idx == -1)
+            throw new IllegalStateException(
+                    offset > 0 ? "Retrieving successor of orphaned message" :
+                            offset < 0 ? "Retrieving predecessor of orphaned message" :
+                                    "Retrieving orphaned message");
+        idx += offset;
+        if (idx < 0 || idx >= l.size()) return null;
+        return l.get(idx - 1);
+    }
+
+    public MessageTree getPredecessor(@NonNull MessageTree tree) {
+        return getSuccessor(tree, -1);
+    }
+
+    public MessageTree getSuccessor(@NonNull MessageTree tree) {
+        return getSuccessor(tree, 1);
+    }
+
+    public MessageTree getReply(@NonNull MessageTree tree, int index) {
+        List<MessageTree> l = tree.getReplies();
+        if (index < 0) index = l.size() + index;
+        if (index < 0 || index >= l.size()) return null;
+        return l.get(index);
+    }
+
+    public MessageTree getFirstReply(@NonNull MessageTree tree) {
+        return getReply(tree, 1);
+    }
+
+    public MessageTree getLastReply(@NonNull MessageTree tree) {
+        return getReply(tree, -1);
+    }
+
     public synchronized MessageTree add(@NonNull Message message) {
         MessageTree mt = allMsgs.get(message.getID());
         if (mt != null) {
