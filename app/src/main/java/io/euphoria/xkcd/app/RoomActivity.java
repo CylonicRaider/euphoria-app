@@ -28,6 +28,9 @@ import static io.euphoria.xkcd.app.impl.ui.RoomUIImpl.isValidRoomUri;
 
 public class RoomActivity extends FragmentActivity {
 
+    // TODO find some appropriate place for this in config
+    public static final boolean RIGHT_KEY_HACK = true;
+
     private class TestMessage implements Message {
 
         private final String id;
@@ -212,7 +215,9 @@ public class RoomActivity extends FragmentActivity {
                         dir = InputBarDirection.LEFT;
                         break;
                     case KeyEvent.KEYCODE_DPAD_RIGHT:
-                        dir = InputBarDirection.RIGHT;
+                        // Upstream Euphoria binds the right key to the ROOT action, and we mirror that as default.
+                        // TODO ask community whether they like it
+                        dir = RIGHT_KEY_HACK ? InputBarDirection.ROOT : InputBarDirection.RIGHT;
                         break;
                     case KeyEvent.KEYCODE_ESCAPE:
                         dir = InputBarDirection.ROOT;
