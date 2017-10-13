@@ -2,13 +2,10 @@ package io.euphoria.xkcd.app;
 
 import android.content.Context;
 import android.content.Intent;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -21,6 +18,7 @@ import io.euphoria.xkcd.app.data.SessionView;
 import io.euphoria.xkcd.app.impl.ui.InputBarView;
 import io.euphoria.xkcd.app.impl.ui.MessageListAdapter;
 import io.euphoria.xkcd.app.impl.ui.MessageListAdapter.InputBarDirection;
+import io.euphoria.xkcd.app.impl.ui.MessageListView;
 import io.euphoria.xkcd.app.impl.ui.RoomUIImpl;
 
 import static io.euphoria.xkcd.app.impl.ui.RoomUIImpl.getRoomName;
@@ -112,13 +110,13 @@ public class RoomActivity extends FragmentActivity {
     // Tag for finding RoomControllerFragment
     private static final String TAG_ROOM_CONTROLLER_FRAGMENT = RoomControllerFragment.class.getSimpleName();
 
-    private RoomControllerFragment rcf;
+    private RoomControllerFragment roomControllerFragment;
     private RoomController roomController;
 
     private RoomUIImpl roomUI;
-    private RecyclerView recyclerView;
+    private MessageListView messageList;
+    private MessageListAdapter messageAdapter;
     private InputBarView inputBar;
-    private MessageListAdapter rmla;
 
     private int testID = 0;
 
@@ -139,26 +137,20 @@ public class RoomActivity extends FragmentActivity {
 
         // Get RoomControllerFragment
         FragmentManager fm = getSupportFragmentManager();
-        rcf = (RoomControllerFragment) fm.findFragmentByTag(TAG_ROOM_CONTROLLER_FRAGMENT);
+        roomControllerFragment = (RoomControllerFragment) fm.findFragmentByTag(TAG_ROOM_CONTROLLER_FRAGMENT);
 
         // create the fragment and data the first time
-        if (rcf == null) {
+        if (roomControllerFragment == null) {
             // add the fragment
-            rcf = new RoomControllerFragment();
-            fm.beginTransaction().add(rcf, TAG_ROOM_CONTROLLER_FRAGMENT).commit();
+            roomControllerFragment = new RoomControllerFragment();
+            fm.beginTransaction().add(roomControllerFragment, TAG_ROOM_CONTROLLER_FRAGMENT).commit();
             fm.executePendingTransactions();
         }
         // Acquire RoomController
-        roomController = rcf.getRoomController();
+        roomController = roomControllerFragment.getRoomController();
 
         // View setup
-        recyclerView = (RecyclerView) findViewById(R.id.message_recycler_view);
-        LinearLayoutManager lm = new LinearLayoutManager(this);
-        lm.setStackFromEnd(true);
-        recyclerView.setLayoutManager(lm);
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.HONEYCOMB) {
-            recyclerView.setItemAnimator(null);
-        }
+        messageList = (MessageListView) findViewById(R.id.message_recycler_view);
 
         LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         inputBar = (InputBarView) inflater.inflate(R.layout.input_bar, null);
@@ -179,14 +171,14 @@ public class RoomActivity extends FragmentActivity {
         setTitle("&" + roomName);
         roomUI = (RoomUIImpl) roomController.getManager().getRoomUI(roomName);
 
-        rmla = new MessageListAdapter(inputBar);
+        messageAdapter = new MessageListAdapter(inputBar);
         // TODO remove test messages
         for (Message msg : testMessages) {
-            rmla.add(msg);
+            messageAdapter.add(msg);
         }
-        rmla.moveInputBar(null);
-        recyclerView.setAdapter(rmla);
-        rmla.setInputBarListener(new MessageListAdapter.InputBarListener() {
+        messageAdapter.moveInputBar(null);
+        messageList.setAdapter(messageAdapter);
+        messageAdapter.setInputBarListener(new MessageListAdapter.InputBarListener() {
             @Override
             public void onInputBarMoved(String oldParent, String newParent) {
                 new Handler(getMainLooper()).post(new Runnable() {
@@ -225,7 +217,7 @@ public class RoomActivity extends FragmentActivity {
                     default:
                         return false;
                 }
-                return inputBar.mayNavigateInput(dir) && rmla.navigateInputBar(dir);
+                return inputBar.mayNavigateInput(dir) && messageAdapter.navigateInputBar(dir);
             }
         });
         // TODO remove test submission
@@ -234,9 +226,9 @@ public class RoomActivity extends FragmentActivity {
             public boolean onSubmit(InputBarView view) {
                 String id = String.format((Locale) null, "z%05d", testID++);
                 String parent = view.getTree().getParent();
-                rmla.add(new TestMessage(parent, id, view.getNick(), view.getMessage()));
+                messageAdapter.add(new TestMessage(parent, id, view.getNick(), view.getMessage()));
                 if (parent == null)
-                    rmla.moveInputBar(id);
+                    messageAdapter.moveInputBar(id);
                 return true;
             }
         });
