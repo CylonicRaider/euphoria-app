@@ -6,7 +6,6 @@ import android.text.TextWatcher;
 import android.util.AttributeSet;
 import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
-import android.widget.RelativeLayout;
 
 import io.euphoria.xkcd.app.R;
 import io.euphoria.xkcd.app.impl.ui.MessageListAdapter.InputBarDirection;
@@ -17,7 +16,7 @@ import static io.euphoria.xkcd.app.impl.ui.UIUtils.nickColor;
 import static io.euphoria.xkcd.app.impl.ui.UIUtils.setEnterKeyListener;
 import static io.euphoria.xkcd.app.impl.ui.UIUtils.setRoundedRectBackground;
 
-public class InputBarView extends RelativeLayout {
+public class InputBarView extends BaseMessageView {
 
     public interface SubmitListener {
 
@@ -28,12 +27,11 @@ public class InputBarView extends RelativeLayout {
     private final MarginLayoutParams defaultLayoutParams;
     private EditText nickEntry;
     private EditText messageEntry;
-    private MessageTree tree;
     private SubmitListener submitListener;
 
     public InputBarView(Context context, AttributeSet attrs) {
         super(context, attrs);
-        defaultLayoutParams = MessageView.getDefaultMargins(context, attrs);
+        defaultLayoutParams = BaseMessageView.getDefaultMargins(context, attrs);
     }
 
     @Override
@@ -83,12 +81,14 @@ public class InputBarView extends RelativeLayout {
         setRoundedRectBackground(nickEntry, defaultColor);
     }
 
-    public MessageTree getTree() {
-        return tree;
+    @Override
+    protected void updateDisplay() {
+        // TODO state restoration should go here
     }
 
-    void setTree(MessageTree tree) {
-        this.tree = tree;
+    public void recycle() {
+        super.recycle();
+        // TODO state saving should go here
     }
 
     public EditText getNickEntry() {
@@ -107,11 +107,11 @@ public class InputBarView extends RelativeLayout {
         this.submitListener = submitListener;
     }
 
-    public String getNick() {
+    public String getNickText() {
         return nickEntry.getText().toString();
     }
 
-    public String getMessage() {
+    public String getMessageText() {
         return messageEntry.getText().toString();
     }
 
@@ -121,7 +121,7 @@ public class InputBarView extends RelativeLayout {
             lp = new MarginLayoutParams(defaultLayoutParams);
             setLayoutParams(lp);
         }
-        MessageView.setMarginForIndent(getContext(), lp, indent);
+        BaseMessageView.setMarginForIndent(getContext(), lp, indent);
     }
 
     public boolean requestEntryFocus() {

@@ -59,7 +59,7 @@ public class MessageListAdapter extends RecyclerView.Adapter<MessageListAdapter.
         this.inputBar = inputBar;
         inputBarTree = new MessageTree(null);
         inputBarPresent = false;
-        inputBar.setTree(inputBarTree);
+        inputBar.setMessage(inputBarTree);
     }
 
     @Override
@@ -520,8 +520,11 @@ public class MessageListAdapter extends RecyclerView.Adapter<MessageListAdapter.
 
     class ViewHolder extends RecyclerView.ViewHolder {
 
-        public ViewHolder(View v) {
+        public final BaseMessageView itemMessageView;
+
+        public ViewHolder(BaseMessageView v) {
             super(v);
+            itemMessageView = v;
         }
 
     }

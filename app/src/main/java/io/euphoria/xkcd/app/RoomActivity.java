@@ -225,8 +225,8 @@ public class RoomActivity extends FragmentActivity {
             @Override
             public boolean onSubmit(InputBarView view) {
                 String id = String.format((Locale) null, "z%05d", testID++);
-                String parent = view.getTree().getParent();
-                messageAdapter.add(new TestMessage(parent, id, view.getNick(), view.getMessage()));
+                String parent = view.getMessage().getParent();
+                messageAdapter.add(new TestMessage(parent, id, view.getNickText(), view.getMessageText()));
                 if (parent == null)
                     messageAdapter.moveInputBar(id);
                 return true;
