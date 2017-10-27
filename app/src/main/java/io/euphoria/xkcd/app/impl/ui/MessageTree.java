@@ -85,7 +85,6 @@ public class MessageTree implements Comparable<MessageTree> {
     }
 
     protected void updateIndent(int i) {
-        // TODO profile for performance
         indent = i++;
         for (MessageTree t : replies) t.updateIndent(i);
     }
@@ -138,7 +137,7 @@ public class MessageTree implements Comparable<MessageTree> {
 
     /**
      * Count replies for user display
-     * If override is true, this and only this MessageTree is assumed to be visible.
+     * If override is true, this and only this MessageTree is assumed to be visible regardless of its actual state.
      * The input bar does not count; otherwise equivalent to countVisibleReplies().
      */
     public int countVisibleUserReplies(boolean override) {
