@@ -59,6 +59,7 @@ public class MessageListAdapter extends RecyclerView.Adapter<MessageListAdapter.
         this.inputBar = inputBar;
         inputBarTree = new MessageTree(null);
         inputBarPresent = false;
+        inputBar.recycle();
         inputBar.setMessage(inputBarTree);
     }
 
