@@ -127,7 +127,23 @@ public class RoomActivity extends FragmentActivity {
             new TestMessage("e", "f", "Test message A/E/F"),
             new TestMessage("b", "d", "Test message A/B/D"),
             new TestMessage("a", "e", "Test message A/E"),
-            new TestMessage("b", "c", "Test message A/B/C")
+            new TestMessage("b", "c", "Test message A/B/C"),
+            new TestMessage(null, "x", "Test message X"),
+            new TestMessage("x", "x01", "Test message X/01"),
+            new TestMessage("x", "x02", "Test message X/02"),
+            new TestMessage("x", "x03", "Test message X/03"),
+            new TestMessage("x", "x04", "Test message X/04"),
+            new TestMessage("x", "x05", "Test message X/05"),
+            new TestMessage("x", "x06", "Test message X/06"),
+            new TestMessage("x", "x07", "Test message X/07"),
+            new TestMessage("x", "x08", "Test message X/08"),
+            new TestMessage("x", "x09", "Test message X/09"),
+            new TestMessage("x", "x10", "Test message X/10"),
+            new TestMessage("x", "x11", "Test message X/11"),
+            new TestMessage("x", "x12", "Test message X/12"),
+            new TestMessage("x", "x13", "Test message X/13"),
+            new TestMessage("x", "x14", "Test message X/14"),
+            new TestMessage("x", "x15", "Test message X/15")
     };
 
     @Override
