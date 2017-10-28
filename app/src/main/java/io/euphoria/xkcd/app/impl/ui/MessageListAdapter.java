@@ -181,7 +181,7 @@ public class MessageListAdapter extends RecyclerView.Adapter<MessageListAdapter.
     }
 
     private int insertPosition(MessageTree mt, MessageTree parent) {
-        int ret = msgList.indexOf(parent);
+        int ret = indexOf(parent);
         assert ret != -1 : "Scanning for index for message without visible parent";
         // Skip parent.
         ret++;
@@ -194,8 +194,7 @@ public class MessageListAdapter extends RecyclerView.Adapter<MessageListAdapter.
 
     private void updateWithParents(MessageTree mt) {
         while (mt != null) {
-            // TODO optimize with some reverse index
-            notifyItemChanged(msgList.indexOf(mt));
+            notifyItemChanged(indexOf(mt));
             mt = allMsgs.get(mt.getParent());
         }
     }
@@ -210,6 +209,11 @@ public class MessageListAdapter extends RecyclerView.Adapter<MessageListAdapter.
         } else {
             notifyItemMoved(from, to);
         }
+    }
+
+    public synchronized int indexOf(MessageTree tree) {
+        // TODO optimize with some reverse index
+        return msgList.indexOf(tree);
     }
 
     public synchronized MessageTree getTree(Message message) {
@@ -278,7 +282,7 @@ public class MessageListAdapter extends RecyclerView.Adapter<MessageListAdapter.
         if (mt != null) {
             // Message already registered -> might get away with an in-place update
             mt.setMessage(message);
-            int index = msgList.indexOf(mt);
+            int index = indexOf(mt);
             if (index != -1) {
                 // Message already visible -> update in-place
                 notifyItemChanged(index);
@@ -339,7 +343,7 @@ public class MessageListAdapter extends RecyclerView.Adapter<MessageListAdapter.
             orphans.put(mt.getID(), new LinkedList<>(mt.getReplies()));
         rootMsgs.remove(mt);
         // Remove from display list
-        int index = msgList.indexOf(mt);
+        int index = indexOf(mt);
         if (index != -1) {
             int replyCount = mt.countVisibleReplies();
             msgList.subList(index, index + 1 + replyCount).clear();
@@ -382,7 +386,7 @@ public class MessageListAdapter extends RecyclerView.Adapter<MessageListAdapter.
         if (oldParent != null) oldParent.removeReply(inputBarTree);
         List<MessageTree> group = orphans.get(inputBarTree.getParent());
         if (group != null) group.remove(inputBarTree);
-        int oldIndex = msgList.indexOf(inputBarTree);
+        int oldIndex = indexOf(inputBarTree);
         if (oldIndex != -1) msgList.remove(inputBarTree);
         int rml = rootMsgs.size() - 1;
         if (rml >= 0 && rootMsgs.get(rml) == inputBarTree) rootMsgs.remove(rml);
@@ -414,7 +418,7 @@ public class MessageListAdapter extends RecyclerView.Adapter<MessageListAdapter.
             // Parent there and visible -> all fine
             assert !newParent.isCollapsed() : "Failed to uncollapse visible input bar parent?!";
             newParent.addReply(inputBarTree);
-            int insertIndex = msgList.indexOf(newParent) + newParent.countVisibleReplies();
+            int insertIndex = indexOf(newParent) + newParent.countVisibleReplies();
             msgList.add(insertIndex, inputBarTree);
             notifyItemMovedLenient(oldIndex, insertIndex);
         }
@@ -499,7 +503,7 @@ public class MessageListAdapter extends RecyclerView.Adapter<MessageListAdapter.
     }
 
     public synchronized void toggleCollapse(@NonNull MessageTree mt) {
-        int index = msgList.indexOf(mt);
+        int index = indexOf(mt);
         assert index != -1 : "Attempting to toggle invisible message";
         if (mt.isCollapsed()) {
             // Un-collapse message for reply traversal
