@@ -6,7 +6,9 @@
 
     <color name="background_message">#f0f0f0</color>
 
-    <color name="text_message">@android:color/black</color>
+    <color name="text_message">#000000</color>
     <color name="text_collapser">@android:color/tertiary_text_light</color>
-    <color name="background_input">@android:color/white</color>
+    <color name="background_input">#ffffff</color>
+
+    <color name="indent_line">#c0c0c0</color>
 </resources>
