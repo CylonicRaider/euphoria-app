@@ -216,6 +216,11 @@ public class MessageListAdapter extends RecyclerView.Adapter<MessageListAdapter.
         return msgList.indexOf(tree);
     }
 
+    public synchronized MessageTree get(String id) {
+        if (id == null) return inputBarTree;
+        return allMsgs.get(id);
+    }
+
     public synchronized MessageTree getTree(Message message) {
         if (message == null) return inputBarTree;
         return allMsgs.get(message.getID());

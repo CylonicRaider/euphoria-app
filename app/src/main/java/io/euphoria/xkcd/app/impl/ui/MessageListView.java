@@ -24,7 +24,6 @@ public class MessageListView extends RecyclerView {
 
     public class IndentLine {
 
-        // FIXME handle views detaching
         // FIXME cooperate with animations
         // FIXME GC entirely offscreen lines
         // TODO debug this hard
@@ -37,7 +36,6 @@ public class MessageListView extends RecyclerView {
 
         public IndentLine(MessageTree base) {
             this.base = base;
-            updatePositions();
         }
 
         public MessageTree getBase() {
@@ -68,15 +66,23 @@ public class MessageListView extends RecyclerView {
             c.drawLine(x, top, x, bottom, indentPaint);
         }
 
-        public void updatePositions() {
+        public void updatePositions(int topVisible, int bottomVisible) {
             int idx = ((MessageListAdapter) getAdapter()).indexOf(base);
             startPos = idx + 1;
             endPos = startPos + base.countVisibleReplies();
             if (startPos != endPos) {
-                ViewHolder h = findViewHolderForAdapterPosition(startPos);
-                displayTop = (h == null) ? Integer.MIN_VALUE : h.itemView.getTop();
-                h = findViewHolderForAdapterPosition(endPos);
-                displayBottom = (h == null) ? Integer.MAX_VALUE : h.itemView.getTop();
+                if (startPos < topVisible) {
+                    displayTop = Integer.MIN_VALUE;
+                } else {
+                    ViewHolder h = findViewHolderForAdapterPosition(startPos);
+                    displayTop = (h == null) ? Integer.MIN_VALUE : h.itemView.getTop();
+                }
+                if (endPos > bottomVisible) {
+                    displayBottom = Integer.MAX_VALUE;
+                } else {
+                    ViewHolder h = findViewHolderForAdapterPosition(endPos);
+                    displayBottom = (h == null) ? Integer.MAX_VALUE : h.itemView.getTop();
+                }
             }
         }
 
@@ -122,7 +128,10 @@ public class MessageListView extends RecyclerView {
     private final Runnable updateLines = new Runnable() {
         @Override
         public void run() {
-            for (IndentLine il : lines) il.updatePositions();
+            LinearLayoutManager layout = (LinearLayoutManager) getLayoutManager();
+            int topVisible = layout.findFirstVisibleItemPosition();
+            int bottomVisible = layout.findLastVisibleItemPosition();
+            for (IndentLine il : lines) il.updatePositions(topVisible, bottomVisible);
             invalidate();
         }
     };
@@ -172,12 +181,18 @@ public class MessageListView extends RecyclerView {
         BaseMessageView msgView = (BaseMessageView) child;
         MessageTree tree = msgView.getMessage();
         if (tree.getID() == null) return;
-        IndentLine il = linesBelow.get(tree);
-        if (il == null) {
-            il = new IndentLine(tree);
-            lines.add(il);
-            linesBelow.put(tree, il);
+        MessageListAdapter adapter = (MessageListAdapter) getAdapter();
+        for (; ; ) {
+            IndentLine il = linesBelow.get(tree);
+            if (il == null) {
+                il = new IndentLine(tree);
+                lines.add(il);
+                linesBelow.put(tree, il);
+            }
+            if (tree.getParent() == null) break;
+            tree = adapter.get(tree.getParent());
         }
+        post(updateLines);
     }
 
     @Override
