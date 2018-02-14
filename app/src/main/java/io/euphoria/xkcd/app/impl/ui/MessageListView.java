@@ -182,7 +182,7 @@ public class MessageListView extends RecyclerView {
         MessageTree tree = msgView.getMessage();
         if (tree.getID() == null) return;
         MessageListAdapter adapter = (MessageListAdapter) getAdapter();
-        for (; ; ) {
+        while (true) {
             IndentLine il = linesBelow.get(tree);
             if (il == null) {
                 il = new IndentLine(tree);
