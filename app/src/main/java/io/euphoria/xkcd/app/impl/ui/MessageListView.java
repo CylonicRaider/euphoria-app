@@ -12,6 +12,7 @@ import android.util.AttributeSet;
 import android.view.View;
 
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -66,10 +67,13 @@ public class MessageListView extends RecyclerView {
             c.drawLine(x, top, x, bottom, indentPaint);
         }
 
-        public void updatePositions(int topVisible, int bottomVisible) {
+        public boolean updatePositions(int topVisible, int bottomVisible) {
             int idx = ((MessageListAdapter) getAdapter()).indexOf(base);
             startPos = idx + 1;
             endPos = startPos + base.countVisibleReplies();
+            if (startPos < topVisible && endPos < topVisible ||
+                    startPos > bottomVisible && endPos > bottomVisible)
+                return false;
             if (startPos != endPos) {
                 if (startPos < topVisible) {
                     displayTop = Integer.MIN_VALUE;
@@ -84,6 +88,7 @@ public class MessageListView extends RecyclerView {
                     displayBottom = (h == null) ? Integer.MAX_VALUE : h.itemView.getTop();
                 }
             }
+            return true;
         }
 
         public void onScrolled(int dx, int dy) {
@@ -131,7 +136,13 @@ public class MessageListView extends RecyclerView {
             LinearLayoutManager layout = (LinearLayoutManager) getLayoutManager();
             int topVisible = layout.findFirstVisibleItemPosition();
             int bottomVisible = layout.findLastVisibleItemPosition();
-            for (IndentLine il : lines) il.updatePositions(topVisible, bottomVisible);
+            Iterator<IndentLine> iter = lines.iterator();
+            while (iter.hasNext()) {
+                IndentLine il = iter.next();
+                if (il.updatePositions(topVisible, bottomVisible)) continue;
+                iter.remove();
+                linesBelow.remove(il.getBase());
+            }
             invalidate();
         }
     };
@@ -180,18 +191,26 @@ public class MessageListView extends RecyclerView {
         if (!(child instanceof BaseMessageView)) return;
         BaseMessageView msgView = (BaseMessageView) child;
         MessageTree tree = msgView.getMessage();
-        if (tree.getID() == null) return;
         MessageListAdapter adapter = (MessageListAdapter) getAdapter();
         while (true) {
-            IndentLine il = linesBelow.get(tree);
-            if (il == null) {
-                il = new IndentLine(tree);
-                lines.add(il);
-                linesBelow.put(tree, il);
+            if (tree.getID() != null) {
+                IndentLine il = linesBelow.get(tree);
+                if (il == null) {
+                    il = new IndentLine(tree);
+                    lines.add(il);
+                    linesBelow.put(tree, il);
+                }
             }
             if (tree.getParent() == null) break;
             tree = adapter.get(tree.getParent());
         }
+        post(updateLines);
+    }
+
+    @Override
+    public void onChildDetachedFromWindow(View child) {
+        super.onChildDetachedFromWindow(child);
+        if (!(child instanceof BaseMessageView)) return;
         post(updateLines);
     }
 
