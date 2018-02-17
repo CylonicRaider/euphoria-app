@@ -24,8 +24,6 @@ public class MessageListView extends RecyclerView {
 
     public class IndentLine {
 
-        // FIXME cooperate with animations
-        // FIXME GC entirely offscreen lines
         // TODO debug this hard
 
         private final MessageTree base;
