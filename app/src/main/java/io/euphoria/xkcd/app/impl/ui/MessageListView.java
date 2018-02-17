@@ -106,7 +106,7 @@ public class MessageListView extends RecyclerView {
     private final AdapterDataObserver adapterObserver = new AdapterDataObserver() {
         @Override
         public void onChanged() {
-            post(updateLines);
+            updateLines();
         }
 
         @Override
@@ -130,9 +130,10 @@ public class MessageListView extends RecyclerView {
         }
     };
 
-    private final Runnable updateLines = new Runnable() {
+    private final Runnable lineUpdater = new Runnable() {
         @Override
         public void run() {
+            lineUpdaterScheduled = false;
             LinearLayoutManager layout = (LinearLayoutManager) getLayoutManager();
             int topVisible = layout.findFirstVisibleItemPosition();
             int bottomVisible = layout.findLastVisibleItemPosition();
@@ -146,6 +147,7 @@ public class MessageListView extends RecyclerView {
             invalidate();
         }
     };
+    private boolean lineUpdaterScheduled = false;
 
     private final Paint indentPaint;
     private final int indentBase;
@@ -204,14 +206,14 @@ public class MessageListView extends RecyclerView {
             if (tree.getParent() == null) break;
             tree = adapter.get(tree.getParent());
         }
-        post(updateLines);
+        updateLines();
     }
 
     @Override
     public void onChildDetachedFromWindow(View child) {
         super.onChildDetachedFromWindow(child);
         if (!(child instanceof BaseMessageView)) return;
-        post(updateLines);
+        updateLines();
     }
 
     @Override
@@ -227,6 +229,12 @@ public class MessageListView extends RecyclerView {
             int top = 0, bottom = getHeight();
             for (IndentLine l : lines) l.draw(c, top, bottom);
         }
+    }
+
+    private void updateLines() {
+        if (lineUpdaterScheduled) return;
+        lineUpdaterScheduled = true;
+        post(lineUpdater);
     }
 
 }
