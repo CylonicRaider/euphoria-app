@@ -14,6 +14,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import io.euphoria.xkcd.app.R;
@@ -69,7 +70,7 @@ public class MessageListView extends RecyclerView {
             startPos = idx + 1;
             endPos = startPos + base.countVisibleReplies();
             if (startPos < topVisible && endPos < topVisible ||
-                    startPos > bottomVisible && endPos > bottomVisible)
+                    startPos > bottomVisible + 1 && endPos > bottomVisible + 1)
                 return false;
             if (startPos != endPos) {
                 if (startPos < topVisible) {
@@ -84,6 +85,8 @@ public class MessageListView extends RecyclerView {
                     ViewHolder h = findViewHolderForAdapterPosition(endPos);
                     displayBottom = (h == null) ? Integer.MAX_VALUE : h.itemView.getTop();
                 }
+            } else {
+                /* NOP -- draw() will do nothing in this case. */
             }
             return true;
         }
