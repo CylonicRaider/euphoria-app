@@ -24,8 +24,6 @@ public class MessageListView extends RecyclerView {
 
     public class IndentLine {
 
-        // TODO debug this hard
-
         private final MessageTree base;
         private int startPos;
         private int endPos;
