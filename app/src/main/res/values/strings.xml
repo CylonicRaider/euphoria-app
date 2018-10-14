@@ -4,5 +4,11 @@
     <string name="join_room_text">Join room</string>
     <string name="message_entry_hint">Message</string>
     <string name="not_available">N/A</string>
+    <string name="collapser_show">Show %1$d %2$s</string>
+    <string name="collapser_hide">Hide %1$d %2$s</string>
+    <plurals name="collapser_replies">
+        <item quantity="one">reply</item>
+        <item quantity="other">replies</item>
+    </plurals>
     <string name="collapser_fallback">Collapse/uncollapse</string>
 </resources>

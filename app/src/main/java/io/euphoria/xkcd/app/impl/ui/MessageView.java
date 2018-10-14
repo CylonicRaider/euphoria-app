@@ -1,6 +1,7 @@
 package io.euphoria.xkcd.app.impl.ui;
 
 import android.content.Context;
+import android.content.res.Resources;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.widget.TextView;
@@ -43,8 +44,9 @@ public class MessageView extends BaseMessageView {
             // Color the background of the sender's nick
             setRoundedRectBackground(nickLbl, nickColor(sender.getName()));
         } else {
-            nickLbl.setText("N/A");
-            contentLbl.setText("N/A");
+            Resources res = getResources();
+            nickLbl.setText(res.getString(R.string.not_available));
+            contentLbl.setText(res.getString(R.string.not_available));
             // Make nick background red
             setRoundedRectBackground(nickLbl, hslToRgbInt(0, 1, 0.5f));
             Log.e(TAG, "updateDisplay: MessageView message is null!",
@@ -59,9 +61,15 @@ public class MessageView extends BaseMessageView {
                 collapseLbl.setVisibility(GONE);
             } else {
                 collapseLbl.setVisibility(VISIBLE);
-                String pref = message.isCollapsed() ? "Show" : "Hide";
-                String suff = replies == 1 ? "reply" : "replies";
-                collapseLbl.setText(pref + " " + replies + " " + suff);
+                Resources res = getResources();
+                String repliesStr = res.getQuantityString(R.plurals.collapser_replies, replies);
+                String text;
+                if (message.isCollapsed()) {
+                    text = res.getString(R.string.collapser_show, replies, repliesStr);
+                } else {
+                    text = res.getString(R.string.collapser_hide, replies, repliesStr);
+                }
+                collapseLbl.setText(text);
             }
         }
     }
