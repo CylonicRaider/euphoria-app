@@ -14,7 +14,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 
 import io.euphoria.xkcd.app.R;
@@ -121,6 +120,14 @@ public class MessageListView extends RecyclerView {
 
         @Override
         public void onItemRangeRemoved(int positionStart, int itemCount) {
+            for (int p = positionStart, e = positionStart + itemCount; p < e; p++) {
+                ViewHolder vh = findViewHolderForAdapterPosition(p);
+                if (vh == null || !(vh.itemView instanceof MessageView)) continue;
+                MessageTree mt = ((MessageView) vh.itemView).getMessage();
+                if (mt == null) continue;
+                IndentLine il = linesBelow.remove(mt);
+                lines.remove(il);
+            }
             onChanged();
         }
 
@@ -191,6 +198,8 @@ public class MessageListView extends RecyclerView {
     public void onChildAttachedToWindow(View child) {
         super.onChildAttachedToWindow(child);
         if (!(child instanceof BaseMessageView)) return;
+        // NOTE: We assume that this method is invoked whenever a view is shown for an adapter item, in particular
+        //       if it has been recycled rather than created anew.
         BaseMessageView msgView = (BaseMessageView) child;
         MessageTree tree = msgView.getMessage();
         MessageListAdapter adapter = (MessageListAdapter) getAdapter();
