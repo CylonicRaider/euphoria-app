@@ -102,21 +102,24 @@ public class MessageListView extends RecyclerView {
     public static final int INDENT_LINE_OFFSET = 3;
     public static final int INDENT_LINE_WIDTH = 2;
 
+    private class LayoutManager extends LinearLayoutManager {
+
+        public LayoutManager(Context context) {
+            super(context);
+            setStackFromEnd(true);
+        }
+
+        @Override
+        public void onLayoutCompleted(State st) {
+            super.onLayoutCompleted(st);
+            // Deferring the update causes a visible delay here; since we have a valid layout, we can as well do it
+            // immediately.
+            lineUpdater.run();
+        }
+
+    }
+
     private final AdapterDataObserver adapterObserver = new AdapterDataObserver() {
-        @Override
-        public void onChanged() {
-            updateLines();
-        }
-
-        @Override
-        public void onItemRangeChanged(int positionStart, int itemCount) {
-            onChanged();
-        }
-
-        @Override
-        public void onItemRangeInserted(int positionStart, int itemCount) {
-            onChanged();
-        }
 
         @Override
         public void onItemRangeRemoved(int positionStart, int itemCount) {
@@ -126,15 +129,21 @@ public class MessageListView extends RecyclerView {
                 MessageTree mt = ((MessageView) vh.itemView).getMessage();
                 if (mt == null) continue;
                 IndentLine il = linesBelow.remove(mt);
-                lines.remove(il);
+                if (il != null) lines.remove(il);
             }
-            onChanged();
         }
 
         @Override
         public void onItemRangeMoved(int fromPosition, int toPosition, int itemCount) {
-            onChanged();
+            for (int p = fromPosition, e = fromPosition + itemCount; p < e; p++) {
+                ViewHolder vh = findViewHolderForAdapterPosition(p);
+                if (vh == null || !(vh.itemView instanceof BaseMessageView)) continue;
+                MessageTree mt = ((BaseMessageView) vh.itemView).getMessage();
+                if (mt == null) continue;
+                addIndentLinesFor(mt);
+            }
         }
+
     };
 
     private final Runnable lineUpdater = new Runnable() {
@@ -174,9 +183,7 @@ public class MessageListView extends RecyclerView {
         lines = new LinkedList<>();
         linesBelow = new HashMap<>();
         /* Parent class configuration */
-        LinearLayoutManager lm = new LinearLayoutManager(context);
-        lm.setStackFromEnd(true);
-        setLayoutManager(lm);
+        setLayoutManager(new LayoutManager(context));
         // FIXME: Re-add animations.
         //if (Build.VERSION.SDK_INT < Build.VERSION_CODES.HONEYCOMB)
         setItemAnimator(null);
@@ -200,21 +207,7 @@ public class MessageListView extends RecyclerView {
         if (!(child instanceof BaseMessageView)) return;
         // NOTE: We assume that this method is invoked whenever a view is shown for an adapter item, in particular
         //       if it has been recycled rather than created anew.
-        BaseMessageView msgView = (BaseMessageView) child;
-        MessageTree tree = msgView.getMessage();
-        MessageListAdapter adapter = (MessageListAdapter) getAdapter();
-        while (true) {
-            if (tree.getID() != null) {
-                IndentLine il = linesBelow.get(tree);
-                if (il == null) {
-                    il = new IndentLine(tree);
-                    lines.add(il);
-                    linesBelow.put(tree, il);
-                }
-            }
-            if (tree.getParent() == null) break;
-            tree = adapter.get(tree.getParent());
-        }
+        addIndentLinesFor(((BaseMessageView) child).getMessage());
         updateLines();
     }
 
@@ -237,6 +230,22 @@ public class MessageListView extends RecyclerView {
         if (!lines.isEmpty()) {
             int top = 0, bottom = getHeight();
             for (IndentLine l : lines) l.draw(c, top, bottom);
+        }
+    }
+
+    private void addIndentLinesFor(MessageTree tree) {
+        MessageListAdapter adapter = (MessageListAdapter) getAdapter();
+        while (true) {
+            if (tree.getID() != null) {
+                IndentLine il = linesBelow.get(tree);
+                if (il == null) {
+                    il = new IndentLine(tree);
+                    lines.add(il);
+                    linesBelow.put(tree, il);
+                }
+            }
+            if (tree.getParent() == null) break;
+            tree = adapter.get(tree.getParent());
         }
     }
 
