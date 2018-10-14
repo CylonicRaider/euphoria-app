@@ -1,8 +1,7 @@
 <resources>
     <!-- Material override of the theme. -->
     <style name="AppTheme" parent="android:Theme.Material.Light.DarkActionBar">
-        <!-- Material colors
-             TODO: Find out whether there are any "official" (branding) colors. -->
+        <!-- Material colors -->
         <item name="android:colorPrimary">@color/primary</item>
         <item name="android:colorPrimaryDark">@color/primary_dark</item>
         <item name="android:colorAccent">@color/accent</item>

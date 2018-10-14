@@ -1,8 +1,8 @@
 <resources>
     <color name="primary">#00a000</color>
     <color name="primary_dark">#008000</color>
-    <color name="accent">#a08000</color>
-    <color name="accent_dark">#806000</color>
+    <color name="accent">#4040c0</color>
+    <color name="accent_dark">#202060</color>
 
     <color name="background_message">#f0f0f0</color>
 
