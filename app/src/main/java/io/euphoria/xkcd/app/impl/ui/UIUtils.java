@@ -23,14 +23,25 @@ import io.euphoria.xkcd.app.R;
 
 public class UIUtils {
 
-    // Color saturation and lightness for input-bar and messages
+    // Color saturation and lightness for input bar and messages
     public static final float COLOR_SENDER_SATURATION = 0.65f;
     public static final float COLOR_SENDER_LIGHTNESS = 0.85f;
+
+    // Color saturation and lightness for emotes
+    private static final float COLOR_EMOTE_SATURATION = 0.65f;
+    private static final float COLOR_EMOTE_LIGHTNESS = 0.9f; // Euphoria has 0.95f
+
     // Color saturation and lightness for @mentions
     public static final float COLOR_AT_SATURATION = 0.42f;
     public static final float COLOR_AT_LIGHTNESS = 0.50f;
+
     // TODO check against actual list of valid emoji
     private static final Pattern EMOJI_RE = Pattern.compile(":[a-zA-Z!?\\-]+?:");
+
+    // Emote message testing
+    public static final Pattern EMOTE_RE = Pattern.compile("^/me");
+    public static final int MAX_EMOTE_LENGTH = 240;
+
     // Hue hash cache
     private static final Map<String, Double> HUE_CACHE = new HashMap<>();
 
@@ -68,19 +79,43 @@ public class UIUtils {
     }
 
     /**
+     * Convenience function for applying a drawable background to a view
+     * <p>
+     * Note that there might be subtle behavioral differences depending on the API level.
+     *
+     * @param v        The view to apply a background to
+     * @param drawable The drawable to use as a background (or <code>null/code> to remove the background)
+     */
+    public static void setViewBackground(View v, Drawable drawable) {
+        if (VERSION.SDK_INT >= VERSION_CODES.JELLY_BEAN) {
+            v.setBackground(drawable);
+        } else {
+            v.setBackgroundDrawable(drawable);
+        }
+    }
+
+    /**
+     * Convenience function for applying a tinted background to a view
+     *
+     * @param v        View whose background to set
+     * @param drawable Resource ID of the drawable to use
+     * @param color    Color to apply
+     * @return The Drawable that was installed as the background
+     */
+    public static Drawable setColoredBackground(View v, @DrawableRes int drawable, @ColorInt int color) {
+        Drawable ret = colorDrawable(v.getContext(), drawable, color);
+        setViewBackground(v, ret);
+        return ret;
+    }
+
+    /**
      * Convenience function for applying a background appropriate to Euphoria nicknames
      * @param v View whose background to set
      * @param color Color to apply (use {@link #nickColor(String)} to obtain the proper color for some nick)
      * @return The Drawable that was installed as the background
      */
     public static Drawable setRoundedRectBackground(View v, @ColorInt int color) {
-        Drawable ret = colorDrawable(v.getContext(), R.drawable.rounded_rect, color);
-        if (VERSION.SDK_INT >= VERSION_CODES.JELLY_BEAN) {
-            v.setBackground(ret);
-        } else {
-            v.setBackgroundDrawable(ret);
-        }
-        return ret;
+        return setColoredBackground(v, R.drawable.rounded_rect, color);
     }
 
     /*                                                                       *
@@ -141,7 +176,7 @@ public class UIUtils {
     public static double hue(String text) {
         String normalized = normalize(text);
 
-        if (normalized.length() == 0) {
+        if (normalized.isEmpty()) {
             normalized = text;
         }
 
@@ -230,6 +265,17 @@ public class UIUtils {
     }
 
     /**
+     * Obtain the color corresponding to the given nickname for use as a light background
+     *
+     * @param name The nickname to colorize
+     * @return the color corresponding to <code>name</code>
+     */
+    @ColorInt
+    public static int emoteColor(String name) {
+        return hslToRgbInt(hue(name), COLOR_EMOTE_SATURATION, COLOR_EMOTE_LIGHTNESS);
+    }
+
+    /**
      * Obtain the color corresponding to the given nickname for use as a text color
      * @param name The nickname to colorize
      * @return The color corresponding to <code>name</code>
@@ -237,6 +283,16 @@ public class UIUtils {
     @ColorInt
     public static int mentionColor(String name) {
         return hslToRgbInt(hue(name), COLOR_AT_SATURATION, COLOR_AT_LIGHTNESS);
+    }
+
+    /**
+     * Test whether the given message content string corresponds to an emote message
+     *
+     * @param text The message content to test
+     * @return Whether <code>text</code> is an emote message text
+     */
+    public static boolean isEmote(String text) {
+        return text.length() < MAX_EMOTE_LENGTH && EMOTE_RE.matcher(text).find();
     }
 
     /**

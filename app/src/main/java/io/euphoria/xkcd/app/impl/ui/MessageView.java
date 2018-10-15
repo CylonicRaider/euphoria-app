@@ -2,16 +2,22 @@ package io.euphoria.xkcd.app.impl.ui;
 
 import android.content.Context;
 import android.content.res.Resources;
+import android.support.annotation.ColorInt;
 import android.util.AttributeSet;
 import android.util.Log;
+import android.view.View;
 import android.widget.TextView;
 
 import io.euphoria.xkcd.app.R;
+import io.euphoria.xkcd.app.data.Message;
 import io.euphoria.xkcd.app.data.SessionView;
 
+import static io.euphoria.xkcd.app.impl.ui.UIUtils.emoteColor;
 import static io.euphoria.xkcd.app.impl.ui.UIUtils.hslToRgbInt;
+import static io.euphoria.xkcd.app.impl.ui.UIUtils.isEmote;
 import static io.euphoria.xkcd.app.impl.ui.UIUtils.nickColor;
-import static io.euphoria.xkcd.app.impl.ui.UIUtils.setRoundedRectBackground;
+import static io.euphoria.xkcd.app.impl.ui.UIUtils.setColoredBackground;
+import static io.euphoria.xkcd.app.impl.ui.UIUtils.setViewBackground;
 
 public class MessageView extends BaseMessageView {
 
@@ -35,28 +41,36 @@ public class MessageView extends BaseMessageView {
             lp = new MarginLayoutParams(defaultLayoutParams);
             setLayoutParams(lp);
         }
-        MessageTree message = getMessage();
-        setMarginForIndent(getContext(), lp, message.getIndent());
-        if (message.getMessage() != null) {
-            contentLbl.setText(message.getMessage().getContent());
-            SessionView sender = message.getMessage().getSender();
+        MessageTree mt = getMessage();
+        Message msg = mt.getMessage();
+        setMarginForIndent(getContext(), lp, mt.getIndent());
+        if (msg != null) {
+            SessionView sender = msg.getSender();
+            String content = msg.getContent();
+            boolean emote = isEmote(content);
+            String displayContent = emote ? content.substring(3) : content;
+            displayContent = displayContent.trim();
+            // Apply the message's text
             nickLbl.setText(sender.getName());
+            contentLbl.setText(displayContent);
             // Color the background of the sender's nick
-            setRoundedRectBackground(nickLbl, nickColor(sender.getName()));
+            setNickBackground(nickLbl, emote, nickColor(sender.getName()));
+            setContentBackground(contentLbl, emote, emoteColor(sender.getName()));
         } else {
             Resources res = getResources();
             nickLbl.setText(res.getString(R.string.not_available));
             contentLbl.setText(res.getString(R.string.not_available));
             // Make nick background red
-            setRoundedRectBackground(nickLbl, hslToRgbInt(0, 1, 0.5f));
+            setNickBackground(nickLbl, false, hslToRgbInt(0, 1, 0.5f));
+            setContentBackground(contentLbl, false, -1);
             Log.e(TAG, "updateDisplay: MessageView message is null!",
                     new RuntimeException("MessageView message is null!"));
         }
-        if (message.getReplies().isEmpty()) {
+        if (mt.getReplies().isEmpty()) {
             collapseLbl.setText("");
             collapseLbl.setVisibility(GONE);
         } else {
-            int replies = message.countVisibleUserReplies(true);
+            int replies = mt.countVisibleUserReplies(true);
             if (replies == 0) {
                 collapseLbl.setVisibility(GONE);
             } else {
@@ -64,7 +78,7 @@ public class MessageView extends BaseMessageView {
                 Resources res = getResources();
                 String repliesStr = res.getQuantityString(R.plurals.collapser_replies, replies);
                 String text;
-                if (message.isCollapsed()) {
+                if (mt.isCollapsed()) {
                     text = res.getString(R.string.collapser_show, replies, repliesStr);
                 } else {
                     text = res.getString(R.string.collapser_hide, replies, repliesStr);
@@ -86,6 +100,18 @@ public class MessageView extends BaseMessageView {
     }
     public void setCollapserClickListener(OnClickListener l) {
         findViewById(R.id.collapse_lbl).setOnClickListener(l);
+    }
+
+    private static void setNickBackground(View v, boolean emote, @ColorInt int color) {
+        setColoredBackground(v, emote ? R.drawable.rounded_rect_left : R.drawable.rounded_rect, color);
+    }
+
+    private static void setContentBackground(View v, boolean emote, @ColorInt int color) {
+        if (emote) {
+            setColoredBackground(v, R.drawable.rounded_rect_right, color);
+        } else {
+            setViewBackground(v, null);
+        }
     }
 
 }

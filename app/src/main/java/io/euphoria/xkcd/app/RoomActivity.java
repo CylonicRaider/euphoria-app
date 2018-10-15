@@ -121,13 +121,16 @@ public class RoomActivity extends FragmentActivity {
     private int testID = 0;
 
     // Test handling of out-of-order messages.
-    private Message[] testMessages = new Message[] {
+    private final Message[] testMessages = new Message[] {
             new TestMessage("a", "b", "Test message A/B"),
             new TestMessage(null, "a", "Test message A"),
             new TestMessage("e", "f", "Test message A/E/F"),
             new TestMessage("b", "d", "Test message A/B/D"),
             new TestMessage("a", "e", "Test message A/E"),
             new TestMessage("b", "c", "Test message A/B/C"),
+            new TestMessage("a", "g", "/me message A/G"),
+            new TestMessage("g", "h", "/me message A/G/H This is a particularly long testing string that will hopefully be wider than the screen."),
+            new TestMessage("g", "i", "Test message A/G/I This is a particularly long testing string that will hopefully be wider than the screen."),
             new TestMessage(null, "x", "Test message X"),
             new TestMessage("x", "x01", "Test message X/01"),
             new TestMessage("x", "x02", "Test message X/02"),
