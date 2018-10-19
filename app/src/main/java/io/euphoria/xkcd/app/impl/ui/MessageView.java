@@ -11,6 +11,7 @@ import android.widget.TextView;
 import io.euphoria.xkcd.app.R;
 import io.euphoria.xkcd.app.data.Message;
 import io.euphoria.xkcd.app.data.SessionView;
+import io.euphoria.xkcd.app.impl.ui.detail.TriangleView;
 
 import static io.euphoria.xkcd.app.impl.ui.UIUtils.emoteColor;
 import static io.euphoria.xkcd.app.impl.ui.UIUtils.hslToRgbInt;
@@ -35,7 +36,9 @@ public class MessageView extends BaseMessageView {
         // TODO move to ViewHolder?
         TextView nickLbl = (TextView) findViewById(R.id.nick_lbl);
         TextView contentLbl = (TextView) findViewById(R.id.content_lbl);
-        TextView collapseLbl = (TextView) findViewById(R.id.collapse_lbl);
+        View collapser = findViewById(R.id.collapser);
+        TriangleView collapserIcon = (TriangleView) findViewById(R.id.collapser_icon);
+        TextView collapserLbl = (TextView) findViewById(R.id.collapser_lbl);
         MarginLayoutParams lp = (MarginLayoutParams) getLayoutParams();
         if (lp == null) {
             lp = new MarginLayoutParams(defaultLayoutParams);
@@ -67,24 +70,23 @@ public class MessageView extends BaseMessageView {
                     new RuntimeException("MessageView message is null!"));
         }
         if (mt.getReplies().isEmpty()) {
-            collapseLbl.setText("");
-            collapseLbl.setVisibility(GONE);
+            collapser.setVisibility(GONE);
+            return;
+        }
+        int replies = mt.countVisibleUserReplies(true);
+        if (replies == 0) {
+            collapser.setVisibility(GONE);
+            return;
+        }
+        collapser.setVisibility(VISIBLE);
+        Resources res = getResources();
+        String repliesStr = res.getQuantityString(R.plurals.collapser_replies, replies);
+        if (mt.isCollapsed()) {
+            collapserLbl.setText(res.getString(R.string.collapser_show, replies, repliesStr));
+            collapserIcon.setPointDown(false);
         } else {
-            int replies = mt.countVisibleUserReplies(true);
-            if (replies == 0) {
-                collapseLbl.setVisibility(GONE);
-            } else {
-                collapseLbl.setVisibility(VISIBLE);
-                Resources res = getResources();
-                String repliesStr = res.getQuantityString(R.plurals.collapser_replies, replies);
-                String text;
-                if (mt.isCollapsed()) {
-                    text = res.getString(R.string.collapser_show, replies, repliesStr);
-                } else {
-                    text = res.getString(R.string.collapser_hide, replies, repliesStr);
-                }
-                collapseLbl.setText(text);
-            }
+            collapserLbl.setText(res.getString(R.string.collapser_hide, replies, repliesStr));
+            collapserIcon.setPointDown(true);
         }
     }
 
@@ -99,7 +101,7 @@ public class MessageView extends BaseMessageView {
         UIUtils.setSelectableOnClickListener(findViewById(R.id.content_lbl), l);
     }
     public void setCollapserClickListener(OnClickListener l) {
-        findViewById(R.id.collapse_lbl).setOnClickListener(l);
+        findViewById(R.id.collapser).setOnClickListener(l);
     }
 
     private static void setNickBackground(View v, boolean emote, @ColorInt int color) {

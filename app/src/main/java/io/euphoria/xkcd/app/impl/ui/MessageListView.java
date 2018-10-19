@@ -97,7 +97,7 @@ public class MessageListView extends RecyclerView {
 
     private static final String TAG = "MessageListView";
 
-    public static final int INDENT_LINE_OFFSET = 3;
+    public static final int INDENT_LINE_OFFSET = 9;
     public static final int INDENT_LINE_WIDTH = 2;
 
     private class LayoutManager extends LinearLayoutManager {
