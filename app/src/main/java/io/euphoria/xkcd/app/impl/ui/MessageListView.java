@@ -168,6 +168,8 @@ public class MessageListView extends RecyclerView {
     private final int indentUnit;
     private final List<IndentLine> lines;
     private final Map<MessageTree, IndentLine> linesBelow;
+    private int lastTopVisible;
+    private int lastBottomVisible;
 
     public MessageListView(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
@@ -180,6 +182,9 @@ public class MessageListView extends RecyclerView {
         /* Indent line containers */
         lines = new LinkedList<>();
         linesBelow = new HashMap<>();
+        /* Scrolliong detection */
+        lastTopVisible = -1;
+        lastBottomVisible = -1;
         /* Parent class configuration */
         setLayoutManager(new LayoutManager(context));
         // FIXME: Re-add animations.
@@ -203,8 +208,6 @@ public class MessageListView extends RecyclerView {
     public void onChildAttachedToWindow(View child) {
         super.onChildAttachedToWindow(child);
         if (!(child instanceof BaseMessageView)) return;
-        // NOTE: We assume that this method is invoked whenever a view is shown for an adapter item, in particular
-        //       if it has been recycled rather than created anew.
         addIndentLinesFor(((BaseMessageView) child).getMessage());
         updateLines();
     }
@@ -220,6 +223,15 @@ public class MessageListView extends RecyclerView {
     public void onScrolled(int dx, int dy) {
         super.onScrolled(dx, dy);
         for (IndentLine l : lines) l.onScrolled(dx, dy);
+        // FIXME: Leverage layout manager's information on loaded children instead of relying on hacks.
+        LayoutManager layout = (LayoutManager) getLayoutManager();
+        int topVisible = layout.findFirstVisibleItemPosition();
+        int bottomVisible = layout.findLastVisibleItemPosition();
+        if (topVisible != lastTopVisible || bottomVisible != lastBottomVisible) {
+            lastTopVisible = topVisible;
+            lastBottomVisible = bottomVisible;
+            post(lineUpdater);
+        }
     }
 
     @Override
