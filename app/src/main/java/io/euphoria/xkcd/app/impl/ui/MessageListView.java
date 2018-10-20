@@ -74,13 +74,13 @@ public class MessageListView extends RecyclerView {
                     displayTop = Integer.MIN_VALUE;
                 } else {
                     ViewHolder h = findViewHolderForAdapterPosition(startPos);
-                    displayTop = (h == null) ? Integer.MIN_VALUE : h.itemView.getTop();
+                    displayTop = (h == null) ? Integer.MIN_VALUE : h.itemView.getTop() + indentTopMargin;
                 }
                 if (endPos > bottomVisible) {
                     displayBottom = Integer.MAX_VALUE;
                 } else {
                     ViewHolder h = findViewHolderForAdapterPosition(endPos);
-                    displayBottom = (h == null) ? Integer.MAX_VALUE : h.itemView.getTop();
+                    displayBottom = (h == null) ? Integer.MAX_VALUE : h.itemView.getTop() - indentBottomMargin;
                 }
             } else {
                 /* NOP -- draw() will do nothing in this case. */
@@ -99,6 +99,8 @@ public class MessageListView extends RecyclerView {
 
     public static final int INDENT_LINE_OFFSET = 9;
     public static final int INDENT_LINE_WIDTH = 2;
+    public static final int INDENT_LINE_TOP_MARGIN = 1;
+    public static final int INDENT_LINE_BOTTOM_MARGIN = 1;
 
     private class LayoutManager extends LinearLayoutManager {
 
@@ -166,6 +168,8 @@ public class MessageListView extends RecyclerView {
     private final Paint indentPaint;
     private final int indentBase;
     private final int indentUnit;
+    private final int indentTopMargin;
+    private final int indentBottomMargin;
     private final List<IndentLine> lines;
     private final Map<MessageTree, IndentLine> linesBelow;
     private int lastTopVisible;
@@ -179,6 +183,8 @@ public class MessageListView extends RecyclerView {
         indentPaint.setColor(ContextCompat.getColor(context, R.color.indent_line));
         indentBase = getPaddingLeft() + UIUtils.dpToPx(context, INDENT_LINE_OFFSET);
         indentUnit = MessageView.computeIndentWidth(context, 1);
+        indentTopMargin = UIUtils.dpToPx(context, INDENT_LINE_TOP_MARGIN);
+        indentBottomMargin = UIUtils.dpToPx(context, INDENT_LINE_BOTTOM_MARGIN);
         /* Indent line containers */
         lines = new LinkedList<>();
         linesBelow = new HashMap<>();
