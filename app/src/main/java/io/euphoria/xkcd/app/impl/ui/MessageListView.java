@@ -14,6 +14,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import io.euphoria.xkcd.app.R;
@@ -32,6 +33,12 @@ public class MessageListView extends RecyclerView {
 
         public IndentLine(MessageTree base) {
             this.base = base;
+        }
+
+        public String toString() {
+            return String.format((Locale) null, "%s@%x[msg=%s,start=%d,end=%d,top=%d,bottom=%d]",
+                    getClass().getSimpleName(), System.identityHashCode(this), base, startPos, endPos,
+                    displayTop, displayBottom);
         }
 
         public MessageTree getBase() {
