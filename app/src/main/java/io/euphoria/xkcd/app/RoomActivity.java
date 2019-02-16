@@ -175,7 +175,7 @@ public class RoomActivity extends FragmentActivity {
         messageList = (MessageListView) findViewById(R.id.message_recycler_view);
 
         LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        inputBar = (InputBarView) inflater.inflate(R.layout.input_bar, null);
+        inputBar = (InputBarView) inflater.inflate(R.layout.input_bar, messageList);
     }
 
     @Override

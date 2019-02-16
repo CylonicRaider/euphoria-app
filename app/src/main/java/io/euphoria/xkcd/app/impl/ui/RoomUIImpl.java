@@ -2,6 +2,7 @@ package io.euphoria.xkcd.app.impl.ui;
 
 import android.net.Uri;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
 import java.util.HashMap;
 import java.util.LinkedHashSet;
@@ -26,8 +27,8 @@ public class RoomUIImpl implements RoomUI {
 
     private String roomName;
     // TODO optionally change to ArrayList, if more efficient
-    private Set<UIListener> listeners = new LinkedHashSet<>();
-    private Map<String, String> activeSessions = new HashMap<>();
+    private final Set<UIListener> listeners = new LinkedHashSet<>();
+    private final Map<String, String> activeSessions = new HashMap<>();
 
     RoomUIImpl(String roomName) {
         this.roomName = roomName;
@@ -40,31 +41,27 @@ public class RoomUIImpl implements RoomUI {
 
     @Override
     public void show() {
-
     }
 
     @Override
     public void close() {
-
     }
 
     @Override
     public void setConnectionStatus(ConnectionStatus status) {
-
     }
 
-    // TODO Adjust to new MessageListAdapter
-    @Override
-    public void showMessages(List<Message> messages) {
-        /*
-        for (Message m : messages) {
-            if (this.messages.containsKey(m.getID())) {
-                this.messages.get(m.getID()).setMessage(m);
-            } else {
-                this.messages.put(m.getID(), new MessageContainer());
-                roots.add(new MessageContainer(m));
-            }
-        }*/
+    /**
+     * Test whether the given URI denotes a valid Euphoria room.
+     *
+     * @param uri The URI to test
+     * @return The test result
+     */
+    public static boolean isValidRoomUri(@Nullable Uri uri) {
+        return uri != null && Pattern.matches("https?", uri.getScheme()) &&
+                "euphoria.io".equalsIgnoreCase(uri.getAuthority()) &&
+                uri.getPath() != null && ROOM_PATH_RE.matcher(uri.getPath()).matches();
+        // Query strings and fragment identifiers are allowed.
     }
 
     @Override
@@ -125,28 +122,28 @@ public class RoomUIImpl implements RoomUI {
     }
 
     /**
-     * Test whether the given URI denotes a valid Euphoria room.
-     *
-     * @param uri The URI to test
-     * @return The test result
-     */
-    public static boolean isValidRoomUri(Uri uri) {
-        return Pattern.matches("https?", uri.getScheme()) &&
-                "euphoria.io".equalsIgnoreCase(uri.getAuthority()) &&
-                ROOM_PATH_RE.matcher(uri.getPath()).matches();
-        // Query strings and fragment identifiers are allowed.
-    }
-
-    /**
      * Retrieve the room name from the given URI.
      *
      * @param uri The URI to probe
      * @return The room name, or <code>null</code> if the room name cannot be isolated
      */
-    public static String getRoomName(Uri uri) {
+    public static String getRoomName(@NonNull Uri uri) {
         Matcher m = ROOM_PATH_RE.matcher(uri.getPath());
         if (!m.matches()) return null;
         return m.group(1);
+    }
+
+    // TODO Adjust to new MessageListAdapter
+    @Override
+    public void showMessages(List<Message> messages) {
+        /*for (Message m : messages) {
+            if (this.messages.containsKey(m.getID())) {
+                this.messages.get(m.getID()).setMessage(m);
+            } else {
+                this.messages.put(m.getID(), new MessageContainer());
+                roots.add(new MessageContainer(m));
+            }
+        }*/
     }
 
 }

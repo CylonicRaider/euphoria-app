@@ -16,8 +16,8 @@ import io.euphoria.xkcd.app.ui.event.RoomSwitchEvent;
 /* Implementation of RoomUIManager */
 public class RoomUIManagerImpl implements RoomUIManager {
 
-    Set<UIManagerListener> listeners = new HashSet<>();
-    HashMap<String, RoomUI> roomUIs = new HashMap<>();
+    private final Set<UIManagerListener> listeners = new HashSet<>();
+    private final HashMap<String, RoomUI> roomUIs = new HashMap<>();
 
     @Override
     public RoomUI getRoomUI(@NonNull String roomName) {
