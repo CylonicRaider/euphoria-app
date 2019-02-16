@@ -159,13 +159,18 @@ public class MessageListAdapter extends RecyclerView.Adapter<MessageListAdapter.
         MessageTree mt = new MessageTree(message);
         if (mt.getID() != null) allMsgs.put(mt.getID(), mt);
         String parID = mt.getParent();
-        if (parID != null && allMsgs.get(parID) == null) {
-            List<MessageTree> group = orphans.get(parID);
-            if (group == null) {
-                group = new LinkedList<>();
-                orphans.put(parID, group);
+        if (parID != null) {
+            MessageTree parent = allMsgs.get(parID);
+            if (parent != null) {
+                parent.addReply(mt);
+            } else {
+                List<MessageTree> group = orphans.get(parID);
+                if (group == null) {
+                    group = new LinkedList<>();
+                    orphans.put(parID, group);
+                }
+                group.add(mt);
             }
-            group.add(mt);
         }
         List<MessageTree> adopted = orphans.remove(mt.getID());
         if (adopted != null) {
@@ -344,7 +349,6 @@ public class MessageListAdapter extends RecyclerView.Adapter<MessageListAdapter.
 
     public synchronized void remove(@NonNull MessageTree mt) {
         // Unlink from data structures
-        String parID = mt.getParent();
         MessageTree parent = allMsgs.get(mt.getParent());
         if (parent != null) parent.removeReply(mt);
         allMsgs.remove(mt.getID());
