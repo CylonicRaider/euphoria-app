@@ -8,6 +8,7 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.AttributeSet;
+import android.view.View;
 
 import java.util.HashMap;
 import java.util.Iterator;
@@ -201,6 +202,21 @@ public class MessageListView extends RecyclerView {
     public void swapAdapter(Adapter adapter, boolean removeAndRecycleExistingViews) {
         super.swapAdapter(adapter, removeAndRecycleExistingViews);
         adapter.registerAdapterDataObserver(adapterObserver);
+    }
+
+    @Override
+    public void onChildAttachedToWindow(View child) {
+        super.onChildAttachedToWindow(child);
+        if (!(child instanceof BaseMessageView)) return;
+        addIndentLinesFor(((BaseMessageView) child).getMessage());
+        updateLines();
+    }
+
+    @Override
+    public void onChildDetachedFromWindow(View child) {
+        super.onChildDetachedFromWindow(child);
+        if (!(child instanceof BaseMessageView)) return;
+        updateLines();
     }
 
     @Override
