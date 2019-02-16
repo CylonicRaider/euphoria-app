@@ -69,7 +69,7 @@ public class MessageListAdapter extends RecyclerView.Adapter<MessageListAdapter.
                 Context.LAYOUT_INFLATER_SERVICE);
         switch (viewType) {
             case MESSAGE:
-                MessageView mc = (MessageView) inflater.inflate(R.layout.template_message, parent);
+                MessageView mc = (MessageView) inflater.inflate(R.layout.template_message, parent, false);
                 mc.setVisibility(View.INVISIBLE);
                 return new ViewHolder(mc);
             case INPUT_BAR:
