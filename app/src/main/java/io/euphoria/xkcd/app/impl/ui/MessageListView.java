@@ -8,7 +8,6 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.AttributeSet;
-import android.view.View;
 
 import java.util.HashMap;
 import java.util.Iterator;
@@ -45,24 +44,8 @@ public class MessageListView extends RecyclerView {
             return base;
         }
 
-        public int getStartPos() {
-            return startPos;
-        }
-
-        public void setStartPos(int startPos) {
-            this.startPos = startPos;
-        }
-
-        public int getEndPos() {
-            return endPos;
-        }
-
-        public void setEndPos(int endPos) {
-            this.endPos = endPos;
-        }
-
         public void draw(Canvas c, int top, int bottom) {
-            if (startPos == endPos) return;
+            if (displayTop >= displayBottom) return;
             top = Math.max(top, displayTop);
             bottom = Math.min(bottom, displayBottom);
             int x = indentBase + base.getIndent() * indentUnit;
@@ -72,32 +55,35 @@ public class MessageListView extends RecyclerView {
         public boolean updatePositions(int topVisible, int bottomVisible) {
             int idx = ((MessageListAdapter) getAdapter()).indexOf(base);
             startPos = idx + 1;
-            endPos = startPos + base.countVisibleReplies();
-            if (startPos < topVisible && endPos < topVisible ||
-                    startPos > bottomVisible + 1 && endPos > bottomVisible + 1)
+            endPos = startPos + base.countVisibleReplies() - 1;
+            /* If we are definitely outside the visible area, discard us. */
+            if (endPos < topVisible - 1 || startPos > bottomVisible + 1)
                 return false;
-            if (startPos != endPos) {
-                if (startPos < topVisible) {
-                    displayTop = Integer.MIN_VALUE;
-                } else {
-                    ViewHolder h = findViewHolderForAdapterPosition(startPos);
-                    displayTop = (h == null) ? Integer.MIN_VALUE : h.itemView.getTop() + indentTopMargin;
-                }
-                if (endPos > bottomVisible) {
-                    displayBottom = Integer.MAX_VALUE;
-                } else {
-                    ViewHolder h = findViewHolderForAdapterPosition(endPos);
-                    displayBottom = (h == null) ? Integer.MAX_VALUE : h.itemView.getTop() - indentBottomMargin;
-                }
+            /* Special case for not being visible at all. */
+            if (endPos < startPos) {
+                displayTop = 0;
+                displayBottom = 0;
+                return true;
+            }
+            /* Otherwise, calculate our top and bottom. */
+            if (startPos < topVisible) {
+                displayTop = Integer.MIN_VALUE;
             } else {
-                /* NOP -- draw() will do nothing in this case. */
+                ViewHolder h = findViewHolderForAdapterPosition(startPos);
+                displayTop = (h == null) ? Integer.MAX_VALUE : h.itemView.getTop() + indentTopMargin;
+            }
+            if (endPos > bottomVisible) {
+                displayBottom = Integer.MAX_VALUE;
+            } else {
+                ViewHolder h = findViewHolderForAdapterPosition(endPos);
+                displayBottom = (h == null) ? Integer.MIN_VALUE : h.itemView.getBottom() - indentBottomMargin;
             }
             return true;
         }
 
         public void onScrolled(int dx, int dy) {
-            if (displayTop != Integer.MIN_VALUE) displayTop -= dy;
-            if (displayBottom != Integer.MAX_VALUE) displayBottom -= dy;
+            if (displayTop != Integer.MIN_VALUE && displayTop != Integer.MAX_VALUE) displayTop -= dy;
+            if (displayBottom != Integer.MIN_VALUE && displayBottom != Integer.MAX_VALUE) displayBottom -= dy;
         }
 
     }
@@ -218,32 +204,23 @@ public class MessageListView extends RecyclerView {
     }
 
     @Override
-    public void onChildAttachedToWindow(View child) {
-        super.onChildAttachedToWindow(child);
-        if (!(child instanceof BaseMessageView)) return;
-        addIndentLinesFor(((BaseMessageView) child).getMessage());
-        updateLines();
-    }
-
-    @Override
-    public void onChildDetachedFromWindow(View child) {
-        super.onChildDetachedFromWindow(child);
-        if (!(child instanceof BaseMessageView)) return;
-        updateLines();
-    }
-
-    @Override
     public void onScrolled(int dx, int dy) {
         super.onScrolled(dx, dy);
         for (IndentLine l : lines) l.onScrolled(dx, dy);
-        // FIXME: Leverage layout manager's information on loaded children instead of relying on hacks.
+        /* Check if any new lines have to be added. */
         LayoutManager layout = (LayoutManager) getLayoutManager();
         int topVisible = layout.findFirstVisibleItemPosition();
         int bottomVisible = layout.findLastVisibleItemPosition();
         if (topVisible != lastTopVisible || bottomVisible != lastBottomVisible) {
+            if (lastTopVisible == -1 || lastBottomVisible == -1) {
+                addIndentLinesFor(topVisible, bottomVisible);
+            } else {
+                addIndentLinesFor(topVisible, lastTopVisible);
+                addIndentLinesFor(lastBottomVisible, bottomVisible);
+            }
             lastTopVisible = topVisible;
             lastBottomVisible = bottomVisible;
-            post(lineUpdater);
+            updateLines();
         }
     }
 
@@ -269,6 +246,13 @@ public class MessageListView extends RecyclerView {
             }
             if (tree.getParent() == null) break;
             tree = adapter.get(tree.getParent());
+        }
+    }
+
+    private void addIndentLinesFor(int minIdx, int maxIdx) {
+        MessageListAdapter adapter = (MessageListAdapter) getAdapter();
+        for (int i = minIdx; i <= maxIdx; i++) {
+            addIndentLinesFor(adapter.getItem(i));
         }
     }
 
