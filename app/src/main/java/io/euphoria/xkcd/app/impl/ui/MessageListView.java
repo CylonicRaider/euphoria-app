@@ -108,10 +108,10 @@ public class MessageListView extends RecyclerView {
 
     private static final String TAG = "MessageListView";
 
-    public static final int INDENT_LINE_OFFSET = 9;
-    public static final int INDENT_LINE_WIDTH = 2;
-    public static final int INDENT_LINE_TOP_MARGIN = 1;
-    public static final int INDENT_LINE_BOTTOM_MARGIN = 1;
+    static final int INDENT_LINE_OFFSET = 9;
+    static final int INDENT_LINE_WIDTH = 2;
+    static final int INDENT_LINE_TOP_MARGIN = 1;
+    static final int INDENT_LINE_BOTTOM_MARGIN = 1;
 
     private final AdapterDataObserver adapterObserver = new AdapterDataObserver() {
 

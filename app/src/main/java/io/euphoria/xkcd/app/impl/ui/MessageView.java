@@ -69,6 +69,7 @@ public class MessageView extends BaseMessageView {
             Log.e(TAG, "updateDisplay: MessageView message is null!",
                     new RuntimeException("MessageView message is null!"));
         }
+        lp.bottomMargin = 0;
         if (mt.getReplies().isEmpty()) {
             collapser.setVisibility(GONE);
             return;
@@ -82,11 +83,13 @@ public class MessageView extends BaseMessageView {
         Resources res = getResources();
         String repliesStr = res.getQuantityString(R.plurals.collapser_replies, replies);
         if (mt.isCollapsed()) {
+            collapserLbl.setVisibility(VISIBLE);
             collapserLbl.setText(res.getString(R.string.collapser_show, replies, repliesStr));
             collapserIcon.setPointDown(false);
         } else {
-            collapserLbl.setText(res.getString(R.string.collapser_hide, replies, repliesStr));
+            collapserLbl.setVisibility(GONE);
             collapserIcon.setPointDown(true);
+            lp.bottomMargin = -UIUtils.dpToPx(getContext(), PADDING_PER_INDENT);
         }
     }
 

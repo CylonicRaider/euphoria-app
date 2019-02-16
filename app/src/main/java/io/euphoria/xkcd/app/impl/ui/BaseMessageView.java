@@ -14,7 +14,7 @@ import static io.euphoria.xkcd.app.impl.ui.UIUtils.dpToPx;
 
 abstract class BaseMessageView extends RelativeLayout {
 
-    private static final int PADDING_PER_INDENT = 15;
+    static final int PADDING_PER_INDENT = 17;
 
     private MessageTree message;
     private boolean established;
