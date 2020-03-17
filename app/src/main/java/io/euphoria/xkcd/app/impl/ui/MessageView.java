@@ -34,11 +34,11 @@ public class MessageView extends BaseMessageView {
     @Override
     protected void updateDisplay() {
         // TODO move to ViewHolder?
-        TextView nickLbl = (TextView) findViewById(R.id.nick_lbl);
-        TextView contentLbl = (TextView) findViewById(R.id.content_lbl);
+        TextView nickLbl = findViewById(R.id.nick_lbl);
+        TextView contentLbl = findViewById(R.id.content_lbl);
         View collapser = findViewById(R.id.collapser);
-        TriangleView collapserIcon = (TriangleView) findViewById(R.id.collapser_icon);
-        TextView collapserLbl = (TextView) findViewById(R.id.collapser_lbl);
+        TriangleView collapserIcon = findViewById(R.id.collapser_icon);
+        TextView collapserLbl = findViewById(R.id.collapser_lbl);
         MarginLayoutParams lp = (MarginLayoutParams) getLayoutParams();
         if (lp == null) {
             lp = new MarginLayoutParams(defaultLayoutParams);
@@ -99,6 +99,7 @@ public class MessageView extends BaseMessageView {
     public void setTextClickListener(OnClickListener l) {
         UIUtils.setSelectableOnClickListener(findViewById(R.id.nick_lbl), l);
         UIUtils.setSelectableOnClickListener(findViewById(R.id.content_lbl), l);
+        findViewById(R.id.clicker).setOnClickListener(l);
     }
     public void setCollapserClickListener(OnClickListener l) {
         findViewById(R.id.collapser).setOnClickListener(l);

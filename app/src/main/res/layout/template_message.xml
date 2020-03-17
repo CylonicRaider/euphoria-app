@@ -47,6 +47,17 @@
         android:textIsSelectable="true"
         android:textSize="18sp"/>
 
+    <View
+        android:id="@+id/clicker"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignTop="@id/content_lbl"
+        android:layout_alignBottom="@id/content_lbl"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
+        android:layout_toEndOf="@id/content_lbl"
+        android:layout_toRightOf="@id/content_lbl"/>
+
     <LinearLayout
         android:id="@+id/collapser"
         android:layout_width="wrap_content"
