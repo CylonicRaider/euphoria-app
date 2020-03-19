@@ -7,8 +7,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
-import io.euphoria.xkcd.app.data.Message;
-
 /**
  * @author N00bySumairu
  */
@@ -18,11 +16,11 @@ public class MessageTree implements Comparable<MessageTree> {
     private final List<MessageTree> replies = new ArrayList<>();
     private String id;
     private String parent;
-    private Message message;
+    private UIMessage message;
     private int indent = 0;
     private boolean collapsed = false;
 
-    public MessageTree(Message m) {
+    public MessageTree(UIMessage m) {
         message = m;
         if (m != null) {
             id = m.getID();
@@ -68,11 +66,11 @@ public class MessageTree implements Comparable<MessageTree> {
     }
 
     /** The message wrapped by this; null for the input bar. */
-    public Message getMessage() {
+    public UIMessage getMessage() {
         return message;
     }
 
-    public void setMessage(@NonNull Message m) {
+    public void setMessage(@NonNull UIMessage m) {
         assert message.getID().equals(id) : "Updating MessageTree with unrelated message";
         message = m;
         id = m.getID();

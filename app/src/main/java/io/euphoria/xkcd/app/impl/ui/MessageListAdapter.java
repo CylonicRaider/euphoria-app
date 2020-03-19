@@ -155,7 +155,7 @@ public class MessageListAdapter extends RecyclerView.Adapter<MessageListAdapter.
         return parent != null && !parent.isCollapsed() && isVisible(parent);
     }
 
-    private MessageTree importNewMessage(Message message) {
+    private MessageTree importNewMessage(UIMessage message) {
         MessageTree mt = new MessageTree(message);
         if (mt.getID() != null) allMsgs.put(mt.getID(), mt);
         String parID = mt.getParent();
@@ -291,7 +291,7 @@ public class MessageListAdapter extends RecyclerView.Adapter<MessageListAdapter.
         return getReply(tree, -1);
     }
 
-    public synchronized MessageTree add(@NonNull Message message) {
+    public synchronized MessageTree add(@NonNull UIMessage message) {
         MessageTree mt = allMsgs.get(message.getID());
         if (mt != null) {
             // Message already registered -> might get away with an in-place update

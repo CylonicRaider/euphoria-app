@@ -9,8 +9,6 @@ import android.view.View;
 import android.widget.TextView;
 
 import io.euphoria.xkcd.app.R;
-import io.euphoria.xkcd.app.data.Message;
-import io.euphoria.xkcd.app.data.SessionView;
 import io.euphoria.xkcd.app.impl.ui.detail.TriangleView;
 
 import static io.euphoria.xkcd.app.impl.ui.UIUtils.emoteColor;
@@ -45,20 +43,19 @@ public class MessageView extends BaseMessageView {
             setLayoutParams(lp);
         }
         MessageTree mt = getMessage();
-        Message msg = mt.getMessage();
+        UIMessage msg = mt.getMessage();
         setMarginForIndent(getContext(), lp, mt.getIndent());
         if (msg != null) {
-            SessionView sender = msg.getSender();
             String content = msg.getContent();
             boolean emote = isEmote(content);
             String displayContent = emote ? content.substring(3) : content;
             displayContent = displayContent.trim();
             // Apply the message's text
-            nickLbl.setText(sender.getName());
+            nickLbl.setText(msg.getSenderName());
             contentLbl.setText(displayContent);
             // Color the background of the sender's nick
-            setNickBackground(nickLbl, emote, nickColor(sender.getName()));
-            setContentBackground(contentLbl, emote, emoteColor(sender.getName()));
+            setNickBackground(nickLbl, emote, nickColor(msg.getSenderName()));
+            setContentBackground(contentLbl, emote, emoteColor(msg.getSenderName()));
         } else {
             Resources res = getResources();
             nickLbl.setText(res.getString(R.string.not_available));
