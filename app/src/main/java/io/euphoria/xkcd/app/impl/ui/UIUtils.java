@@ -127,7 +127,7 @@ public class UIUtils {
      * Raw hue hash implementation
      * Inline comments are original; block comments are porters' notes.
      */
-    private static double hueHash(String text, double offset) {
+    private static strictfp double hueHash(String text, double offset) {
         // DJBX33A-ish
         double val = 0.0;
         for (int i = 0; i < text.length(); i++) {
@@ -139,7 +139,7 @@ public class UIUtils {
             // this keeps the value within Number.MAX_SAFE_INTEGER without throwing out
             // information.
             double origVal = val;
-            /* Double cast to avoid integer saturation; recall that shift is applied after the casts */
+            /* Double cast to avoid integer saturation; recall that the shift is applied after the casts */
             val = (int) (long) val << 5;
             val += origVal;
 
