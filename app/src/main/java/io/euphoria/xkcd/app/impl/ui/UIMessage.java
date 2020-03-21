@@ -8,14 +8,6 @@ import io.euphoria.xkcd.app.data.Message;
 
 public class UIMessage {
 
-    private static boolean equalsOrNull(Object a, Object b) {
-        return (a == null) ? (b == null) : a.equals(b);
-    }
-
-    private static int hashCodeOrNull(Object a) {
-        return (a == null) ? 0 : a.hashCode();
-    }
-
     private static int longHashCode(long n) {
         return (int) (n >>> 32) ^ (int) n;
     }
@@ -43,17 +35,20 @@ public class UIMessage {
     }
 
     public int hashCode() {
-        return hashCodeOrNull(id) ^ hashCodeOrNull(parent) << 4 ^ longHashCode(timestamp) ^
-                hashCodeOrNull(senderAgent) << 4 ^ hashCodeOrNull(senderName) << 8 ^ hashCodeOrNull(content) ^
-                booleanHashCode(truncated);
+        return UIUtils.hashCodeOrNull(id) ^ UIUtils.hashCodeOrNull(parent) << 4 ^ longHashCode(timestamp) ^
+                UIUtils.hashCodeOrNull(senderAgent) << 4 ^ UIUtils.hashCodeOrNull(senderName) << 8 ^
+                UIUtils.hashCodeOrNull(content) ^ booleanHashCode(truncated);
     }
 
     public boolean equals(Object other) {
         if (!(other instanceof UIMessage)) return false;
         UIMessage mo = (UIMessage) other;
-        return (equalsOrNull(getID(), mo.getID()) && equalsOrNull(getParent(), mo.getParent()) &&
-                getTimestamp() == mo.getTimestamp() && equalsOrNull(getSenderAgent(), mo.getSenderAgent()) &&
-                equalsOrNull(getSenderName(), mo.getSenderName()) && equalsOrNull(getContent(), mo.getContent()) &&
+        return (UIUtils.equalsOrNull(getID(), mo.getID()) &&
+                UIUtils.equalsOrNull(getParent(), mo.getParent()) &&
+                getTimestamp() == mo.getTimestamp() &&
+                UIUtils.equalsOrNull(getSenderAgent(), mo.getSenderAgent()) &&
+                UIUtils.equalsOrNull(getSenderName(), mo.getSenderName()) &&
+                UIUtils.equalsOrNull(getContent(), mo.getContent()) &&
                 isTruncated() == mo.isTruncated());
     }
 

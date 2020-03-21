@@ -330,6 +330,13 @@ public class UIUtils {
         });
     }
 
+    /**
+     * Set an OnEditorActionListener at the given view that executes the given Runnable when the Enter key is pressed.
+     *
+     * @param v                The View to modify.
+     * @param expectedActionId The expected IME action ID (such as EditorInfo.IME_ACTION_GO).
+     * @param r                The Runnable to execute.
+     */
     public static void setEnterKeyListener(final TextView v, final int expectedActionId, final Runnable r) {
         v.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
@@ -343,6 +350,27 @@ public class UIUtils {
                 }
             }
         });
+    }
+
+    /**
+     * Null-safe method for comparing objects.
+     *
+     * @param a An arbitrary object, or null.
+     * @param b An arbitrary object, or null.
+     * @return {@code (a == null) ? (b == null) : a.equals(b)}
+     */
+    public static boolean equalsOrNull(Object a, Object b) {
+        return (a == null) ? (b == null) : a.equals(b);
+    }
+
+    /**
+     * Null-safe hash code calculation method.
+     *
+     * @param a An arbitrary object, or null.
+     * @return {@code (a == null) ? 0 : a.hashCode()}
+     */
+    public static int hashCodeOrNull(Object a) {
+        return (a == null) ? 0 : a.hashCode();
     }
 
 }

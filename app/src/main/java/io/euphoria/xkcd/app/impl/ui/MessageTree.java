@@ -41,7 +41,7 @@ public class MessageTree implements Comparable<MessageTree> {
 
     @Override
     public int compareTo(@NonNull MessageTree o) {
-        // The input bar is "greater" than every other messgae so that it gets to the bottom
+        // The input bar is "greater" than every other message so that it gets to the bottom
         return id == null ? (o.id == null ? 0 : 1) : (o.id == null ? -1 : id.compareTo(o.id));
     }
 
