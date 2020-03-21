@@ -55,6 +55,10 @@ public class MessageTree implements Comparable<MessageTree> {
         return parent;
     }
 
+    /**
+     * Set this MessageTree's parent ID.
+     * Only permissible for a MessageTree representing the input bar.
+     */
     public void setParent(String parent) {
         if (message != null) throw new IllegalStateException("Attempting to change parent of message");
         this.parent = parent;
@@ -70,6 +74,7 @@ public class MessageTree implements Comparable<MessageTree> {
         return message;
     }
 
+    /** Change the message wrapped by this MessageTree. */
     public void setMessage(@NonNull UIMessage m) {
         assert message.getID().equals(id) : "Updating MessageTree with unrelated message";
         message = m;
@@ -92,20 +97,19 @@ public class MessageTree implements Comparable<MessageTree> {
         return collapsed;
     }
 
+    /** Set the {@link #isCollapsed()} flag. */
     public void setCollapsed(boolean collapsed) {
         this.collapsed = collapsed;
     }
 
-    /** Add a MessageTree to the replies list. */
-    public void addReply(@NonNull MessageTree t) {
+    /**
+     * Add a MessageTree to the replies list.
+     * Returns the index into the replies list at which t now resides.
+     */
+    public int addReply(@NonNull MessageTree t) {
         if (message == null) throw new IllegalStateException("Input bar cannot have replies");
         t.updateIndent(indent + 1);
-        int idx = Collections.binarySearch(replies, t);
-        if (idx >= 0) {
-            replies.set(idx, t);
-        } else {
-            replies.add(-idx - 1, t);
-        }
+        return UIUtils.insertSorted(replies, t);
     }
 
     /** Add every MessageTree in the list as a reply. */
@@ -125,6 +129,7 @@ public class MessageTree implements Comparable<MessageTree> {
      * The message this method is invoked upon is assumed not to have a parent.
      */
     public int countVisibleReplies() {
+        // TODO cache this?
         if (collapsed) return 0;
         int ret = 0;
         for (MessageTree mt : replies) {
@@ -149,16 +154,18 @@ public class MessageTree implements Comparable<MessageTree> {
     }
 
     /** Return a list of all the visible replies to this MessageTree. */
-    public List<MessageTree> traverseVisibleReplies() {
+    public List<MessageTree> traverseVisibleReplies(boolean includeThis) {
         List<MessageTree> ret = new ArrayList<>();
-        traverseVisible(ret);
+        if (includeThis) ret.add(this);
+        traverseVisibleRepliesInner(ret);
         return ret;
     }
-    private void traverseVisible(List<MessageTree> drain) {
+
+    private void traverseVisibleRepliesInner(List<MessageTree> drain) {
         if (isCollapsed()) return;
         for (MessageTree t : replies) {
             drain.add(t);
-            t.traverseVisible(drain);
+            t.traverseVisibleRepliesInner(drain);
         }
     }
 

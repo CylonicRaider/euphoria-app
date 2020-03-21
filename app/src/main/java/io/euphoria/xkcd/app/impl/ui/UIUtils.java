@@ -15,7 +15,9 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.widget.TextView;
 
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
 
@@ -371,6 +373,26 @@ public class UIUtils {
      */
     public static int hashCodeOrNull(Object a) {
         return (a == null) ? 0 : a.hashCode();
+    }
+
+    /**
+     * Insert the given item into the given list using binary search.
+     * <p>
+     * The list must be sorted according to T's natural ordering.
+     *
+     * @param list A list of things.
+     * @param item The item to insert.
+     * @return The index into the list at which item now resides.
+     */
+    public static <T extends Comparable<T>> int insertSorted(List<T> list, T item) {
+        int idx = Collections.binarySearch(list, item);
+        if (idx >= 0) {
+            list.set(idx, item);
+            return idx;
+        } else {
+            list.add(-idx - 1, item);
+            return -idx - 1;
+        }
     }
 
 }

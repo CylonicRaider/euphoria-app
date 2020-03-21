@@ -331,8 +331,7 @@ public class MessageListAdapter extends RecyclerView.Adapter<MessageListAdapter.
         if (insertIndex < msgList.size() && mt.equals(msgList.get(insertIndex)))
             return;
         // Insert message along with its visible replies
-        List<MessageTree> toInsert = mt.traverseVisibleReplies();
-        toInsert.add(0, mt);
+        List<MessageTree> toInsert = mt.traverseVisibleReplies(true);
         msgList.addAll(insertIndex, toInsert);
         notifyItemRangeInserted(insertIndex, toInsert.size());
         if (parID != null) {
@@ -522,7 +521,7 @@ public class MessageListAdapter extends RecyclerView.Adapter<MessageListAdapter.
             // Un-collapse message for reply traversal
             mt.setCollapsed(false);
             // Message is collapsed -> splice replies back in
-            List<MessageTree> toInsert = mt.traverseVisibleReplies();
+            List<MessageTree> toInsert = mt.traverseVisibleReplies(false);
             msgList.addAll(index + 1, toInsert);
             notifyItemRangeInserted(index + 1, toInsert.size());
         } else {
