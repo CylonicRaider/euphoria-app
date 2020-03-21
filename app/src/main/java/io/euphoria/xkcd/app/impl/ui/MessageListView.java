@@ -36,9 +36,8 @@ public class MessageListView extends RecyclerView {
         }
 
         public String toString() {
-            return String.format((Locale) null, "%s@%x[msg=%s,start=%d,end=%d,top=%d,bottom=%d]",
-                    getClass().getSimpleName(), System.identityHashCode(this), base, startPos, endPos,
-                    displayTop, displayBottom);
+            return String.format((Locale) null, "%s@%h[msg=%s,start=%d,end=%d,top=%d,bottom=%d]",
+                    getClass().getSimpleName(), this, base, startPos, endPos, displayTop, displayBottom);
         }
 
         public MessageTree getBase() {
