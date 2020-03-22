@@ -10,6 +10,31 @@ import java.util.Map;
 
 public class MessageForest {
 
+    public interface DisplayListener {
+
+        void onItemRangeInserted(int start, int length);
+
+        void onItemChanged(int index);
+
+        void onItemRangeRemoved(int start, int length);
+
+    }
+
+    public static class DisplayListenerAdapter implements DisplayListener {
+
+        private static DisplayListener NULL = new DisplayListenerAdapter();
+
+        @Override
+        public void onItemRangeInserted(int start, int length) {}
+
+        @Override
+        public void onItemChanged(int index) {}
+
+        @Override
+        public void onItemRangeRemoved(int start, int length) {}
+
+    }
+
     /* All messages by ID. */
     private final Map<String, MessageTree> allMessages;
     /* The roots (i.e. messages with a parent of null) ordered by ID. */
@@ -235,34 +260,6 @@ public class MessageForest {
         if (displayIndex == -1) return;
         // Splice the message along with its replies out.
         removeDisplayRange(mt, displayIndex, true);
-    }
-
-    public interface DisplayListener {
-
-        void onItemRangeInserted(int start, int length);
-
-        void onItemChanged(int index);
-
-        void onItemRangeRemoved(int start, int length);
-
-    }
-
-    public static class DisplayListenerAdapter implements DisplayListener {
-
-        private static DisplayListener NULL = new DisplayListenerAdapter();
-
-        @Override
-        public void onItemRangeInserted(int start, int length) {
-        }
-
-        @Override
-        public void onItemChanged(int index) {
-        }
-
-        @Override
-        public void onItemRangeRemoved(int start, int length) {
-        }
-
     }
 
 }
