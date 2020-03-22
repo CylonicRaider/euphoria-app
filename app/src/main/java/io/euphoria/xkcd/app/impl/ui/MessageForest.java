@@ -1,7 +1,6 @@
 package io.euphoria.xkcd.app.impl.ui;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -16,6 +15,8 @@ public class MessageForest {
 
         void onItemChanged(int index);
 
+        void onItemMoved(int from, int to);
+
         void onItemRangeRemoved(int start, int length);
 
     }
@@ -29,6 +30,9 @@ public class MessageForest {
 
         @Override
         public void onItemChanged(int index) {}
+
+        @Override
+        public void onItemMoved(int from, int to) {}
 
         @Override
         public void onItemRangeRemoved(int start, int length) {}
@@ -164,6 +168,28 @@ public class MessageForest {
         processCollapse(mt, !mt.isCollapsed());
     }
 
+    public boolean tryEnsureVisible(MessageTree mt) {
+        MessageTree parent = getParent(mt);
+        if (mt.getParent() == null) {
+            // Roots are always visible.
+            return true;
+        } else if (parent == null) {
+            // Orphans cannot be made visible.
+            return false;
+        } else {
+            // Otherwise, we go to the parent.
+            setCollapsed(parent, false);
+            return tryEnsureVisible(parent);
+        }
+    }
+
+    public void move(MessageTree mt, MessageTree newParent, boolean ensureVisible) {
+        if (ensureVisible && newParent != null) tryEnsureVisible(newParent);
+        String newParentID = (newParent == null) ? null : newParent.getID();
+        if (UIUtils.equalsOrNull(mt.getParent(), newParentID)) return;
+        processMove(mt, newParent);
+    }
+
     public MessageTree remove(MessageTree mt, boolean recursive) {
         MessageTree existing = allMessages.get(mt.getID());
         if (existing == null) return null;
@@ -171,14 +197,14 @@ public class MessageForest {
         return existing;
     }
 
-    private void addDisplayRange(MessageTree mt, int index, boolean includeSelf) {
+    protected void addDisplayRange(MessageTree mt, int index, boolean includeSelf) {
         List<MessageTree> toAdd = mt.traverseVisibleReplies(includeSelf);
         if (!includeSelf) index++;
         displayed.addAll(index, toAdd);
         listener.onItemRangeInserted(index, toAdd.size());
     }
 
-    private void removeDisplayRange(MessageTree mt, int index, boolean includeSelf) {
+    protected void removeDisplayRange(MessageTree mt, int index, boolean includeSelf) {
         int length = mt.countVisibleReplies();
         if (includeSelf) {
             length++;
@@ -187,6 +213,18 @@ public class MessageForest {
         }
         displayed.subList(index, index + length).clear();
         listener.onItemRangeRemoved(index, length);
+    }
+
+    protected void notifyItemMovedLenient(int from, int to) {
+        if (from == -1 && to == -1) {
+            /* NOP */
+        } else if (from == -1) {
+            listener.onItemRangeInserted(to, 1);
+        } else if (to == -1) {
+            listener.onItemRangeRemoved(from, 1);
+        } else {
+            listener.onItemMoved(from, to);
+        }
     }
 
     protected void processInsert(MessageTree mt) {
@@ -230,6 +268,8 @@ public class MessageForest {
             mt.setCollapsed(collapse);
             return;
         }
+        // Do not forget to mark the message itself for updating.
+        listener.onItemChanged(displayIndex);
         // Now to the main branch.
         if (collapse) {
             removeDisplayRange(mt, displayIndex, false);
@@ -238,6 +278,42 @@ public class MessageForest {
             mt.setCollapsed(false);
             addDisplayRange(mt, displayIndex, false);
         }
+    }
+
+    protected void processMove(MessageTree mt, MessageTree newParent) {
+        // The sequence of operations is somewhat tricky, in particular w.r.t. ensuring we pass the right indices
+        // to the update listener.
+        // First, unlink the message from the data structures.
+        int oldIndex = findDisplayIndex(mt, true);
+        if (oldIndex != -1) {
+            displayed.remove(oldIndex);
+        }
+        MessageTree oldParent = getParent(mt);
+        if (oldParent != null) {
+            oldParent.removeReply(mt);
+        } else if (mt.getParent() == null) {
+            UIUtils.removeSorted(roots, mt);
+        } else {
+            List<MessageTree> siblings = orphans.get(mt.getParent());
+            if (siblings != null) siblings.remove(mt);
+        }
+        // Now, flip the message's parent to the new one.
+        mt.setParent((newParent == null) ? null : newParent.getID());
+        // Next, re-link the message into the data structures.
+        // Here, we cannot use findDisplayIndex()' auto-notification feature as we have not yet notified the listener
+        // about the message's move.
+        int newIndex = findDisplayIndex(mt, false);
+        if (newIndex != -1) {
+            displayed.add(newIndex, mt);
+        }
+        if (newParent != null) {
+            newParent.addReply(mt);
+        } else {
+            UIUtils.insertSorted(roots, mt);
+        }
+        // Finally, issue listener notifications.
+        notifyItemMovedLenient(oldIndex, newIndex);
+        findDisplayIndex(mt, true);
     }
 
     protected void processRemove(MessageTree mt, boolean recursive) {
@@ -251,10 +327,7 @@ public class MessageForest {
             getOrphanList(mt.getID()).addAll(mt.getReplies());
         }
         // Remove the message from the root list.
-        if (mt.getParent() == null) {
-            int index = Collections.binarySearch(roots, mt);
-            roots.remove(index);
-        }
+        if (mt.getParent() == null) UIUtils.removeSorted(roots, mt);
         // Locate the message in the display list, and mark its parents for updates.
         int displayIndex = findDisplayIndex(mt, true);
         if (displayIndex == -1) return;

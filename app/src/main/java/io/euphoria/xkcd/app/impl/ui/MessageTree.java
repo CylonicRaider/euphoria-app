@@ -120,7 +120,7 @@ public class MessageTree implements Comparable<MessageTree> {
 
     /** Remove a MessageTree from the replies list. */
     public void removeReply(@NonNull MessageTree t) {
-        replies.remove(t);
+        UIUtils.removeSorted(replies, t);
     }
 
     /**

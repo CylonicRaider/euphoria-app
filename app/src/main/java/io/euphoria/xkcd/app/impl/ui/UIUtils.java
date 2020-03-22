@@ -395,4 +395,23 @@ public class UIUtils {
         }
     }
 
+    /**
+     * Remove the given item from the given list using binary search.
+     * <p>
+     * The list must be sorted according to T's natural ordering.
+     *
+     * @param list A list of things.
+     * @param item The item to remove.
+     * @return The index at which item resided, or -1 if it had not been in the list before the call.
+     */
+    public static <T extends Comparable<T>> int removeSorted(List<T> list, T item) {
+        int idx = Collections.binarySearch(list, item);
+        if (idx >= 0) {
+            list.remove(idx);
+            return idx;
+        } else {
+            return -1;
+        }
+    }
+
 }
