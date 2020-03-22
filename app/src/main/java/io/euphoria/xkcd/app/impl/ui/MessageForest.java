@@ -11,13 +11,13 @@ public class MessageForest {
 
     public interface DisplayListener {
 
-        void onItemRangeInserted(int start, int length);
+        void notifyItemRangeInserted(int start, int length);
 
-        void onItemChanged(int index);
+        void notifyItemChanged(int index);
 
-        void onItemMoved(int from, int to);
+        void notifyItemMoved(int from, int to);
 
-        void onItemRangeRemoved(int start, int length);
+        void notifyItemRangeRemoved(int start, int length);
 
     }
 
@@ -26,16 +26,16 @@ public class MessageForest {
         private static DisplayListener NULL = new DisplayListenerAdapter();
 
         @Override
-        public void onItemRangeInserted(int start, int length) {}
+        public void notifyItemRangeInserted(int start, int length) {}
 
         @Override
-        public void onItemChanged(int index) {}
+        public void notifyItemChanged(int index) {}
 
         @Override
-        public void onItemMoved(int from, int to) {}
+        public void notifyItemMoved(int from, int to) {}
 
         @Override
-        public void onItemRangeRemoved(int start, int length) {}
+        public void notifyItemRangeRemoved(int start, int length) {}
 
     }
 
@@ -121,7 +121,7 @@ public class MessageForest {
         if (parent == null || parent.isCollapsed()) return -1;
         int index = findDisplayIndex(parent, markUpdate);
         if (index == -1) return -1;
-        if (markUpdate) listener.onItemChanged(index);
+        if (markUpdate) listener.notifyItemChanged(index);
         index++;
         for (MessageTree sib : parent.getReplies()) {
             if (sib.compareTo(mt) >= 0) break;
@@ -201,7 +201,7 @@ public class MessageForest {
         List<MessageTree> toAdd = mt.traverseVisibleReplies(includeSelf);
         if (!includeSelf) index++;
         displayed.addAll(index, toAdd);
-        listener.onItemRangeInserted(index, toAdd.size());
+        listener.notifyItemRangeInserted(index, toAdd.size());
     }
 
     protected void removeDisplayRange(MessageTree mt, int index, boolean includeSelf) {
@@ -212,18 +212,18 @@ public class MessageForest {
             index++;
         }
         displayed.subList(index, index + length).clear();
-        listener.onItemRangeRemoved(index, length);
+        listener.notifyItemRangeRemoved(index, length);
     }
 
     protected void notifyItemMovedLenient(int from, int to) {
         if (from == -1 && to == -1) {
             /* NOP */
         } else if (from == -1) {
-            listener.onItemRangeInserted(to, 1);
+            listener.notifyItemRangeInserted(to, 1);
         } else if (to == -1) {
-            listener.onItemRangeRemoved(from, 1);
+            listener.notifyItemRangeRemoved(from, 1);
         } else {
-            listener.onItemMoved(from, to);
+            listener.notifyItemMoved(from, to);
         }
     }
 
@@ -258,7 +258,7 @@ public class MessageForest {
         // If an already-existing MessageTree's underlying message has been replaced, we only need to mark it as
         // changed (and do so for all its parents for good measure).
         int index = findDisplayIndex(mt, true);
-        if (index != -1) listener.onItemChanged(index);
+        if (index != -1) listener.notifyItemChanged(index);
     }
 
     protected void processCollapse(MessageTree mt, boolean collapse) {
@@ -269,7 +269,7 @@ public class MessageForest {
             return;
         }
         // Do not forget to mark the message itself for updating.
-        listener.onItemChanged(displayIndex);
+        listener.notifyItemChanged(displayIndex);
         // Now to the main branch.
         if (collapse) {
             removeDisplayRange(mt, displayIndex, false);
