@@ -130,29 +130,29 @@ public class MessageForest {
         return ret;
     }
 
-    protected int findRootDisplayIndex(MessageTree mt) {
+    protected int findRootDisplayIndex(MessageTree mt, boolean visible) {
         int index = 0;
         while (index < displayed.size()) {
             MessageTree cur = displayed.get(index);
-            if (cur.compareTo(mt) >= 0) break;
+            if (cur.compareTo(mt) >= 0) return (visible && !cur.equals(mt)) ? -1 : index;
             index += 1 + cur.countVisibleReplies();
         }
-        return index;
+        return (visible) ? -1 : index;
     }
 
-    protected int findDisplayIndex(MessageTree mt, boolean markUpdate) {
-        if (mt.getParent() == null) return findRootDisplayIndex(mt);
+    protected int findDisplayIndex(MessageTree mt, boolean visible, boolean markUpdate) {
+        if (mt.getParent() == null) return findRootDisplayIndex(mt, visible);
         MessageTree parent = getParent(mt);
         if (parent == null || parent.isCollapsed()) return -1;
-        int index = findDisplayIndex(parent, markUpdate);
+        int index = findDisplayIndex(parent, false, markUpdate);
         if (index == -1) return -1;
         if (markUpdate) listener.notifyItemChanged(index);
         index++;
         for (MessageTree sib : parent.getReplies()) {
-            if (sib.compareTo(mt) >= 0) break;
+            if (sib.compareTo(mt) >= 0) return (visible && !sib.equals(mt)) ? -1 : index;
             index += 1 + sib.countVisibleReplies();
         }
-        return index;
+        return (visible) ? -1 : index;
     }
 
     public MessageTree add(MessageTree mt) {
@@ -265,14 +265,15 @@ public class MessageForest {
         if (parentID == null) {
             // If there is no parent, this is a new root.
             UIUtils.insertSorted(roots, mt);
-            displayIndex = findRootDisplayIndex(mt);
+            mt.updateIndent(0);
+            displayIndex = findRootDisplayIndex(mt, false);
         } else if (!has(parentID)) {
             // If the parent does not exist, the message is an orphan.
             getOrphanList(parentID).add(mt);
             return;
         } else {
             // Otherwise, a parent exists.
-            displayIndex = findDisplayIndex(mt, true);
+            displayIndex = findDisplayIndex(mt, false, true);
             get(parentID).addReply(mt);
             // Updating the display list does, naturally, not happen for invisible messages.
             if (displayIndex == -1) return;
@@ -284,13 +285,13 @@ public class MessageForest {
     protected void processReplace(MessageTree mt) {
         // If an already-existing MessageTree's underlying message has been replaced, we only need to mark it as
         // changed (and do so for all its parents for good measure).
-        int index = findDisplayIndex(mt, true);
+        int index = findDisplayIndex(mt, true, true);
         if (index != -1) listener.notifyItemChanged(index);
     }
 
     protected void processCollapse(MessageTree mt, boolean collapse) {
         // Locate the message, marking its parents for refreshing. If it is invisible, there is little to do.
-        int displayIndex = findDisplayIndex(mt, true);
+        int displayIndex = findDisplayIndex(mt, true, true);
         if (displayIndex == -1) {
             mt.setCollapsed(collapse);
             return;
@@ -311,7 +312,7 @@ public class MessageForest {
         // The sequence of operations is somewhat tricky, in particular w.r.t. ensuring we pass the right indices
         // to the update listener.
         // First, unlink the message from the data structures.
-        int oldIndex = findDisplayIndex(mt, true);
+        int oldIndex = findDisplayIndex(mt, true, true);
         if (oldIndex != -1) {
             displayed.remove(oldIndex);
         }
@@ -329,7 +330,7 @@ public class MessageForest {
         // Next, re-link the message into the data structures.
         // Here, we cannot use findDisplayIndex()' auto-notification feature as we have not yet notified the listener
         // about the message's move.
-        int newIndex = findDisplayIndex(mt, false);
+        int newIndex = findDisplayIndex(mt, false, false);
         if (newIndex != -1) {
             displayed.add(newIndex, mt);
         }
@@ -337,10 +338,11 @@ public class MessageForest {
             newParent.addReply(mt);
         } else {
             UIUtils.insertSorted(roots, mt);
+            mt.updateIndent(0);
         }
         // Finally, issue listener notifications.
         notifyItemMovedLenient(oldIndex, newIndex);
-        findDisplayIndex(mt, true);
+        findDisplayIndex(mt, true, true);
     }
 
     protected void processRemove(MessageTree mt, boolean recursive) {
@@ -356,7 +358,7 @@ public class MessageForest {
         // Remove the message from the root list.
         if (mt.getParent() == null) UIUtils.removeSorted(roots, mt);
         // Locate the message in the display list, and mark its parents for updates.
-        int displayIndex = findDisplayIndex(mt, true);
+        int displayIndex = findDisplayIndex(mt, true, true);
         if (displayIndex == -1) return;
         // Splice the message along with its replies out.
         removeDisplayRange(mt, displayIndex, true);

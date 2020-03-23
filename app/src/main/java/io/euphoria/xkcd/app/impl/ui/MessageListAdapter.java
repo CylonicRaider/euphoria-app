@@ -44,6 +44,8 @@ public class MessageListAdapter extends RecyclerView.Adapter<MessageListAdapter.
         this.data = new MessageForest();
         this.inputBar = inputBar;
         this.inputBarTree = new MessageTree(null);
+        data.setListener(this);
+        data.add(inputBarTree);
         inputBar.recycle();
         inputBar.setMessage(inputBarTree);
     }
@@ -127,7 +129,7 @@ public class MessageListAdapter extends RecyclerView.Adapter<MessageListAdapter.
     }
 
     public int indexOf(MessageTree mt) {
-        return data.findDisplayIndex(mt, false);
+        return data.findDisplayIndex(mt, true, false);
     }
 
     public MessageTree get(String id) {
