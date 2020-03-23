@@ -29,6 +29,11 @@ public class MessageTree implements Comparable<MessageTree> {
     }
 
     @Override
+    public int hashCode() {
+        return id.hashCode();
+    }
+
+    @Override
     public boolean equals(Object o) {
         return o instanceof MessageTree && compareTo((MessageTree) o) == 0;
     }
