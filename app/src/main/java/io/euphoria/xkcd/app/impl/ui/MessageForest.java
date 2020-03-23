@@ -193,23 +193,25 @@ public class MessageForest {
         processCollapse(mt, !mt.isCollapsed());
     }
 
-    public boolean tryEnsureVisible(MessageTree mt) {
+    public boolean tryEnsureVisible(MessageTree mt, boolean expand) {
+        boolean ret;
         MessageTree parent = getParent(mt);
         if (mt.getParent() == null) {
             // Roots are always visible.
-            return true;
+            ret = true;
         } else if (parent == null) {
             // Orphans cannot be made visible.
-            return false;
+            ret = false;
         } else {
             // Otherwise, we go to the parent.
-            setCollapsed(parent, false);
-            return tryEnsureVisible(parent);
+            ret = tryEnsureVisible(parent, true);
         }
+        if (ret && expand) setCollapsed(mt, false);
+        return ret;
     }
 
     public void move(MessageTree mt, MessageTree newParent, boolean ensureVisible) {
-        if (ensureVisible && newParent != null) tryEnsureVisible(newParent);
+        if (ensureVisible && newParent != null) tryEnsureVisible(newParent, true);
         String newParentID = (newParent == null) ? null : newParent.getID();
         if (UIUtils.equalsOrNull(mt.getParent(), newParentID)) return;
         processMove(mt, newParent);
