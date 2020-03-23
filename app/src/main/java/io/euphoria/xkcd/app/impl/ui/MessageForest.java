@@ -1,9 +1,11 @@
 package io.euphoria.xkcd.app.impl.ui;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 
 /** Created by Xyzzy on 2020-03-19. */
 
@@ -94,6 +96,29 @@ public class MessageForest {
             if (!has(parentID)) return null;
             mt = get(parentID);
         }
+    }
+
+    public MessageTree getReply(MessageTree mt, int index) {
+        List<MessageTree> replies = mt.getReplies();
+        if (index < 0) index += replies.size();
+        if (index < 0 || index >= replies.size()) return null;
+        return replies.get(index);
+    }
+
+    public MessageTree getSibling(MessageTree mt, int offset) {
+        List<MessageTree> container;
+        if (mt.getParent() == null) {
+            container = roots;
+        } else if (!has(mt.getParent())) {
+            container = getOrphanList(mt.getParent());
+        } else {
+            container = getParent(mt).getReplies();
+        }
+        int index = Collections.binarySearch(container, mt);
+        if (index < 0) throw new NoSuchElementException("Trying to get sibling of non-linked-in MessageTree " + mt);
+        index += offset;
+        if (index < 0 || index >= container.size()) return null;
+        return container.get(index);
     }
 
     protected List<MessageTree> getOrphanList(String parentID) {
