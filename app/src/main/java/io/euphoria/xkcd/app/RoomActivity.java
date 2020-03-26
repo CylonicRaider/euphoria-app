@@ -27,6 +27,79 @@ import static io.euphoria.xkcd.app.impl.ui.RoomUIImpl.isValidRoomUri;
 
 public class RoomActivity extends FragmentActivity {
 
+    private static class TestMessage implements Message {
+
+        private final String id;
+        private final String nick;
+        private final String parent;
+        private final String content;
+
+        private final SessionView sender = new SessionView() {
+            @Override
+            public String getSessionID() {
+                return "0123-4567-89ab-cdef";
+            }
+
+            @Override
+            public String getAgentID() {
+                return "bot:test";
+            }
+
+            @Override
+            public String getName() {
+                return nick;
+            }
+
+            @Override
+            public boolean isStaff() {
+                return false;
+            }
+
+            @Override
+            public boolean isManager() {
+                return false;
+            }
+        };
+
+        public TestMessage(String parent, String id, String nick, String content) {
+            this.id = id;
+            this.parent = parent;
+            this.nick = nick;
+            this.content = content;
+        }
+
+        @Override
+        public String getID() {
+            return id;
+        }
+
+        @Override
+        public String getParent() {
+            return parent;
+        }
+
+        @Override
+        public long getTimestamp() {
+            return 0;
+        }
+
+        @Override
+        public SessionView getSender() {
+            return sender;
+        }
+
+        @Override
+        public String getContent() {
+            return content;
+        }
+
+        @Override
+        public boolean isTruncated() {
+            return false;
+        }
+
+    }
+
     // TODO find some appropriate place for this in config
     public static final boolean RIGHT_KEY_HACK = true;
 
@@ -187,79 +260,6 @@ public class RoomActivity extends FragmentActivity {
                 return true;
             }
         });
-    }
-
-    private static class TestMessage implements Message {
-
-        private final String id;
-        private final String nick;
-        private final String parent;
-        private final String content;
-
-        private final SessionView sender = new SessionView() {
-            @Override
-            public String getSessionID() {
-                return "0123-4567-89ab-cdef";
-            }
-
-            @Override
-            public String getAgentID() {
-                return "bot:test";
-            }
-
-            @Override
-            public String getName() {
-                return nick;
-            }
-
-            @Override
-            public boolean isStaff() {
-                return false;
-            }
-
-            @Override
-            public boolean isManager() {
-                return false;
-            }
-        };
-
-        public TestMessage(String parent, String id, String nick, String content) {
-            this.id = id;
-            this.parent = parent;
-            this.nick = nick;
-            this.content = content;
-        }
-
-        @Override
-        public String getID() {
-            return id;
-        }
-
-        @Override
-        public String getParent() {
-            return parent;
-        }
-
-        @Override
-        public long getTimestamp() {
-            return 0;
-        }
-
-        @Override
-        public SessionView getSender() {
-            return sender;
-        }
-
-        @Override
-        public String getContent() {
-            return content;
-        }
-
-        @Override
-        public boolean isTruncated() {
-            return false;
-        }
-
     }
 
     @Override
