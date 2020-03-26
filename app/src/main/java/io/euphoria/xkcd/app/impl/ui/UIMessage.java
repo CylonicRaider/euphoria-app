@@ -1,5 +1,7 @@
 package io.euphoria.xkcd.app.impl.ui;
 
+import android.os.Parcel;
+
 import java.util.Locale;
 
 import io.euphoria.xkcd.app.data.Message;
@@ -34,12 +36,24 @@ public class UIMessage {
         this.truncated = source.isTruncated();
     }
 
+    protected UIMessage(Parcel in, String id, String parent, boolean truncated) {
+        this.id = id;
+        this.parent = parent;
+        this.timestamp = in.readLong();
+        this.senderAgent = in.readString();
+        this.senderName = in.readString();
+        this.content = in.readString();
+        this.truncated = truncated;
+    }
+
+    @Override
     public int hashCode() {
         return UIUtils.hashCodeOrNull(id) ^ UIUtils.hashCodeOrNull(parent) << 4 ^ longHashCode(timestamp) ^
                 UIUtils.hashCodeOrNull(senderAgent) << 4 ^ UIUtils.hashCodeOrNull(senderName) << 8 ^
                 UIUtils.hashCodeOrNull(content) ^ booleanHashCode(truncated);
     }
 
+    @Override
     public boolean equals(Object other) {
         if (!(other instanceof UIMessage)) return false;
         UIMessage mo = (UIMessage) other;
@@ -52,6 +66,7 @@ public class UIMessage {
                 isTruncated() == mo.isTruncated());
     }
 
+    @Override
     public String toString() {
         return String.format((Locale) null,
                 "%s@%h[id=%s,parent=%s,timestamp=%s,sender=[agent=%s,name=%s],content=%s,truncated=%s]",
@@ -84,6 +99,13 @@ public class UIMessage {
 
     public boolean isTruncated() {
         return truncated;
+    }
+
+    protected void writeToParcel(Parcel out) {
+        out.writeLong(timestamp);
+        out.writeString(senderAgent);
+        out.writeString(senderName);
+        out.writeString(content);
     }
 
 }

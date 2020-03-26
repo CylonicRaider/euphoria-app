@@ -1,5 +1,6 @@
 package io.euphoria.xkcd.app.impl.ui;
 
+import android.os.Parcel;
 import android.support.annotation.NonNull;
 
 import java.util.ArrayList;
@@ -13,6 +14,12 @@ import java.util.List;
 
 public class MessageTree implements Comparable<MessageTree> {
 
+    protected static final byte PF_IS_A_THING  = 0x01;
+    protected static final byte PF_HAS_CONTENT = 0x02;
+    protected static final byte PF_HAS_REPLIES = 0x04;
+    protected static final byte PF_TRUNCATED   = 0x08;
+    protected static final byte PF_COLLAPSED   = 0x10;
+
     private final List<MessageTree> replies = new ArrayList<>();
     private String id;
     private String parent;
@@ -25,6 +32,26 @@ public class MessageTree implements Comparable<MessageTree> {
         if (m != null) {
             id = m.getID();
             parent = m.getParent();
+        }
+    }
+
+    protected MessageTree(Parcel in, byte flags, String parent) {
+        if ((flags & PF_IS_A_THING) == 0) {
+            throw new IllegalArgumentException("Invalid encoded MessageTree flags");
+        }
+        String id = in.readString();
+        if ((flags & PF_HAS_CONTENT) != 0) {
+            message = new UIMessage(in, id, parent, ((flags & PF_TRUNCATED) != 0));
+        }
+        this.id = id;
+        this.parent = parent;
+        this.collapsed = ((flags & PF_COLLAPSED) != 0);
+        if ((flags & PF_HAS_REPLIES) != 0) {
+            while (true) {
+                byte nextFlags = in.readByte();
+                if (nextFlags == 0) break;
+                addReply(new MessageTree(in, nextFlags, id));
+            }
         }
     }
 
@@ -171,6 +198,30 @@ public class MessageTree implements Comparable<MessageTree> {
         for (MessageTree t : replies) {
             drain.add(t);
             t.traverseVisibleRepliesInner(drain);
+        }
+    }
+
+    /** Serialization logic. */
+    protected void writeToParcel(Parcel out) {
+        byte flags = PF_IS_A_THING;
+        if (message != null) {
+            flags |= PF_HAS_CONTENT;
+            if (message.isTruncated()) flags |= PF_TRUNCATED;
+        }
+        if (replies.size() != 0) {
+            flags |= PF_HAS_REPLIES;
+        }
+        if (isCollapsed()) {
+            flags |= PF_COLLAPSED;
+        }
+        out.writeByte(flags);
+        out.writeString(id);
+        if ((flags & PF_HAS_CONTENT) != 0) {
+            message.writeToParcel(out);
+        }
+        if ((flags & PF_HAS_REPLIES) != 0) {
+            for (MessageTree mt : replies) mt.writeToParcel(out);
+            out.writeByte((byte) 0);
         }
     }
 

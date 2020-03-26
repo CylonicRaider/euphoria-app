@@ -1,5 +1,8 @@
 package io.euphoria.xkcd.app.impl.ui;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -9,7 +12,7 @@ import java.util.NoSuchElementException;
 
 /** Created by Xyzzy on 2020-03-19. */
 
-public class MessageForest {
+public class MessageForest implements Parcelable {
 
     public interface DisplayListener {
 
@@ -41,6 +44,20 @@ public class MessageForest {
 
     }
 
+    public static final Creator<MessageForest> CREATOR = new Creator<MessageForest>() {
+
+        @Override
+        public MessageForest createFromParcel(Parcel in) {
+            return new MessageForest(in);
+        }
+
+        @Override
+        public MessageForest[] newArray(int size) {
+            return new MessageForest[size];
+        }
+
+    };
+
     /* All messages by ID. */
     private final Map<String, MessageTree> allMessages;
     /* The roots (i.e. messages with a parent of null) ordered by ID. */
@@ -60,6 +77,26 @@ public class MessageForest {
         listener = DisplayListenerAdapter.NULL;
     }
 
+    protected MessageForest(Parcel in) {
+        allMessages = new HashMap<>();
+        roots = readGroupFromParcel(in);
+        orphans = new HashMap<>();
+        displayed = new ArrayList<>();
+        listener = DisplayListenerAdapter.NULL;
+        while (true) {
+            byte marker = in.readByte();
+            if (marker == 0) {
+                break;
+            } else if (marker != MessageTree.PF_IS_A_THING) {
+                throw new IllegalArgumentException("Invalid parcelled data");
+            }
+            readGroupFromParcel(in);
+        }
+        for (MessageTree mt : roots) {
+            displayed.addAll(mt.traverseVisibleReplies(true));
+        }
+    }
+
     public DisplayListener getListener() {
         return listener;
     }
@@ -67,6 +104,45 @@ public class MessageForest {
     public void setListener(DisplayListener listener) {
         if (listener == null) listener = DisplayListenerAdapter.NULL;
         this.listener = listener;
+    }
+
+    @Override
+    public int describeContents() {
+        return 0; // Nothing to see here.
+    }
+
+    @Override
+    public void writeToParcel(Parcel out, int flags) {
+        writeGroupToParcel(out, null, roots);
+        for (Map.Entry<String, List<MessageTree>> ent : orphans.entrySet()) {
+            out.writeByte(MessageTree.PF_IS_A_THING);
+            writeGroupToParcel(out, ent.getKey(), ent.getValue());
+        }
+        out.writeByte((byte) 0);
+    }
+
+    private List<MessageTree> readGroupFromParcel(Parcel in) {
+        String parent = in.readString();
+        List<MessageTree> ret = new ArrayList<>();
+        while (true) {
+            byte flags = in.readByte();
+            if (flags == 0) break;
+            MessageTree mt = new MessageTree(in, flags, parent);
+            allMessages.put(mt.getID(), mt);
+            ret.add(mt);
+        }
+        if (parent != null) {
+            orphans.put(parent, ret);
+        }
+        return ret;
+    }
+
+    private void writeGroupToParcel(Parcel out, String parent, List<MessageTree> mts) {
+        out.writeString(parent);
+        for (MessageTree mt : mts) {
+            mt.writeToParcel(out);
+        }
+        out.writeByte((byte) 0);
     }
 
     public int size() {
