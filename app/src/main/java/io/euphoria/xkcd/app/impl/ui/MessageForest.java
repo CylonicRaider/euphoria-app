@@ -128,7 +128,7 @@ public class MessageForest implements Parcelable {
             byte flags = in.readByte();
             if (flags == 0) break;
             MessageTree mt = new MessageTree(in, flags, parent);
-            allMessages.put(mt.getID(), mt);
+            if (mt.getID() != null) allMessages.put(mt.getID(), mt);
             ret.add(mt);
         }
         if (parent != null) {
@@ -248,7 +248,6 @@ public class MessageForest implements Parcelable {
         MessageTree existing = allMessages.get(msg.getID());
         if (existing == null) {
             MessageTree mt = new MessageTree(msg);
-            allMessages.put(mt.getID(), mt);
             processInsert(mt);
             return mt;
         } else if (!UIUtils.equalsOrNull(msg, existing.getMessage())) {
@@ -331,7 +330,7 @@ public class MessageForest implements Parcelable {
     }
 
     protected void processInsert(MessageTree mt) {
-        allMessages.put(mt.getID(), mt);
+        if (mt.getID() != null) allMessages.put(mt.getID(), mt);
         // Adopt orphans! :)
         List<MessageTree> children = orphans.remove(mt.getID());
         if (children != null) mt.addReplies(children);
