@@ -14,6 +14,8 @@ import java.util.List;
 
 public class MessageTree implements Comparable<MessageTree> {
 
+    public static final String CURSOR_ID = "~";
+
     protected static final byte PF_IS_A_THING  = 0x01;
     protected static final byte PF_HAS_CONTENT = 0x02;
     protected static final byte PF_HAS_REPLIES = 0x04;
@@ -29,7 +31,10 @@ public class MessageTree implements Comparable<MessageTree> {
 
     public MessageTree(UIMessage m) {
         message = m;
-        if (m != null) {
+        if (m == null) {
+            id = CURSOR_ID;
+            parent = null;
+        } else {
             id = m.getID();
             parent = m.getParent();
         }
@@ -77,7 +82,7 @@ public class MessageTree implements Comparable<MessageTree> {
         return id == null ? (o.id == null ? 0 : 1) : (o.id == null ? -1 : id.compareTo(o.id));
     }
 
-    /** The ID of this MessageTree (null for the input bar). */
+    /** The ID of this MessageTree (CURSOR_ID for the input bar). */
     public String getID() {
         return id;
     }
@@ -108,7 +113,7 @@ public class MessageTree implements Comparable<MessageTree> {
 
     /** Change the message wrapped by this MessageTree. */
     public void setMessage(@NonNull UIMessage m) {
-        assert message.getID().equals(id) : "Updating MessageTree with unrelated message";
+        assert m.getID().equals(id) : "Updating MessageTree with unrelated message";
         message = m;
         id = m.getID();
         parent = m.getParent();
@@ -179,7 +184,7 @@ public class MessageTree implements Comparable<MessageTree> {
         if (!override && collapsed) return 0;
         int ret = 0;
         for (MessageTree mt : replies) {
-            if (mt.getID() == null) continue;
+            if (mt.getID().equals(CURSOR_ID)) continue;
             ret += 1 + mt.countVisibleUserReplies(false);
         }
         return ret;

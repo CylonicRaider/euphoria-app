@@ -48,7 +48,7 @@ public class UIMessage {
 
     @Override
     public int hashCode() {
-        return UIUtils.hashCodeOrNull(id) ^ UIUtils.hashCodeOrNull(parent) << 4 ^ longHashCode(timestamp) ^
+        return id.hashCode() ^ UIUtils.hashCodeOrNull(parent) << 4 ^ longHashCode(timestamp) ^
                 UIUtils.hashCodeOrNull(senderAgent) << 4 ^ UIUtils.hashCodeOrNull(senderName) << 8 ^
                 UIUtils.hashCodeOrNull(content) ^ booleanHashCode(truncated);
     }
@@ -57,7 +57,7 @@ public class UIMessage {
     public boolean equals(Object other) {
         if (!(other instanceof UIMessage)) return false;
         UIMessage mo = (UIMessage) other;
-        return (UIUtils.equalsOrNull(getID(), mo.getID()) &&
+        return (getID().equals(mo.getID()) &&
                 UIUtils.equalsOrNull(getParent(), mo.getParent()) &&
                 getTimestamp() == mo.getTimestamp() &&
                 UIUtils.equalsOrNull(getSenderAgent(), mo.getSenderAgent()) &&

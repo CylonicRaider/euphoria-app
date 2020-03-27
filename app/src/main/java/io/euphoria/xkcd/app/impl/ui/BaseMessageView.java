@@ -32,7 +32,7 @@ abstract class BaseMessageView extends RelativeLayout {
             throw new IllegalStateException("Updating message of view without resetting");
         } else {
             this.message = message;
-            if (message.getID() != null) setTag(message.getID());
+            setTag(message.getID());
             established = true;
             updateDisplay();
         }

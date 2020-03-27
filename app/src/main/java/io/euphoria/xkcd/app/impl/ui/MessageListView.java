@@ -251,7 +251,7 @@ public class MessageListView extends RecyclerView {
     private void addIndentLinesFor(MessageTree tree) {
         MessageListAdapter adapter = (MessageListAdapter) getAdapter();
         while (true) {
-            if (tree.getID() != null) {
+            if (!tree.getID().equals(MessageTree.CURSOR_ID)) {
                 IndentLine il = linesBelow.get(tree);
                 if (il == null) {
                     il = new IndentLine(tree);
