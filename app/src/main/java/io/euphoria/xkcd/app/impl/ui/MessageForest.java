@@ -78,11 +78,8 @@ public class MessageForest implements Parcelable {
     }
 
     protected MessageForest(Parcel in) {
-        allMessages = new HashMap<>();
-        roots = readGroupFromParcel(in);
-        orphans = new HashMap<>();
-        displayed = new ArrayList<>();
-        listener = DisplayListenerAdapter.NULL;
+        this();
+        roots.addAll(readGroupFromParcel(in));
         while (true) {
             byte marker = in.readByte();
             if (marker == 0) {
@@ -384,6 +381,8 @@ public class MessageForest implements Parcelable {
     }
 
     protected void processMove(MessageTree mt, MessageTree newParent) {
+        // Just in case someone "moves" a nonexistent message.
+        if (!allMessages.containsKey(mt.getID())) allMessages.put(mt.getID(), mt);
         // The sequence of operations is somewhat tricky, in particular w.r.t. ensuring we pass the right indices
         // to the update listener.
         // First, unlink the message from the data structures.
