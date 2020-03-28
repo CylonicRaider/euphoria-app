@@ -4,8 +4,10 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Parcelable;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
+import android.util.SparseArray;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -146,6 +148,7 @@ public class RoomActivity extends FragmentActivity {
 
     private static final String KEY_MESSAGES = "messages";
     private static final String KEY_TEST_ID = "testID";
+    private static final String KEY_INPUT_STATE = "inputState";
 
     private final String TAG = "RoomActivity";
 
@@ -191,6 +194,8 @@ public class RoomActivity extends FragmentActivity {
         if (savedInstanceState != null) {
             data = savedInstanceState.getParcelable(KEY_MESSAGES);
             testID = savedInstanceState.getInt(KEY_TEST_ID);
+            SparseArray<Parcelable> inputState = savedInstanceState.getSparseParcelableArray(KEY_INPUT_STATE);
+            if (inputState != null) inputBar.restoreHierarchyState(inputState);
         }
         if (data == null) {
             data = new MessageForest();
@@ -278,9 +283,14 @@ public class RoomActivity extends FragmentActivity {
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
         outState.putParcelable(KEY_MESSAGES, messageAdapter.getData());
         outState.putInt(KEY_TEST_ID, testID);
-        super.onSaveInstanceState(outState);
+        // RecyclerView suppresses instance state saving for all its children; we override this decision for the
+        // input bar without poking into RecyclerView internals.
+        SparseArray<Parcelable> inputState = new SparseArray<>();
+        inputBar.saveHierarchyState(inputState);
+        outState.putSparseParcelableArray(KEY_INPUT_STATE, inputState);
     }
 
     @Override
