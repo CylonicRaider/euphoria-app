@@ -168,7 +168,19 @@ public class RoomActivity extends FragmentActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        // Quickly bounce away if we have a wrong room
+        Intent i = getIntent();
+        if (!Intent.ACTION_VIEW.equals(i.getAction()) || !isValidRoomUri(i.getData())) {
+            Intent chooserIntent = new Intent(this, MainActivity.class);
+            startActivity(chooserIntent);
+            return;
+        }
+
+        // Create the UI
         setContentView(R.layout.activity_room);
+        String roomName = getRoomName(i.getData());
+        setTitle("&" + roomName);
 
         // Get RoomControllerFragment
         FragmentManager fm = getSupportFragmentManager();
@@ -181,8 +193,9 @@ public class RoomActivity extends FragmentActivity {
             fm.beginTransaction().add(roomControllerFragment, TAG_ROOM_CONTROLLER_FRAGMENT).commit();
             fm.executePendingTransactions();
         }
-        // Acquire RoomController
+        // Acquire RoomController and roomUI
         roomController = roomControllerFragment.getRoomController();
+        roomUI = (RoomUIImpl) roomController.getManager().getRoomUI(roomName);
 
         // View setup
         messageList = findViewById(R.id.message_recycler_view);
@@ -190,6 +203,7 @@ public class RoomActivity extends FragmentActivity {
         LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         inputBar = (InputBarView) inflater.inflate(R.layout.input_bar, messageList, false);
 
+        // Message data setup
         MessageForest data = null;
         if (savedInstanceState != null) {
             data = savedInstanceState.getParcelable(KEY_MESSAGES);
@@ -207,24 +221,10 @@ public class RoomActivity extends FragmentActivity {
             }
         }
         messageAdapter = new MessageListAdapter(data, inputBar);
-    }
-
-    @Override
-    protected void onStart() {
-        super.onStart();
-
-        Intent i = getIntent();
-        if (!Intent.ACTION_VIEW.equals(i.getAction()) || !isValidRoomUri(i.getData())) {
-            Intent chooserIntent = new Intent(this, MainActivity.class);
-            startActivity(chooserIntent);
-            return;
-        }
-
-        String roomName = getRoomName(i.getData());
-        setTitle("&" + roomName);
-        roomUI = (RoomUIImpl) roomController.getManager().getRoomUI(roomName);
 
         messageList.setAdapter(messageAdapter);
+
+        // Input bar setup
         messageAdapter.setInputBarListener(new MessageListAdapter.InputBarListener() {
             @Override
             public void onInputBarMoved(String oldParent, String newParent) {
@@ -236,7 +236,6 @@ public class RoomActivity extends FragmentActivity {
                 });
             }
         });
-
         inputBar.requestEntryFocus();
         inputBar.getMessageEntry().setOnKeyListener(new View.OnKeyListener() {
             @Override
