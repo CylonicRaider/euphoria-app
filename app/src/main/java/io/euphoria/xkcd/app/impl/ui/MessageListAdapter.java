@@ -40,12 +40,16 @@ public class MessageListAdapter extends RecyclerView.Adapter<MessageListAdapter.
 
     private InputBarListener inputBarListener;
 
-    public MessageListAdapter(InputBarView inputBar) {
-        this.data = new MessageForest();
+    public MessageListAdapter(MessageForest data, InputBarView inputBar) {
+        this.data = data;
         this.inputBar = inputBar;
-        this.inputBarTree = new MessageTree(null);
+        if (data.has(MessageTree.CURSOR_ID)) {
+            inputBarTree = data.get(MessageTree.CURSOR_ID);
+        } else {
+            inputBarTree = new MessageTree(null);
+            data.add(inputBarTree);
+        }
         data.setListener(this);
-        data.add(inputBarTree);
         inputBar.recycle();
         inputBar.setMessage(inputBarTree);
     }

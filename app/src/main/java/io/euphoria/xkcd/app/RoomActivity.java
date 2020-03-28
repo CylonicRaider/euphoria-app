@@ -16,6 +16,7 @@ import io.euphoria.xkcd.app.control.RoomController;
 import io.euphoria.xkcd.app.data.Message;
 import io.euphoria.xkcd.app.data.SessionView;
 import io.euphoria.xkcd.app.impl.ui.InputBarView;
+import io.euphoria.xkcd.app.impl.ui.MessageForest;
 import io.euphoria.xkcd.app.impl.ui.MessageListAdapter;
 import io.euphoria.xkcd.app.impl.ui.MessageListAdapter.InputBarDirection;
 import io.euphoria.xkcd.app.impl.ui.MessageListView;
@@ -143,6 +144,9 @@ public class RoomActivity extends FragmentActivity {
         return makeUIMessage(parent, id, "test", content);
     }
 
+    private static final String KEY_MESSAGES = "messages";
+    private static final String KEY_TEST_ID = "testID";
+
     private final String TAG = "RoomActivity";
 
     // Tag for finding RoomControllerFragment
@@ -182,6 +186,22 @@ public class RoomActivity extends FragmentActivity {
 
         LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         inputBar = (InputBarView) inflater.inflate(R.layout.input_bar, messageList, false);
+
+        MessageForest data = null;
+        if (savedInstanceState != null) {
+            data = savedInstanceState.getParcelable(KEY_MESSAGES);
+            testID = savedInstanceState.getInt(KEY_TEST_ID);
+        }
+        if (data == null) {
+            data = new MessageForest();
+        }
+        if (savedInstanceState == null) {
+            // TODO remove test messages
+            for (UIMessage msg : testMessages) {
+                data.add(msg);
+            }
+        }
+        messageAdapter = new MessageListAdapter(data, inputBar);
     }
 
     @Override
@@ -199,12 +219,6 @@ public class RoomActivity extends FragmentActivity {
         setTitle("&" + roomName);
         roomUI = (RoomUIImpl) roomController.getManager().getRoomUI(roomName);
 
-        messageAdapter = new MessageListAdapter(inputBar);
-        // TODO remove test messages
-        for (UIMessage msg : testMessages) {
-            messageAdapter.add(msg);
-        }
-        messageAdapter.moveInputBar(null);
         messageList.setAdapter(messageAdapter);
         messageAdapter.setInputBarListener(new MessageListAdapter.InputBarListener() {
             @Override
@@ -260,6 +274,13 @@ public class RoomActivity extends FragmentActivity {
                 return true;
             }
         });
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        outState.putParcelable(KEY_MESSAGES, messageAdapter.getData());
+        outState.putInt(KEY_TEST_ID, testID);
+        super.onSaveInstanceState(outState);
     }
 
     @Override
