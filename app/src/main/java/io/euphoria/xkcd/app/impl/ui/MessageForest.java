@@ -118,6 +118,13 @@ public class MessageForest implements Parcelable {
         out.writeByte((byte) 0);
     }
 
+    private void addToAllMessagesRecursive(MessageTree mt) {
+        allMessages.put(mt.getID(), mt);
+        for (MessageTree r : mt.getReplies()) {
+            addToAllMessagesRecursive(r);
+        }
+    }
+
     private List<MessageTree> readGroupFromParcel(Parcel in) {
         String parent = in.readString();
         List<MessageTree> ret = new ArrayList<>();
@@ -125,7 +132,7 @@ public class MessageForest implements Parcelable {
             byte flags = in.readByte();
             if (flags == 0) break;
             MessageTree mt = new MessageTree(in, flags, parent);
-            allMessages.put(mt.getID(), mt);
+            addToAllMessagesRecursive(mt);
             ret.add(mt);
         }
         if (parent != null) {
