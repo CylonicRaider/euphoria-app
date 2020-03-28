@@ -14,6 +14,16 @@ import java.util.List;
 
 public class MessageTree implements Comparable<MessageTree> {
 
+    public static long idStringToLong(String id) {
+        if (id.equals(CURSOR_ID)) return -1;
+        return Long.parseLong(id, 36);
+    }
+
+    public static String idLongToString(long id) {
+        if (id == -1) return CURSOR_ID;
+        return Long.toString(id, 36);
+    }
+
     public static final String CURSOR_ID = "~";
 
     protected static final byte PF_IS_A_THING  = 0x01;
@@ -26,6 +36,7 @@ public class MessageTree implements Comparable<MessageTree> {
     private String id;
     private String parent;
     private UIMessage message;
+    private long longID;
     private int indent = 0;
     private boolean collapsed = false;
 
@@ -38,6 +49,7 @@ public class MessageTree implements Comparable<MessageTree> {
             id = m.getID();
             parent = m.getParent();
         }
+        longID = idStringToLong(id);
     }
 
     protected MessageTree(Parcel in, byte flags, String parent) {
@@ -50,6 +62,7 @@ public class MessageTree implements Comparable<MessageTree> {
         }
         this.id = id;
         this.parent = parent;
+        this.longID = idStringToLong(id);
         this.collapsed = ((flags & PF_COLLAPSED) != 0);
         if ((flags & PF_HAS_REPLIES) != 0) {
             while (true) {
@@ -78,8 +91,7 @@ public class MessageTree implements Comparable<MessageTree> {
 
     @Override
     public int compareTo(@NonNull MessageTree o) {
-        // The input bar is "greater" than every other message so that it gets to the bottom
-        return id == null ? (o.id == null ? 0 : 1) : (o.id == null ? -1 : id.compareTo(o.id));
+        return id.compareTo(o.id);
     }
 
     /** The ID of this MessageTree (CURSOR_ID for the input bar). */
@@ -90,6 +102,14 @@ public class MessageTree implements Comparable<MessageTree> {
     /** The parent node of this MessageTree. */
     public String getParent() {
         return parent;
+    }
+
+    /**
+     * A long containing the numerical value of this message's ID.
+     * CURSOR_ID is mapped to the special value -1.
+     */
+    public long getLongID() {
+        return longID;
     }
 
     /**
@@ -117,6 +137,7 @@ public class MessageTree implements Comparable<MessageTree> {
         message = m;
         id = m.getID();
         parent = m.getParent();
+        longID = idStringToLong(id);
     }
 
     /** The indentation level of this. */

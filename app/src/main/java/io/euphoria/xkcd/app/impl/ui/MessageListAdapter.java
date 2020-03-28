@@ -52,6 +52,7 @@ public class MessageListAdapter extends RecyclerView.Adapter<MessageListAdapter.
         data.setListener(this);
         inputBar.recycle();
         inputBar.setMessage(inputBarTree);
+        setHasStableIds(true);
     }
 
     @Override
@@ -108,6 +109,11 @@ public class MessageListAdapter extends RecyclerView.Adapter<MessageListAdapter.
 
     public MessageTree getItem(int position) {
         return data.get(position);
+    }
+
+    @Override
+    public long getItemId(int position) {
+        return getItem(position).getLongID();
     }
 
     @Override
