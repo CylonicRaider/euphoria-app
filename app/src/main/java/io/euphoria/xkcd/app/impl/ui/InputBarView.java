@@ -13,8 +13,8 @@ import io.euphoria.xkcd.app.impl.ui.MessageListAdapter.InputBarDirection;
 import static io.euphoria.xkcd.app.impl.ui.UIUtils.COLOR_SENDER_LIGHTNESS;
 import static io.euphoria.xkcd.app.impl.ui.UIUtils.hslToRgbInt;
 import static io.euphoria.xkcd.app.impl.ui.UIUtils.nickColor;
+import static io.euphoria.xkcd.app.impl.ui.UIUtils.setColoredBackground;
 import static io.euphoria.xkcd.app.impl.ui.UIUtils.setEnterKeyListener;
-import static io.euphoria.xkcd.app.impl.ui.UIUtils.setRoundedRectBackground;
 
 public class InputBarView extends BaseMessageView {
 
@@ -37,8 +37,8 @@ public class InputBarView extends BaseMessageView {
     @Override
     protected void onFinishInflate() {
         super.onFinishInflate();
-        nickEntry = (EditText) findViewById(R.id.nick_entry);
-        messageEntry = (EditText) findViewById(R.id.message_entry);
+        nickEntry = findViewById(R.id.nick_entry);
+        messageEntry = findViewById(R.id.message_entry);
         // Color nick-background with unsaturated nickname color as default
         final int defaultColor = hslToRgbInt(0, 0, COLOR_SENDER_LIGHTNESS);
         nickEntry.addTextChangedListener(new TextWatcher() {
@@ -62,7 +62,7 @@ public class InputBarView extends BaseMessageView {
                 int color = defaultColor;
                 if (s.length() != 0)
                     color = nickColor(s.toString());
-                setRoundedRectBackground(nickEntry, color);
+                setColoredBackground(nickEntry, R.drawable.bg_nick, color);
             }
         });
         setEnterKeyListener(nickEntry, EditorInfo.IME_ACTION_NEXT, new Runnable() {
@@ -78,7 +78,7 @@ public class InputBarView extends BaseMessageView {
                     messageEntry.setText("");
             }
         });
-        setRoundedRectBackground(nickEntry, defaultColor);
+        setColoredBackground(nickEntry, R.drawable.bg_nick, defaultColor);
     }
 
     @Override

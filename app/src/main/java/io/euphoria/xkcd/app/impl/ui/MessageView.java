@@ -103,14 +103,14 @@ public class MessageView extends BaseMessageView {
     }
 
     private static void setNickBackground(View v, boolean emote, @ColorInt int color) {
-        setColoredBackground(v, emote ? R.drawable.rounded_rect_left : R.drawable.rounded_rect, color);
+        setColoredBackground(v, emote ? R.drawable.bg_nick_emote : R.drawable.bg_nick, color);
     }
 
     private static void setContentBackground(View v, boolean emote, @ColorInt int color) {
         if (emote) {
-            setColoredBackground(v, R.drawable.rounded_rect_right, color);
+            setColoredBackground(v, R.drawable.bg_content_emote, color);
         } else {
-            setViewBackground(v, null);
+            setViewBackground(v, R.drawable.bg_content);
         }
     }
 

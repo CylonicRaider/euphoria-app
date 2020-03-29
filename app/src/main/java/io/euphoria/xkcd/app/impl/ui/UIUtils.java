@@ -21,8 +21,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
 
-import io.euphoria.xkcd.app.R;
-
 public class UIUtils {
 
     // Color saturation and lightness for input bar and messages
@@ -60,6 +58,21 @@ public class UIUtils {
     }
 
     /**
+     * Obtain a Drawable for the given resource ID.
+     *
+     * @param ctx      The context w.r.t. which to resolve.
+     * @param drawable The resource ID of the Drawable to obtain.
+     * @return The Drawable.
+     */
+    private static Drawable getDrawable(Context ctx, @DrawableRes int drawable) {
+        if (VERSION.SDK_INT >= VERSION_CODES.LOLLIPOP) {
+            return ctx.getDrawable(drawable);
+        } else {
+            return ctx.getResources().getDrawable(drawable);
+        }
+    }
+
+    /**
      * Obtain an instance of the drawable resource with the given color applied
      * @param ctx Context
      * @param drawable Resource ID of the drawable to color
@@ -67,12 +80,7 @@ public class UIUtils {
      * @return A mutable Drawable with the given color applied
      */
     public static Drawable colorDrawable(Context ctx, @DrawableRes int drawable, @ColorInt int color) {
-        GradientDrawable ret;
-        if (VERSION.SDK_INT >= VERSION_CODES.LOLLIPOP) {
-            ret = (GradientDrawable) ctx.getDrawable(drawable);
-        } else {
-            ret = (GradientDrawable) ctx.getResources().getDrawable(drawable);
-        }
+        GradientDrawable ret = (GradientDrawable) getDrawable(ctx, drawable);
         if (ret != null) {
             ret.mutate();
             ret.setColor(color);
@@ -97,6 +105,18 @@ public class UIUtils {
     }
 
     /**
+     * Convenience function for applying a drawable background to a view
+     * <p>
+     * Note that there might be subtle behavioral differences depending on the API level.
+     *
+     * @param v        The view to apply the background to
+     * @param drawable The drawable to use as a background (or <code>0</code>> to remove the background)
+     */
+    public static void setViewBackground(View v, @DrawableRes int drawable) {
+        setViewBackground(v, getDrawable(v.getContext(), drawable));
+    }
+
+    /**
      * Convenience function for applying a tinted background to a view
      *
      * @param v        View whose background to set
@@ -108,16 +128,6 @@ public class UIUtils {
         Drawable ret = colorDrawable(v.getContext(), drawable, color);
         setViewBackground(v, ret);
         return ret;
-    }
-
-    /**
-     * Convenience function for applying a background appropriate to Euphoria nicknames
-     * @param v View whose background to set
-     * @param color Color to apply (use {@link #nickColor(String)} to obtain the proper color for some nick)
-     * @return The Drawable that was installed as the background
-     */
-    public static Drawable setRoundedRectBackground(View v, @ColorInt int color) {
-        return setColoredBackground(v, R.drawable.rounded_rect, color);
     }
 
     /*                                                                       *
