@@ -14,7 +14,6 @@ import io.euphoria.xkcd.app.impl.ui.detail.TriangleView;
 import static io.euphoria.xkcd.app.impl.ui.UIUtils.emoteColor;
 import static io.euphoria.xkcd.app.impl.ui.UIUtils.hslToRgbInt;
 import static io.euphoria.xkcd.app.impl.ui.UIUtils.isEmote;
-import static io.euphoria.xkcd.app.impl.ui.UIUtils.nickColor;
 import static io.euphoria.xkcd.app.impl.ui.UIUtils.setColoredBackground;
 import static io.euphoria.xkcd.app.impl.ui.UIUtils.setViewBackground;
 
@@ -32,7 +31,7 @@ public class MessageView extends BaseMessageView {
     @Override
     protected void updateDisplay() {
         // TODO move to ViewHolder?
-        TextView nickLbl = findViewById(R.id.nick_lbl);
+        NicknameView nickLbl = findViewById(R.id.nick_lbl);
         TextView contentLbl = findViewById(R.id.content_lbl);
         View collapser = findViewById(R.id.collapser);
         TriangleView collapserIcon = findViewById(R.id.collapser_icon);
@@ -50,18 +49,17 @@ public class MessageView extends BaseMessageView {
             boolean emote = isEmote(content);
             String displayContent = emote ? content.substring(3) : content;
             displayContent = displayContent.trim();
+            // Apply the nickname
+            nickLbl.updateParameters(emote, msg.getSenderName());
             // Apply the message's text
-            nickLbl.setText(msg.getSenderName());
             contentLbl.setText(displayContent);
-            // Color the background of the sender's nick
-            setNickBackground(nickLbl, emote, nickColor(msg.getSenderName()));
             setContentBackground(contentLbl, emote, emoteColor(msg.getSenderName()));
         } else {
             Resources res = getResources();
             nickLbl.setText(res.getString(R.string.not_available));
             contentLbl.setText(res.getString(R.string.not_available));
             // Make nick background red
-            setNickBackground(nickLbl, false, hslToRgbInt(0, 1, 0.5f));
+            nickLbl.updateParameters(hslToRgbInt(0, 1, 0.5f));
             setContentBackground(contentLbl, false, -1);
             Log.e(TAG, "updateDisplay: MessageView message is null!",
                     new RuntimeException("MessageView message is null!"));
@@ -100,10 +98,6 @@ public class MessageView extends BaseMessageView {
     }
     public void setCollapserClickListener(OnClickListener l) {
         findViewById(R.id.collapser).setOnClickListener(l);
-    }
-
-    private static void setNickBackground(View v, boolean emote, @ColorInt int color) {
-        setColoredBackground(v, emote ? R.drawable.bg_nick_emote : R.drawable.bg_nick, color);
     }
 
     private static void setContentBackground(View v, boolean emote, @ColorInt int color) {

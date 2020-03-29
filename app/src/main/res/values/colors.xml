@@ -11,4 +11,6 @@
     <color name="background_input">#ffffff</color>
 
     <color name="indent_line">#c0c0c0</color>
+
+    <color name="neutral">#c0c0c0</color>
 </resources>
