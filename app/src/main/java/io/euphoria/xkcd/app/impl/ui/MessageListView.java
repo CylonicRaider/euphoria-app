@@ -248,8 +248,15 @@ public class MessageListView extends RecyclerView {
         }
     }
 
+    private MessageListAdapter getMessageListAdapter() {
+        Adapter ret = getAdapter();
+        if (!(ret instanceof MessageListAdapter)) return null;
+        return (MessageListAdapter) ret;
+    }
+
     private void addIndentLinesFor(MessageTree tree) {
-        MessageListAdapter adapter = (MessageListAdapter) getAdapter();
+        MessageListAdapter adapter = getMessageListAdapter();
+        if (adapter == null) return;
         while (true) {
             if (!tree.getID().equals(MessageTree.CURSOR_ID)) {
                 IndentLine il = linesBelow.get(tree);
@@ -265,7 +272,8 @@ public class MessageListView extends RecyclerView {
     }
 
     private void addIndentLinesFor(int minIdx, int maxIdx) {
-        MessageListAdapter adapter = (MessageListAdapter) getAdapter();
+        MessageListAdapter adapter = getMessageListAdapter();
+        if (adapter == null) return;
         for (int i = minIdx; i <= maxIdx; i++) {
             addIndentLinesFor(adapter.getItem(i));
         }
