@@ -337,7 +337,9 @@ public class UIUtils {
         v.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
-                return d.onTouchEvent(event);
+                d.onTouchEvent(event);
+                // HACK: The gesture detector eats too many events.
+                return false;
             }
         });
     }
