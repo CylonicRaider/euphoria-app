@@ -63,10 +63,6 @@ public class InputBarView extends BaseMessageView {
 
             @Override
             public void afterTextChanged(Editable s) {
-                // Strip whitespace
-                if (!s.toString().equals(s.toString().trim())) {
-                    s.replace(0, s.length(), s.toString().trim());
-                }
                 // Recolor background
                 int color = defaultColor;
                 if (s.length() != 0)
@@ -77,10 +73,18 @@ public class InputBarView extends BaseMessageView {
         setEnterKeyListener(nickEntry, EditorInfo.IME_ACTION_NEXT, new Runnable() {
             @Override
             public void run() {
+                // Strip whitespace
+                Editable nickEditor = nickEntry.getText();
+                String newNick = nickEditor.toString();
+                String trimmedNick = newNick.trim();
+                if (!newNick.equals(trimmedNick)) {
+                    nickEditor.replace(0, newNick.length(), trimmedNick);
+                    newNick = trimmedNick;
+                }
                 if (nickChangeListener != null && !nickChangeListener.onChangeNick(InputBarView.this)) {
                     nickEntry.setText(lastNick);
                 } else {
-                    lastNick = nickEntry.getText().toString();
+                    lastNick = newNick;
                 }
                 messageEntry.requestFocus();
             }
