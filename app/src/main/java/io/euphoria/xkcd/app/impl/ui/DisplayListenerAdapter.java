@@ -4,6 +4,18 @@ package io.euphoria.xkcd.app.impl.ui;
 
 public class DisplayListenerAdapter implements DisplayListener {
 
+    public static void notifyItemMovedLenient(DisplayListener listener, int from, int to) {
+        if (from == -1 && to == -1) {
+            /* NOP */
+        } else if (from == -1) {
+            listener.notifyItemRangeInserted(to, 1);
+        } else if (to == -1) {
+            listener.notifyItemRangeRemoved(from, 1);
+        } else {
+            listener.notifyItemMoved(from, to);
+        }
+    }
+
     public static DisplayListener NULL = new DisplayListenerAdapter();
 
     @Override

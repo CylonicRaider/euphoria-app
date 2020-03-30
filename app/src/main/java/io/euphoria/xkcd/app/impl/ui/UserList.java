@@ -195,33 +195,55 @@ public class UserList implements Parcelable {
         }
     }
 
+    protected int findDisplayIndex(UIUser usr, boolean visible) {
+        int index = Collections.binarySearch(displayed, usr);
+        if (index < 0) index = (usr.getNickname().isEmpty() || visible) ? -1 : -index - 1;
+        return index;
+    }
+
     protected void processInsert(UIUser usr) {
         allUsers.put(usr.getSessionID(), usr);
-        listener.notifyItemRangeInserted(UIUtils.insertSorted(displayed, usr), 1);
+        int index = findDisplayIndex(usr, false);
+        if (index != -1) {
+            displayed.add(index, usr);
+            listener.notifyItemRangeInserted(index, 1);
+        }
     }
 
     protected void processUpdate(UIUser usr, UIUser update) {
+        int oldIndex = findDisplayIndex(usr, true);
         usr.updateFrom(update);
-        listener.notifyItemChanged(Collections.binarySearch(displayed, usr));
+        processMoveCommon(usr, oldIndex);
     }
 
     protected void processRename(UIUser usr, String newName) {
-        int oldIndex = Collections.binarySearch(displayed, usr);
-        listener.notifyItemChanged(oldIndex);
+        int oldIndex = findDisplayIndex(usr, true);
         usr.setNickname(newName);
-        if ((oldIndex == 0 || get(oldIndex - 1).compareTo(usr) <= 0) &&
-                (oldIndex == size() - 1 || get(oldIndex + 1).compareTo(usr) >= 0))
-            return;
-        displayed.remove(oldIndex);
-        int newIndex = Collections.binarySearch(displayed, usr);
-        if (newIndex < 0) newIndex = -newIndex - 1;
-        displayed.add(newIndex, usr);
-        listener.notifyItemMoved(oldIndex, newIndex);
+        processMoveCommon(usr, oldIndex);
+    }
+
+    protected void processMoveCommon(UIUser usr, int oldIndex) {
+        if (oldIndex != -1) {
+            if ((oldIndex == 0 || get(oldIndex - 1).compareTo(usr) <= 0) &&
+                    (oldIndex == size() - 1 || get(oldIndex + 1).compareTo(usr) >= 0)) {
+                listener.notifyItemChanged(oldIndex);
+                return;
+            }
+            displayed.remove(oldIndex);
+        }
+        int newIndex = findDisplayIndex(usr, false);
+        if (newIndex != -1) displayed.add(newIndex, usr);
+        DisplayListenerAdapter.notifyItemMovedLenient(listener, oldIndex, newIndex);
+        if (newIndex != -1) listener.notifyItemChanged(newIndex);
     }
 
     protected void processRemove(UIUser usr) {
         allUsers.remove(usr.getSessionID());
-        listener.notifyItemRangeRemoved(UIUtils.removeSorted(displayed, usr), 1);
+        int index = findDisplayIndex(usr, true);
+        if (index != -1) {
+            displayed.remove(index);
+            listener.notifyItemRangeRemoved(index, 1);
+        }
     }
 
 }

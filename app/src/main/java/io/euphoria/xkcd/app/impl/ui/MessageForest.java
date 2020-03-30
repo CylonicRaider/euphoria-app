@@ -291,18 +291,6 @@ public class MessageForest implements Parcelable {
         listener.notifyItemRangeRemoved(index, length);
     }
 
-    protected void notifyItemMovedLenient(int from, int to) {
-        if (from == -1 && to == -1) {
-            /* NOP */
-        } else if (from == -1) {
-            listener.notifyItemRangeInserted(to, 1);
-        } else if (to == -1) {
-            listener.notifyItemRangeRemoved(from, 1);
-        } else {
-            listener.notifyItemMoved(from, to);
-        }
-    }
-
     protected void processInsert(MessageTree mt) {
         allMessages.put(mt.getID(), mt);
         // Adopt orphans! :)
@@ -392,7 +380,7 @@ public class MessageForest implements Parcelable {
             mt.updateIndent(0);
         }
         // Finally, issue listener notifications.
-        notifyItemMovedLenient(oldIndex, newIndex);
+        DisplayListenerAdapter.notifyItemMovedLenient(listener, oldIndex, newIndex);
         findDisplayIndex(mt, true, true);
     }
 
