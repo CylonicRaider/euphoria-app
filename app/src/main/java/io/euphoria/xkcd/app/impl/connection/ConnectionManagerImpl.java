@@ -1,5 +1,8 @@
 package io.euphoria.xkcd.app.impl.connection;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import io.euphoria.xkcd.app.connection.Connection;
 import io.euphoria.xkcd.app.connection.ConnectionManager;
 
@@ -8,28 +11,46 @@ import io.euphoria.xkcd.app.connection.ConnectionManager;
 /* Implementation of ConnectionManager */
 public class ConnectionManagerImpl implements ConnectionManager {
 
+    private final Map<String, ConnectionImpl> connections;
+
+    public ConnectionManagerImpl() {
+        connections = new HashMap<>();
+    }
+
     public static ConnectionManager getInstance() {
-        throw new AssertionError("Not implemented");
+        return new ConnectionManagerImpl();
     }
 
     @Override
-    public Connection getConnection(String roomName) {
-        throw new AssertionError("Not implemented");
+    public synchronized Connection getConnection(String roomName) {
+        return connections.get(roomName);
     }
 
     @Override
-    public Connection connect(String roomName) {
-        throw new AssertionError("Not implemented");
+    public synchronized Connection connect(String roomName) {
+        ConnectionImpl conn = connections.get(roomName);
+        if (conn == null) {
+            conn = new ConnectionImpl(this, roomName);
+            conn.connect();
+            connections.put(roomName, conn);
+        }
+        return conn;
+    }
+
+    synchronized void remove(ConnectionImpl conn) {
+        connections.remove(conn.getRoomName());
     }
 
     @Override
-    public boolean hasConnections() {
-        throw new AssertionError("Not implemented");
+    public synchronized boolean hasConnections() {
+        return !connections.isEmpty();
     }
 
     @Override
-    public void shutdown() {
-        throw new AssertionError("Not implemented");
+    public synchronized void shutdown() {
+        for (ConnectionImpl c : connections.values()) {
+            c.close();
+        }
     }
 
 }
