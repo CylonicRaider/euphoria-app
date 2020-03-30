@@ -12,7 +12,7 @@ import io.euphoria.xkcd.app.data.Message;
 
 // TODO input bar
 public class MessageListAdapter extends RecyclerView.Adapter<MessageListAdapter.ViewHolder>
-                                implements MessageForest.DisplayListener {
+                                implements DisplayListener {
 
     public interface InputBarListener {
 

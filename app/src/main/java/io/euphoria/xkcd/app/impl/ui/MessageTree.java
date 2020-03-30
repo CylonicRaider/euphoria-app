@@ -24,6 +24,10 @@ public class MessageTree implements Comparable<MessageTree> {
         return Long.toString(id, 36);
     }
 
+    private static String formatID(String id) {
+        return (id == null) ? "-" : id;
+    }
+
     public static final String CURSOR_ID = "~";
 
     protected static final byte PF_IS_A_THING  = 0x01;
@@ -85,8 +89,7 @@ public class MessageTree implements Comparable<MessageTree> {
 
     @Override
     public String toString() {
-        if (id == null) return String.format("%s@%x[%s/-]", getClass().getSimpleName(), hashCode(), parent);
-        return String.format("%s@%x[%s/%s]", getClass().getSimpleName(), hashCode(), parent, id);
+        return String.format("%s@%x[%s/%s]", getClass().getSimpleName(), hashCode(), formatID(parent), formatID(id));
     }
 
     @Override

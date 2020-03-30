@@ -14,36 +14,6 @@ import java.util.NoSuchElementException;
 
 public class MessageForest implements Parcelable {
 
-    public interface DisplayListener {
-
-        void notifyItemRangeInserted(int start, int length);
-
-        void notifyItemChanged(int index);
-
-        void notifyItemMoved(int from, int to);
-
-        void notifyItemRangeRemoved(int start, int length);
-
-    }
-
-    public static class DisplayListenerAdapter implements DisplayListener {
-
-        private static DisplayListener NULL = new DisplayListenerAdapter();
-
-        @Override
-        public void notifyItemRangeInserted(int start, int length) {}
-
-        @Override
-        public void notifyItemChanged(int index) {}
-
-        @Override
-        public void notifyItemMoved(int from, int to) {}
-
-        @Override
-        public void notifyItemRangeRemoved(int start, int length) {}
-
-    }
-
     public static final Creator<MessageForest> CREATOR = new Creator<MessageForest>() {
 
         @Override
