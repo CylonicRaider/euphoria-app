@@ -16,9 +16,9 @@
         android:layout_marginBottom="1dp"
         android:background="@drawable/bg_nick"
         android:text="@string/not_available"
-        android:textColor="@color/text_message"
-        android:textIsSelectable="true"
-        android:textSize="18sp"/>
+        android:textColor="@color/text"
+        android:textSize="@dimen/main_font_size"
+        android:textIsSelectable="true"/>
 
     <TextView
         android:id="@+id/content_lbl"
@@ -36,9 +36,9 @@
         android:autoLink="web|email"
         android:background="@drawable/bg_content"
         android:text="@string/not_available"
-        android:textColor="@color/text_message"
-        android:textIsSelectable="true"
-        android:textSize="18sp"/>
+        android:textColor="@color/text"
+        android:textSize="@dimen/main_font_size"
+        android:textIsSelectable="true"/>
 
     <View
         android:id="@+id/clicker"

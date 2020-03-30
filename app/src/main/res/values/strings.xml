@@ -11,4 +11,5 @@
         <item quantity="other">replies</item>
     </plurals>
     <string name="collapser_fallback">Collapse/uncollapse</string>
+    <string name="heading_users">Users:</string>
 </resources>

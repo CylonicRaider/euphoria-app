@@ -99,7 +99,6 @@ public class UserList implements Parcelable {
 
     };
 
-
     private final Map<String, UIUser> allUsers;
     private final List<UIUser> displayed;
     private DisplayListener listener;
@@ -208,12 +207,14 @@ public class UserList implements Parcelable {
 
     protected void processRename(UIUser usr, String newName) {
         int oldIndex = Collections.binarySearch(displayed, usr);
+        listener.notifyItemChanged(oldIndex);
         usr.setNickname(newName);
+        if ((oldIndex == 0 || get(oldIndex - 1).compareTo(usr) <= 0) &&
+                (oldIndex == size() - 1 || get(oldIndex + 1).compareTo(usr) >= 0))
+            return;
+        displayed.remove(oldIndex);
         int newIndex = Collections.binarySearch(displayed, usr);
         if (newIndex < 0) newIndex = -newIndex - 1;
-        if (newIndex == oldIndex) return;
-        if (newIndex > oldIndex) newIndex -= 1;
-        displayed.remove(oldIndex);
         displayed.add(newIndex, usr);
         listener.notifyItemMoved(oldIndex, newIndex);
     }

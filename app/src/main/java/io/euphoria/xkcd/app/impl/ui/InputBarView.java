@@ -18,6 +18,12 @@ import static io.euphoria.xkcd.app.impl.ui.UIUtils.setEnterKeyListener;
 
 public class InputBarView extends BaseMessageView {
 
+    public interface NickChangeListener {
+
+        boolean onChangeNick(InputBarView view);
+
+    }
+
     public interface SubmitListener {
 
         boolean onSubmit(InputBarView view);
@@ -25,13 +31,16 @@ public class InputBarView extends BaseMessageView {
     }
 
     private final MarginLayoutParams defaultLayoutParams;
+    private String lastNick;
     private EditText nickEntry;
     private EditText messageEntry;
+    private NickChangeListener nickChangeListener;
     private SubmitListener submitListener;
 
     public InputBarView(Context context, AttributeSet attrs) {
         super(context, attrs);
         defaultLayoutParams = BaseMessageView.getDefaultMargins(context, attrs);
+        lastNick = "";
     }
 
     @Override
@@ -68,6 +77,11 @@ public class InputBarView extends BaseMessageView {
         setEnterKeyListener(nickEntry, EditorInfo.IME_ACTION_NEXT, new Runnable() {
             @Override
             public void run() {
+                if (nickChangeListener != null && !nickChangeListener.onChangeNick(InputBarView.this)) {
+                    nickEntry.setText(lastNick);
+                } else {
+                    lastNick = nickEntry.getText().toString();
+                }
                 messageEntry.requestFocus();
             }
         });
@@ -91,6 +105,10 @@ public class InputBarView extends BaseMessageView {
         // TODO state saving should go here
     }
 
+    public String getLastNick() {
+        return lastNick;
+    }
+
     public EditText getNickEntry() {
         return nickEntry;
     }
@@ -105,6 +123,14 @@ public class InputBarView extends BaseMessageView {
 
     public void setSubmitListener(SubmitListener submitListener) {
         this.submitListener = submitListener;
+    }
+
+    public NickChangeListener getNickChangeListener() {
+        return nickChangeListener;
+    }
+
+    public void setNickChangeListener(NickChangeListener nickChangeListener) {
+        this.nickChangeListener = nickChangeListener;
     }
 
     public String getNickText() {

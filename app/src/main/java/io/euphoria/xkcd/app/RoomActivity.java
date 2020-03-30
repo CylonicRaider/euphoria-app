@@ -7,6 +7,8 @@ import android.os.Handler;
 import android.os.Parcelable;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.SparseArray;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -24,50 +26,69 @@ import io.euphoria.xkcd.app.impl.ui.MessageListAdapter.InputBarDirection;
 import io.euphoria.xkcd.app.impl.ui.MessageListView;
 import io.euphoria.xkcd.app.impl.ui.RoomUIImpl;
 import io.euphoria.xkcd.app.impl.ui.UIMessage;
+import io.euphoria.xkcd.app.impl.ui.UserList;
+import io.euphoria.xkcd.app.impl.ui.UserListAdapter;
 
 import static io.euphoria.xkcd.app.impl.ui.RoomUIImpl.getRoomName;
 import static io.euphoria.xkcd.app.impl.ui.RoomUIImpl.isValidRoomUri;
 
 public class RoomActivity extends FragmentActivity {
 
+    private static class TestSessionView implements SessionView {
+
+        private String session;
+        private String nick;
+
+        public TestSessionView(String session, String nick) {
+            this.session = session;
+            this.nick = nick;
+        }
+        public TestSessionView(String nick) {
+            this("0123-4567-89ab-cdef", nick);
+        }
+
+        @Override
+        public String getSessionID() {
+            return session;
+        }
+
+        @Override
+        public String getAgentID() {
+            return "bot:test";
+        }
+
+        @Override
+        public String getName() {
+            return nick;
+        }
+
+        @Override
+        public boolean isStaff() {
+            return false;
+        }
+
+        @Override
+        public boolean isManager() {
+            return false;
+        }
+
+        public void setName(String name) {
+            nick = name;
+        }
+
+    }
+
     private static class TestMessage implements Message {
 
         private final String id;
-        private final String nick;
         private final String parent;
+        private final TestSessionView sender;
         private final String content;
-
-        private final SessionView sender = new SessionView() {
-            @Override
-            public String getSessionID() {
-                return "0123-4567-89ab-cdef";
-            }
-
-            @Override
-            public String getAgentID() {
-                return "bot:test";
-            }
-
-            @Override
-            public String getName() {
-                return nick;
-            }
-
-            @Override
-            public boolean isStaff() {
-                return false;
-            }
-
-            @Override
-            public boolean isManager() {
-                return false;
-            }
-        };
 
         public TestMessage(String parent, String id, String nick, String content) {
             this.id = id;
             this.parent = parent;
-            this.nick = nick;
+            this.sender = new TestSessionView(nick);
             this.content = content;
         }
 
@@ -107,7 +128,7 @@ public class RoomActivity extends FragmentActivity {
     public static final boolean RIGHT_KEY_HACK = true;
 
     // Test handling of out-of-order messages.
-    private final UIMessage[] testMessages = new UIMessage[] {
+    private final UIMessage[] testMessages = {
             makeUIMessage("a", "j", "Test message A/J"),
             makeUIMessage("j", "k", "Test message A/J/K"),
             makeUIMessage("k", "l", "Test message A/J/K/L"),
@@ -137,6 +158,12 @@ public class RoomActivity extends FragmentActivity {
             makeUIMessage("x", "x14", "Test message X/14"),
             makeUIMessage("x", "x15", "Test message X/15")
     };
+    private final TestSessionView[] testUsers = {
+            new TestSessionView("abc", "abc"),
+            new TestSessionView("def", "def"),
+            new TestSessionView("ghi", "ghi"),
+            new TestSessionView("jkl", "jkl")
+    };
 
     private static UIMessage makeUIMessage(String parent, String id, String nick, String content) {
         return new UIMessage(new TestMessage(parent, id, nick, content));
@@ -147,6 +174,7 @@ public class RoomActivity extends FragmentActivity {
     }
 
     private static final String KEY_MESSAGES = "messages";
+    private static final String KEY_USERS = "users";
     private static final String KEY_TEST_ID = "testID";
     private static final String KEY_INPUT_STATE = "inputState";
 
@@ -161,9 +189,12 @@ public class RoomActivity extends FragmentActivity {
     private RoomUIImpl roomUI;
     private MessageListView messageList;
     private MessageListAdapter messageAdapter;
+    private RecyclerView userList;
+    private UserListAdapter userListAdapter;
     private InputBarView inputBar;
 
     private int testID = 0;
+    private TestSessionView testSession = new TestSessionView("");
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -198,31 +229,42 @@ public class RoomActivity extends FragmentActivity {
         roomUI = (RoomUIImpl) roomController.getManager().getRoomUI(roomName);
 
         // View setup
-        messageList = findViewById(R.id.message_recycler_view);
+        messageList = findViewById(R.id.message_list_view);
+        userList = findViewById(R.id.user_list_view);
+        userList.setLayoutManager(new LinearLayoutManager(userList.getContext()));
 
         LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         inputBar = (InputBarView) inflater.inflate(R.layout.input_bar, messageList, false);
 
-        // Message data setup
-        MessageForest data = null;
+        // Data setup
+        MessageForest messages = null;
+        UserList users = null;
         if (savedInstanceState != null) {
-            data = savedInstanceState.getParcelable(KEY_MESSAGES);
+            messages = savedInstanceState.getParcelable(KEY_MESSAGES);
+            users = savedInstanceState.getParcelable(KEY_USERS);
             testID = savedInstanceState.getInt(KEY_TEST_ID);
             SparseArray<Parcelable> inputState = savedInstanceState.getSparseParcelableArray(KEY_INPUT_STATE);
             if (inputState != null) inputBar.restoreHierarchyState(inputState);
         }
-        if (data == null) {
-            data = new MessageForest();
-        }
-        if (savedInstanceState == null) {
+        if (messages == null) {
+            messages = new MessageForest();
             // TODO remove test messages
             for (UIMessage msg : testMessages) {
-                data.add(msg);
+                messages.add(msg);
             }
         }
-        messageAdapter = new MessageListAdapter(data, inputBar);
-
+        if (users == null) {
+            users = new UserList();
+            // TODO remove test users
+            for (SessionView sv : testUsers) {
+                users.add(sv);
+            }
+            users.add(testSession);
+        }
+        messageAdapter = new MessageListAdapter(messages, inputBar);
+        userListAdapter = new UserListAdapter(users);
         messageList.setAdapter(messageAdapter);
+        userList.setAdapter(userListAdapter);
 
         // Input bar setup
         messageAdapter.setInputBarListener(new MessageListAdapter.InputBarListener() {
@@ -267,6 +309,16 @@ public class RoomActivity extends FragmentActivity {
             }
         });
         // TODO remove test submission
+        inputBar.setNickChangeListener(new InputBarView.NickChangeListener() {
+            @Override
+            public boolean onChangeNick(InputBarView view) {
+                String newNick = view.getNickText();
+                UserList users = userListAdapter.getData();
+                users.setNick(users.get(testSession.getSessionID()), newNick);
+                testSession.setName(newNick);
+                return true;
+            }
+        });
         inputBar.setSubmitListener(new InputBarView.SubmitListener() {
             @Override
             public boolean onSubmit(InputBarView view) {
@@ -284,6 +336,7 @@ public class RoomActivity extends FragmentActivity {
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putParcelable(KEY_MESSAGES, messageAdapter.getData());
+        outState.putParcelable(KEY_USERS, userListAdapter.getData());
         outState.putInt(KEY_TEST_ID, testID);
         // RecyclerView suppresses instance state saving for all its children; we override this decision for the
         // input bar without poking into RecyclerView internals.
