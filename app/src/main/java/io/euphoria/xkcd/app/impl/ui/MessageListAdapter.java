@@ -10,7 +10,6 @@ import android.view.ViewGroup;
 import io.euphoria.xkcd.app.R;
 import io.euphoria.xkcd.app.data.Message;
 
-// TODO input bar
 public class MessageListAdapter extends RecyclerView.Adapter<MessageListAdapter.ViewHolder>
                                 implements DisplayListener {
 
