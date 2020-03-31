@@ -7,11 +7,16 @@ import android.os.Handler;
 import android.os.Parcelable;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.widget.DrawerLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.SparseArray;
+import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 
 import java.util.Locale;
@@ -330,6 +335,22 @@ public class RoomActivity extends FragmentActivity {
                 return true;
             }
         });
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.actions_room, menu);
+        return true;
+    }
+
+    public void toggleUserDrawer(MenuItem item) {
+        DrawerLayout dl = findViewById(R.id.room_drawer_root);
+        if (dl.isDrawerOpen(Gravity.END)) {
+            dl.closeDrawer(Gravity.END);
+        } else {
+            dl.openDrawer(Gravity.END);
+        }
     }
 
     @Override
