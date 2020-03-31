@@ -104,6 +104,7 @@ public class InputBarView extends BaseMessageView {
         // TODO state restoration should go here
     }
 
+    @Override
     public void recycle() {
         super.recycle();
         // TODO state saving should go here
