@@ -28,6 +28,10 @@ import io.euphoria.xkcd.app.impl.ui.MessageListView;
 import io.euphoria.xkcd.app.impl.ui.RoomUIImpl;
 import io.euphoria.xkcd.app.impl.ui.UserList;
 import io.euphoria.xkcd.app.impl.ui.UserListAdapter;
+import io.euphoria.xkcd.app.ui.RoomUI;
+import io.euphoria.xkcd.app.ui.event.LogRequestEvent;
+import io.euphoria.xkcd.app.ui.event.MessageSendEvent;
+import io.euphoria.xkcd.app.ui.event.NewNickEvent;
 
 import static io.euphoria.xkcd.app.impl.ui.RoomUIImpl.getRoomName;
 import static io.euphoria.xkcd.app.impl.ui.RoomUIImpl.isValidRoomUri;
@@ -86,7 +90,7 @@ public class RoomActivity extends FragmentActivity {
         }
         // Acquire RoomController and roomUI
         roomController = roomControllerFragment.getRoomController();
-        roomUI = (RoomUIImpl) roomController.getManager().getRoomUI(roomName);
+        roomUI = (RoomUIImpl) roomController.getRoomUIManager().getRoomUI(roomName);
 
         // View setup
         messageList = findViewById(R.id.message_list_view);
@@ -158,6 +162,53 @@ public class RoomActivity extends FragmentActivity {
                 return inputBar.mayNavigateInput(dir) && messageAdapter.navigateInputBar(dir);
             }
         });
+
+        // Controller etc. setup
+        roomController.openRoom(roomName);
+        roomUI.link(messageAdapter, userListAdapter);
+        inputBar.setNickChangeListener(new InputBarView.NickChangeListener() {
+            @Override
+            public boolean onChangeNick(InputBarView view) {
+                final String text = view.getNickText();
+                roomUI.submitEvent(new NewNickEvent() {
+                    @Override
+                    public String getNewNick() {
+                        return text;
+                    }
+
+                    @Override
+                    public RoomUI getRoomUI() {
+                        return roomUI;
+                    }
+                });
+                return true;
+            }
+        });
+        inputBar.setSubmitListener(new InputBarView.SubmitListener() {
+            @Override
+            public boolean onSubmit(InputBarView view) {
+                final String text = view.getMessageText();
+                final String parent = view.getMessage().getParent();
+                roomUI.submitEvent(new MessageSendEvent() {
+                    @Override
+                    public String getText() {
+                        return text;
+                    }
+
+                    @Override
+                    public String getParent() {
+                        return parent;
+                    }
+
+                    @Override
+                    public RoomUI getRoomUI() {
+                        return roomUI;
+                    }
+                });
+                return true;
+            }
+        });
+        requestMoreLogs();
     }
 
     @Override
@@ -191,7 +242,25 @@ public class RoomActivity extends FragmentActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        //roomController.shutdown(); //NYI
+        roomUI.unlink(messageAdapter, userListAdapter);
+        roomController.closeRoom(roomUI.getRoomName());
+        roomController.shutdown();
+    }
+
+    private void requestMoreLogs() {
+        final String top;
+        top = (messageAdapter.getItemCount() == 0) ? null : messageAdapter.getItem(0).getID();
+        roomUI.submitEvent(new LogRequestEvent() {
+            @Override
+            public String getBefore() {
+                return top;
+            }
+
+            @Override
+            public RoomUI getRoomUI() {
+                return roomUI;
+            }
+        });
     }
 
 }

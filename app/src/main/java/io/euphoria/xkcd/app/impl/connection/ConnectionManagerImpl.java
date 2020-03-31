@@ -17,10 +17,6 @@ public class ConnectionManagerImpl implements ConnectionManager {
         connections = new HashMap<>();
     }
 
-    public static ConnectionManager getInstance() {
-        return new ConnectionManagerImpl();
-    }
-
     @Override
     public synchronized Connection getConnection(String roomName) {
         return connections.get(roomName);

@@ -7,8 +7,6 @@ import android.view.LayoutInflater;
 import android.view.ViewGroup;
 
 import io.euphoria.xkcd.app.R;
-import io.euphoria.xkcd.app.connection.event.NickChangeEvent;
-import io.euphoria.xkcd.app.connection.event.PresenceChangeEvent;
 
 /** Created by Xyzzy on 2020-03-30. */
 
@@ -58,18 +56,6 @@ public class UserListAdapter extends RecyclerView.Adapter<UserListAdapter.ViewHo
 
     public UserList getData() {
         return data;
-    }
-
-    public void handle(PresenceChangeEvent evt) {
-        if (evt.isPresent()) {
-            data.addAll(evt.getSessions());
-        } else {
-            data.removeAll(evt.getSessions());
-        }
-    }
-
-    public void handle(NickChangeEvent evt) {
-        data.setNick(data.get(evt.getSession().getSessionID()), evt.getNewNick());
     }
 
 }

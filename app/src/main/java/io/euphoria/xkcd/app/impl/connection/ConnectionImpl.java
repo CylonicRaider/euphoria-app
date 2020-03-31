@@ -118,7 +118,7 @@ public class ConnectionImpl implements Connection {
                 }
                 l.onClose((CloseEvent) evt);
             } else {
-                Log.e("ConnectionImpl", "Unknown connection event class; dropping.");
+                Log.e("ConnectionImpl", "Unknown connection event " + evt + "; dropping.");
             }
         }
     }

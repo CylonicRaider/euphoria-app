@@ -1,10 +1,10 @@
 package io.euphoria.xkcd.app.ui;
 
-import io.euphoria.xkcd.app.ui.event.CloseEvent;
 import io.euphoria.xkcd.app.ui.event.LogRequestEvent;
 import io.euphoria.xkcd.app.ui.event.MessageSendEvent;
 import io.euphoria.xkcd.app.ui.event.NewNickEvent;
 import io.euphoria.xkcd.app.ui.event.RoomSwitchEvent;
+import io.euphoria.xkcd.app.ui.event.UICloseEvent;
 
 /** Created by Xyzzy on 2017-02-26. */
 
@@ -24,6 +24,6 @@ public interface UIListener {
     void onRoomSwitch(RoomSwitchEvent evt);
 
     /* The user intends to close the room */
-    void onClose(CloseEvent evt);
+    void onClose(UICloseEvent evt);
 
 }

@@ -3,19 +3,25 @@ package io.euphoria.xkcd.app.impl.ui;
 import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.util.Log;
 
-import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import io.euphoria.xkcd.app.connection.ConnectionStatus;
 import io.euphoria.xkcd.app.data.Message;
+import io.euphoria.xkcd.app.data.SessionView;
 import io.euphoria.xkcd.app.ui.RoomUI;
 import io.euphoria.xkcd.app.ui.UIListener;
+import io.euphoria.xkcd.app.ui.event.LogRequestEvent;
+import io.euphoria.xkcd.app.ui.event.MessageSendEvent;
+import io.euphoria.xkcd.app.ui.event.NewNickEvent;
+import io.euphoria.xkcd.app.ui.event.RoomSwitchEvent;
+import io.euphoria.xkcd.app.ui.event.UICloseEvent;
+import io.euphoria.xkcd.app.ui.event.UIEvent;
 
 public class RoomUIImpl implements RoomUI {
 
@@ -25,12 +31,12 @@ public class RoomUIImpl implements RoomUI {
     private static final Pattern ROOM_NAME_RE = Pattern.compile("(?:[a-z]+:)?[a-z0-9]+");
     private static final Pattern ROOM_PATH_RE = Pattern.compile("/room/(" + ROOM_NAME_RE.pattern() + ")/?");
 
-    private String roomName;
-    // TODO optionally change to ArrayList, if more efficient
+    private final String roomName;
     private final Set<UIListener> listeners = new LinkedHashSet<>();
-    private final Map<String, String> activeSessions = new HashMap<>();
+    private MessageListAdapter messagesAdapter;
+    private UserListAdapter usersAdapter;
 
-    RoomUIImpl(String roomName) {
+    public RoomUIImpl(String roomName) {
         this.roomName = roomName;
     }
 
@@ -41,39 +47,34 @@ public class RoomUIImpl implements RoomUI {
 
     @Override
     public void show() {
+        logNYI("Showing a room");
     }
 
     @Override
     public void close() {
+        logNYI("Closing a room");
     }
 
     @Override
     public void setConnectionStatus(ConnectionStatus status) {
-    }
-
-    /**
-     * Test whether the given URI denotes a valid Euphoria room.
-     *
-     * @param uri The URI to test
-     * @return The test result
-     */
-    public static boolean isValidRoomUri(@Nullable Uri uri) {
-        return uri != null && Pattern.matches("https?", uri.getScheme()) &&
-                "euphoria.io".equalsIgnoreCase(uri.getAuthority()) &&
-                uri.getPath() != null && ROOM_PATH_RE.matcher(uri.getPath()).matches();
-        // Query strings and fragment identifiers are allowed.
+        logNYI("Setting a connection status");
     }
 
     @Override
-    public void showNicks(@NonNull Map<String, String> nicknames) {
-        activeSessions.putAll(nicknames);
-    }
-
-    @Override
-    public void removeNicks(@NonNull List<String> sessions) {
-        for (String session : sessions) {
-            activeSessions.remove(session);
+    public void showMessages(List<Message> messages) {
+        for (Message m : messages) {
+            messagesAdapter.add(new UIMessage(m));
         }
+    }
+
+    @Override
+    public void showNicks(List<SessionView> sessions) {
+        usersAdapter.getData().addAll(sessions);
+    }
+
+    @Override
+    public void removeNicks(List<SessionView> sessions) {
+        usersAdapter.getData().removeAll(sessions);
     }
 
     /**
@@ -98,6 +99,51 @@ public class RoomUIImpl implements RoomUI {
     @Override
     public void removeEventListener(@NonNull UIListener l) {
         listeners.remove(l);
+    }
+
+    private static void logNYI(String detail) {
+        Log.e("RoomUIImpl", detail + " is not yet implemented...");
+    }
+
+    public void link(MessageListAdapter messages, UserListAdapter users) {
+        messagesAdapter = messages;
+        usersAdapter = users;
+    }
+
+    public void unlink(MessageListAdapter messages, UserListAdapter users) {
+        if (messagesAdapter == messages) messagesAdapter = null;
+        if (usersAdapter == users) usersAdapter = null;
+    }
+
+    public void submitEvent(UIEvent evt) {
+        for (UIListener l : listeners) {
+            if (evt instanceof NewNickEvent) {
+                l.onNewNick((NewNickEvent) evt);
+            } else if (evt instanceof MessageSendEvent) {
+                l.onMessageSend((MessageSendEvent) evt);
+            } else if (evt instanceof LogRequestEvent) {
+                l.onLogRequest((LogRequestEvent) evt);
+            } else if (evt instanceof RoomSwitchEvent) {
+                l.onRoomSwitch((RoomSwitchEvent) evt);
+            } else if (evt instanceof UICloseEvent) {
+                l.onClose((UICloseEvent) evt);
+            } else {
+                Log.e("RoomUIImpl", "Unknown UI event " + evt + "; dropping.");
+            }
+        }
+    }
+
+    /**
+     * Test whether the given URI denotes a valid Euphoria room.
+     *
+     * @param uri The URI to test
+     * @return The test result
+     */
+    public static boolean isValidRoomUri(@Nullable Uri uri) {
+        return uri != null && Pattern.matches("https?", uri.getScheme()) &&
+                "euphoria.io".equalsIgnoreCase(uri.getAuthority()) &&
+                uri.getPath() != null && ROOM_PATH_RE.matcher(uri.getPath()).matches();
+        // Query strings and fragment identifiers are allowed.
     }
 
     /**
@@ -131,19 +177,6 @@ public class RoomUIImpl implements RoomUI {
         Matcher m = ROOM_PATH_RE.matcher(uri.getPath());
         if (!m.matches()) return null;
         return m.group(1);
-    }
-
-    // TODO Adjust to new MessageListAdapter
-    @Override
-    public void showMessages(List<Message> messages) {
-        /*for (Message m : messages) {
-            if (this.messages.containsKey(m.getID())) {
-                this.messages.get(m.getID()).setMessage(m);
-            } else {
-                this.messages.put(m.getID(), new MessageContainer());
-                roots.add(new MessageContainer(m));
-            }
-        }*/
     }
 
 }
