@@ -1,4 +1,16 @@
-<?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- None. -->
+    <color name="primary">#00a000</color>
+    <color name="primary_dark">#008000</color>
+    <color name="accent">#4040c0</color>
+    <color name="accent_dark">#202060</color>
+
+    <color name="background_message">#f0f0f0</color>
+
+    <color name="text">#000000</color>
+    <color name="text_collapser">@android:color/tertiary_text_light</color>
+    <color name="background_input">#ffffff</color>
+
+    <color name="indent_line">#c0c0c0</color>
+
+    <color name="neutral">#c0c0c0</color>
 </resources>

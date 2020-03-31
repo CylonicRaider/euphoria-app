@@ -3,18 +3,40 @@
           package="io.euphoria.xkcd.app">
 
     <application
-        android:allowBackup="true"
+        android:allowBackup="false"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
-        android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".RoomChooser">
+        <activity
+            android:name=".MainActivity"
+            android:launchMode="singleInstance"
+            android:theme="@style/AppTheme.Title"
+            android:windowSoftInputMode="adjustResize">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
+
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
-        <activity android:name=".MainActivity">
+        <activity
+            android:name=".RoomActivity"
+            android:launchMode="singleInstance"
+            android:windowSoftInputMode="adjustResize">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW"/>
+
+                <category android:name="android.intent.category.DEFAULT"/>
+                <category android:name="android.intent.category.BROWSABLE"/>
+
+                <data
+                    android:host="euphoria.io"
+                    android:pathPattern="/room/.*"
+                    android:scheme="https"/>
+                <data
+                    android:host="euphoria.io"
+                    android:pathPattern="/room/.*"
+                    android:scheme="http"/>
+            </intent-filter>
         </activity>
     </application>
 

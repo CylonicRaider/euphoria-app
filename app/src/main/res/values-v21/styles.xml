@@ -1,0 +1,21 @@
+<resources>
+    <!-- Material override of the theme. -->
+    <style name="AppTheme" parent="android:Theme.Material.Light.DarkActionBar">
+        <!-- Material colors -->
+        <item name="android:colorPrimary">@color/primary</item>
+        <item name="android:colorPrimaryDark">@color/primary_dark</item>
+        <item name="android:colorAccent">@color/accent</item>
+        <!-- Ancillary Material colors -->
+        <item name="android:statusBarColor">@color/primary_dark</item>
+    </style>
+    <!-- Title screen variation (puffing up feathers) -->
+    <style name="AppTheme.Title" parent="android:Theme.Material.NoActionBar">
+        <!-- Material colors -->
+        <item name="android:colorPrimary">@color/primary</item>
+        <item name="android:colorPrimaryDark">@color/primary_dark</item>
+        <item name="android:colorAccent">@color/accent_dark</item>
+        <!-- Ancillary Material colors -->
+        <item name="android:windowBackground">@color/primary</item>
+        <item name="android:statusBarColor">@color/primary_dark</item>
+    </style>
+</resources>

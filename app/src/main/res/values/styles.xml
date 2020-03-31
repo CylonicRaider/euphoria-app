@@ -1,9 +1,6 @@
 <resources>
-
-    <!-- Base application theme.
-         No parent to ensure native look across platforms. -->
-    <style name="AppTheme">
-        <!-- None. -->
-    </style>
-
+    <!-- Deriving from whatever default theme there was -->
+    <style name="AppTheme" parent="android:Theme.Light"/>
+    <!-- Dark theme for title screen -->
+    <style name="AppTheme.Title" parent="android:Theme"/>
 </resources>
