@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Parcelable;
+import android.support.annotation.NonNull;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.widget.DrawerLayout;
@@ -59,13 +60,17 @@ public class RoomActivity extends FragmentActivity {
         @Override
         public void showMessages(List<Message> messages) {
             super.showMessages(messages);
-            isPullingLogs = false;
-            onPullingLogsFinished();
+            // An empty response signifies no more logs.
+            if (!messages.isEmpty()) {
+                isPullingLogs = false;
+                checkPullLogs();
+            }
         }
     }
 
     // TODO find some appropriate place for this in config
     public static final boolean RIGHT_KEY_HACK = true;
+    private static final double LOG_PULL_THRESHOLD = 0.1;
 
     private static final String KEY_MESSAGES = "messages";
     private static final String KEY_USERS = "users";
@@ -192,6 +197,15 @@ public class RoomActivity extends FragmentActivity {
             }
         });
 
+        // Scrolling setup
+        messageList.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
+                if (dy == 0) return;
+                checkPullLogs();
+            }
+        });
+
         // Controller etc. setup
         roomController.openRoom(roomName);
         roomUI.link(messageAdapter, userListAdapter);
@@ -237,7 +251,8 @@ public class RoomActivity extends FragmentActivity {
                 return true;
             }
         });
-        requestMoreLogs();
+        // Suspend log pulling until the snapshot-event arrives.
+        isPullingLogs = true;
     }
 
     @Override
@@ -277,11 +292,15 @@ public class RoomActivity extends FragmentActivity {
         roomController.shutdown();
     }
 
-    private void onPullingLogsFinished() {
-        // NYI
+    private void checkPullLogs() {
+        LinearLayoutManager layout = (LinearLayoutManager) messageList.getLayoutManager();
+        RecyclerView.Adapter adapter = messageList.getAdapter();
+        if (layout == null || adapter == null) return;
+        if (layout.findFirstVisibleItemPosition() > adapter.getItemCount() * LOG_PULL_THRESHOLD) return;
+        pullMoreLogs();
     }
 
-    private void requestMoreLogs() {
+    private void pullMoreLogs() {
         if (isPullingLogs) return;
         isPullingLogs = true;
         String top = (messageAdapter.getItemCount() == 0) ? null : messageAdapter.getItem(0).getID();
