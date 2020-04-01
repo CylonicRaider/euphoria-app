@@ -379,6 +379,11 @@ public class EuphoriaWebSocketClient extends WebSocketClient {
                     }
                 case "nick-event": case "nick-reply":
                     ServerSessionView session = sessions.get(data.getString("session_id"));
+                    if (session == null) {
+                        Log.e("EuphoriaWebSocketClient", "Dropping nick change of unknown session ID " +
+                                data.getString("session_id") + "!");
+                        break;
+                    }
                     submitEvent(new NickChangeEventImpl(new SessionViewImpl(session, data.getString("to")),
                             session.getName()));
                     break;
