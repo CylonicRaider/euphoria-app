@@ -49,7 +49,7 @@ public class ConnectionImpl implements Connection {
     public synchronized void connect() {
         try {
             // FIXME: Allow specifying a custom URL template.
-            client = new EuphoriaWebSocketClient(this, new URI("wss://euphoria.io/room/" + roomName + "/ws"));
+            client = new EuphoriaWebSocketClient(this, new URI("wss://euphoria.io/room/" + roomName + "/ws?h=1"));
         } catch (URISyntaxException e) {
             throw new IllegalArgumentException("Bad room name (did not form a valid URI)");
         }
