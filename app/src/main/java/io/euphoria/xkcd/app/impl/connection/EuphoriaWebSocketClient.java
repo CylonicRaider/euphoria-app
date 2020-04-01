@@ -175,14 +175,14 @@ public class EuphoriaWebSocketClient extends WebSocketClient {
 
     private class IdentityEventImpl extends EventImpl implements IdentityEvent {
 
-        private final SessionView session;
+        private final ServerSessionView session;
 
-        public IdentityEventImpl(SessionView session) {
+        public IdentityEventImpl(ServerSessionView session) {
             this.session = session;
         }
 
         @Override
-        public SessionView getIdentity() {
+        public ServerSessionView getIdentity() {
             return session;
         }
 
@@ -232,7 +232,7 @@ public class EuphoriaWebSocketClient extends WebSocketClient {
 
     private class PresenceChangeEventImpl extends EventImpl implements PresenceChangeEvent {
 
-        private final List<ServerSessionView> sessions;
+         private final List<ServerSessionView> sessions;
 
          private final boolean present;
 
@@ -292,7 +292,7 @@ public class EuphoriaWebSocketClient extends WebSocketClient {
     private final ConnectionImpl parent;
     private final Map<String, ServerSessionView> sessions;
     private final Queue<String> sendaheadQueue;
-    private boolean opened;
+    private boolean ready;
     private boolean closed;
 
     public EuphoriaWebSocketClient(ConnectionImpl parent, URI endpoint) {
@@ -300,7 +300,7 @@ public class EuphoriaWebSocketClient extends WebSocketClient {
         this.parent = parent;
         this.sessions = new HashMap<>();
         this.sendaheadQueue = new ArrayDeque<>();
-        this.opened = false;
+        this.ready = false;
         this.closed = false;
     }
 
@@ -310,18 +310,22 @@ public class EuphoriaWebSocketClient extends WebSocketClient {
 
     @Override
     public void onOpen(ServerHandshake handshakedata) {
+        parent.submitEvent(new OpenEventImpl());
+    }
+
+    private void dispatchReady() {
         while (true) {
             String item;
             synchronized (this) {
+                if (ready) return;
                 item = sendaheadQueue.poll();
                 if (item == null) {
-                    opened = true;
+                    ready = true;
                     break;
                 }
             }
             send(item);
         }
-        parent.submitEvent(new OpenEventImpl());
     }
 
     @Override
@@ -344,8 +348,13 @@ public class EuphoriaWebSocketClient extends WebSocketClient {
         }
         try {
             switch (type) {
+                case "ping-event":
+                    send(buildJSONObject("type", "ping-reply", "data", buildJSONObject("time", data.getLong("time")))
+                            .toString());
+                    break;
                 case "hello-event":
                     submitEvent(new IdentityEventImpl(parseSessionView(data.getJSONObject("session"))));
+                    dispatchReady();
                     break;
                 case "join-event":
                     submitEvent(new PresenceChangeEventImpl(Collections.singletonList(parseSessionView(data)),
@@ -395,6 +404,9 @@ public class EuphoriaWebSocketClient extends WebSocketClient {
                     submitEvent(new PresenceChangeEventImpl(parseSessionViewArray(data.getJSONArray("listing")),
                             true));
                     break;
+                default:
+                    Log.i("EuphoriaWebSocketClient", "Unrecognized packet type " + type + "!");
+                    break;
             }
         } catch (JSONException e) {
             Log.e("EuphoriaWebSocketClient", type + " packet missing required fields", e);
@@ -403,6 +415,8 @@ public class EuphoriaWebSocketClient extends WebSocketClient {
 
     @Override
     public void onClose(int code, String reason, boolean remote) {
+        Log.i("EuphoriaWebSocketClient", "WebSocket connection closed (code " + code + "; reason: \"" + reason +
+                "\"; " + (remote ? "remote" : "local") + ")");
         doClose(true);
     }
 
@@ -414,7 +428,7 @@ public class EuphoriaWebSocketClient extends WebSocketClient {
 
     public void sendWithQueue(String data) {
         synchronized (this) {
-            if (!opened) {
+            if (!ready) {
                 sendaheadQueue.add(data);
                 return;
             }
@@ -425,7 +439,8 @@ public class EuphoriaWebSocketClient extends WebSocketClient {
     public int sendObject(String type, Object... data) {
         int seq = parent.sequence();
         try {
-            sendWithQueue(buildJSONObject("type", type, "id", seq, "data", buildJSONObject(data)).toString());
+            sendWithQueue(buildJSONObject("type", type, "id", Integer.toString(seq),
+                    "data", buildJSONObject(data)).toString());
         } catch (JSONException exc) {
             Log.e("EuphoriaWebSocketClient", "Exception while serializing JSON", exc);
             return -1;
@@ -446,7 +461,10 @@ public class EuphoriaWebSocketClient extends WebSocketClient {
     }
 
     private void submitEvent(ConnectionEvent evt) {
-        if (evt instanceof PresenceChangeEventImpl) {
+        if (evt instanceof IdentityEventImpl) {
+            IdentityEventImpl e = (IdentityEventImpl) evt;
+            sessions.put(e.getIdentity().getSessionID(), e.getIdentity());
+        } else if (evt instanceof PresenceChangeEventImpl) {
             PresenceChangeEventImpl e = (PresenceChangeEventImpl) evt;
             if (e.isPresent()) {
                 for (ServerSessionView s : e.getSessionsEx()) sessions.remove(s.getSessionID());
@@ -478,7 +496,7 @@ public class EuphoriaWebSocketClient extends WebSocketClient {
     }
 
     private static Message parseMessage(final JSONObject source) throws JSONException {
-        return new MessageImpl(source.getString("id"), source.optString("parent"), source.getLong("time"),
+        return new MessageImpl(source.getString("id"), source.optString("parent", null), source.getLong("time"),
                 parseSessionView(source.getJSONObject("sender")), source.getString("content"),
                 source.optBoolean("truncated"));
     }

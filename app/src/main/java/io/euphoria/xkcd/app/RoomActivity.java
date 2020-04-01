@@ -28,6 +28,7 @@ import io.euphoria.xkcd.app.impl.ui.MessageForest;
 import io.euphoria.xkcd.app.impl.ui.MessageListAdapter;
 import io.euphoria.xkcd.app.impl.ui.MessageListAdapter.InputBarDirection;
 import io.euphoria.xkcd.app.impl.ui.MessageListView;
+import io.euphoria.xkcd.app.impl.ui.MessageTree;
 import io.euphoria.xkcd.app.impl.ui.RoomUIImpl;
 import io.euphoria.xkcd.app.impl.ui.UserList;
 import io.euphoria.xkcd.app.impl.ui.UserListAdapter;
@@ -283,12 +284,13 @@ public class RoomActivity extends FragmentActivity {
     private void requestMoreLogs() {
         if (isPullingLogs) return;
         isPullingLogs = true;
-        final String top;
-        top = (messageAdapter.getItemCount() == 0) ? null : messageAdapter.getItem(0).getID();
+        String top = (messageAdapter.getItemCount() == 0) ? null : messageAdapter.getItem(0).getID();
+        if (MessageTree.CURSOR_ID.equals(top)) top = null;
+        final String finalTop = top;
         roomUI.submitEvent(new LogRequestEvent() {
             @Override
             public String getBefore() {
-                return top;
+                return finalTop;
             }
 
             @Override
