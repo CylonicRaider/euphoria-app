@@ -9,12 +9,14 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.net.URI;
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Queue;
 
 import io.euphoria.xkcd.app.connection.Connection;
 import io.euphoria.xkcd.app.connection.event.CloseEvent;
@@ -289,12 +291,16 @@ public class EuphoriaWebSocketClient extends WebSocketClient {
 
     private final ConnectionImpl parent;
     private final Map<String, ServerSessionView> sessions;
+    private final Queue<String> sendaheadQueue;
+    private boolean opened;
     private boolean closed;
 
     public EuphoriaWebSocketClient(ConnectionImpl parent, URI endpoint) {
         super(endpoint);
         this.parent = parent;
         this.sessions = new HashMap<>();
+        this.sendaheadQueue = new ArrayDeque<>();
+        this.opened = false;
         this.closed = false;
     }
 
@@ -304,6 +310,17 @@ public class EuphoriaWebSocketClient extends WebSocketClient {
 
     @Override
     public void onOpen(ServerHandshake handshakedata) {
+        while (true) {
+            String item;
+            synchronized (this) {
+                item = sendaheadQueue.poll();
+                if (item == null) {
+                    opened = true;
+                    break;
+                }
+            }
+            send(item);
+        }
         parent.submitEvent(new OpenEventImpl());
     }
 
@@ -391,14 +408,24 @@ public class EuphoriaWebSocketClient extends WebSocketClient {
 
     @Override
     public void onError(Exception ex) {
+        Log.e("EuphoriaWebSocketClient", "Error in WebSocket connection:", ex);
         doClose(false);
     }
 
+    public void sendWithQueue(String data) {
+        synchronized (this) {
+            if (!opened) {
+                sendaheadQueue.add(data);
+                return;
+            }
+        }
+        send(data);
+    }
+
     public int sendObject(String type, Object... data) {
-        if (data.length == 0) data = null;
         int seq = parent.sequence();
         try {
-            send(buildJSONObject("type", type, "id", seq, "data", buildJSONObject(data)).toString());
+            sendWithQueue(buildJSONObject("type", type, "id", seq, "data", buildJSONObject(data)).toString());
         } catch (JSONException exc) {
             Log.e("EuphoriaWebSocketClient", "Exception while serializing JSON", exc);
             return -1;

@@ -1,5 +1,8 @@
 package io.euphoria.xkcd.app.impl.connection;
 
+import android.os.Handler;
+import android.os.Looper;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -11,9 +14,11 @@ import io.euphoria.xkcd.app.connection.ConnectionManager;
 /* Implementation of ConnectionManager */
 public class ConnectionManagerImpl implements ConnectionManager {
 
+    private final Handler handler;
     private final Map<String, ConnectionImpl> connections;
 
     public ConnectionManagerImpl() {
+        handler = new Handler(Looper.getMainLooper());
         connections = new HashMap<>();
     }
 
@@ -47,6 +52,10 @@ public class ConnectionManagerImpl implements ConnectionManager {
         for (ConnectionImpl c : connections.values()) {
             c.close();
         }
+    }
+
+    public void invokeLater(Runnable cb, int delay) {
+        handler.postDelayed(cb, delay);
     }
 
 }

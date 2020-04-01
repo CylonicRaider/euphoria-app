@@ -60,6 +60,9 @@ public class ConnectionImpl implements Connection {
     public void close() {
         parent.remove(this);
         client.close();
+        synchronized (this) {
+            status = ConnectionStatus.DISCONNECTED;
+        }
     }
 
     protected synchronized int sequence() {
@@ -113,7 +116,15 @@ public class ConnectionImpl implements Connection {
                         status = ConnectionStatus.DISCONNECTED;
                     } else {
                         status = ConnectionStatus.RECONNECTING;
-                        connect();
+                        parent.invokeLater(new Runnable() {
+                            @Override
+                            public void run() {
+                                synchronized (ConnectionImpl.this) {
+                                    if (status != ConnectionStatus.DISCONNECTED)
+                                        connect();
+                                }
+                            }
+                        }, 1000);
                     }
                 }
                 l.onClose((CloseEvent) evt);
