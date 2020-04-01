@@ -6,6 +6,7 @@ import android.graphics.drawable.GradientDrawable;
 import android.os.Build.VERSION;
 import android.os.Build.VERSION_CODES;
 import android.support.annotation.ColorInt;
+import android.support.annotation.ColorRes;
 import android.support.annotation.DrawableRes;
 import android.support.v4.view.GestureDetectorCompat;
 import android.util.TypedValue;
@@ -55,6 +56,22 @@ public class UIUtils {
     public static int dpToPx(Context ctx, int dp) {
         return (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp,
                 ctx.getResources().getDisplayMetrics());
+    }
+
+    /**
+     * Obtain a color from the given resource ID.
+     *
+     * @param ctx   The context w.r.t. which to resolve.
+     * @param resid The resource ID of the color to obtain.
+     * @return The resolved color.
+     */
+    @ColorInt
+    public static int getColor(Context ctx, @ColorRes int resid) {
+        if (VERSION.SDK_INT >= VERSION_CODES.M) {
+            return ctx.getColor(resid);
+        } else {
+            return ctx.getResources().getColor(resid);
+        }
     }
 
     /**

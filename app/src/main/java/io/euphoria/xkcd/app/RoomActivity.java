@@ -19,6 +19,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.TextView;
 
 import java.util.List;
 
@@ -88,6 +89,7 @@ public class RoomActivity extends FragmentActivity {
     private RoomController roomController;
 
     private RoomUIImpl roomUI;
+    private TextView statusDisplay;
     private MessageListView messageList;
     private MessageListAdapter messageAdapter;
     private RecyclerView userList;
@@ -131,6 +133,8 @@ public class RoomActivity extends FragmentActivity {
         roomUI = (RoomUIImpl) roomController.getRoomUIManager().getRoomUI(roomName);
 
         // View setup
+        statusDisplay = findViewById(R.id.conn_status_display);
+
         messageList = findViewById(R.id.message_list_view);
         userList = findViewById(R.id.user_list_view);
         userList.setLayoutManager(new LinearLayoutManager(userList.getContext()));
@@ -211,8 +215,8 @@ public class RoomActivity extends FragmentActivity {
         });
 
         // Controller etc. setup
+        roomUI.link(statusDisplay, messageAdapter, userListAdapter);
         roomController.openRoom(roomName);
-        roomUI.link(messageAdapter, userListAdapter);
         inputBar.setNickChangeListener(new InputBarView.NickChangeListener() {
             @Override
             public boolean onChangeNick(InputBarView view) {
@@ -300,7 +304,7 @@ public class RoomActivity extends FragmentActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        roomUI.unlink(messageAdapter, userListAdapter);
+        roomUI.unlink(statusDisplay, messageAdapter, userListAdapter);
         roomController.closeRoom(roomUI.getRoomName());
         roomController.getRoomUIManager().setRoomUIFactory(null);
         roomController.shutdown();

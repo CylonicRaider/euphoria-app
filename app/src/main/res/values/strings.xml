@@ -13,4 +13,10 @@
     <string name="collapser_fallback">Collapse/uncollapse</string>
     <string name="room_action_users_title">Users</string>
     <string name="heading_users">Users:</string>
+
+    <string name="status_unknown">Unknown?!</string>
+    <string name="status_connecting">Connecting…</string>
+    <string name="status_connected">Online</string>
+    <string name="status_reconnecting">Reconnecting…</string>
+    <string name="status_disconnected">Disconnected</string>
 </resources>

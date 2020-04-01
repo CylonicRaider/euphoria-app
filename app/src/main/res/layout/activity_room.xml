@@ -25,11 +25,25 @@
         android:background="#ffffff">
 
         <TextView
+            android:id="@+id/conn_status_display"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:paddingStart="12dp"
             android:paddingLeft="12dp"
             android:paddingTop="12dp"
+            android:paddingBottom="4dp"
+            android:paddingRight="12dp"
+            android:paddingEnd="12dp"
+            android:text="@string/status_unknown"
+            android:textSize="@dimen/small_font_size"
+            android:textColor="@color/status_unknown"
+            android:textStyle="bold"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingStart="12dp"
+            android:paddingLeft="12dp"
             android:paddingRight="12dp"
             android:paddingEnd="12dp"
             android:text="@string/heading_users"

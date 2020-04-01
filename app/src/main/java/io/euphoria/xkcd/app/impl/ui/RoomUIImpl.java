@@ -1,9 +1,12 @@
 package io.euphoria.xkcd.app.impl.ui;
 
 import android.net.Uri;
+import android.support.annotation.ColorRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.annotation.StringRes;
 import android.util.Log;
+import android.widget.TextView;
 
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -11,6 +14,7 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import io.euphoria.xkcd.app.R;
 import io.euphoria.xkcd.app.connection.ConnectionStatus;
 import io.euphoria.xkcd.app.data.Message;
 import io.euphoria.xkcd.app.data.SessionView;
@@ -33,6 +37,7 @@ public class RoomUIImpl implements RoomUI {
 
     private final String roomName;
     private final Set<UIListener> listeners = new LinkedHashSet<>();
+    private TextView statusDisplay;
     private MessageListAdapter messagesAdapter;
     private UserListAdapter usersAdapter;
 
@@ -57,7 +62,33 @@ public class RoomUIImpl implements RoomUI {
 
     @Override
     public void setConnectionStatus(ConnectionStatus status) {
-        logNYI("Setting connection status to " + status);
+        @ColorRes int color = R.color.status_unknown;
+        @StringRes int content = R.string.status_unknown;
+        switch (status) {
+            case DISCONNECTED:
+                color = R.color.status_disconnected;
+                content = R.string.status_disconnected;
+                break;
+            case CONNECTING:
+                color = R.color.status_connecting;
+                content = R.string.status_connecting;
+                break;
+            case RECONNECTING:
+                color = R.color.status_reconnecting;
+                content = R.string.status_reconnecting;
+                break;
+            case CONNECTED:
+                color = R.color.status_connected;
+                content = R.string.status_connected;
+                break;
+        }
+        // This one is called after unlinking; handle that case gracefully.
+        if (statusDisplay == null) {
+            Log.e("RoomUIImpl", "Lost connection status update: " + status);
+            return;
+        }
+        statusDisplay.setTextColor(UIUtils.getColor(statusDisplay.getContext(), color));
+        statusDisplay.setText(content);
     }
 
     @Override
@@ -105,12 +136,14 @@ public class RoomUIImpl implements RoomUI {
         Log.e("RoomUIImpl", detail + " is not yet implemented...");
     }
 
-    public void link(MessageListAdapter messages, UserListAdapter users) {
+    public void link(TextView status, MessageListAdapter messages, UserListAdapter users) {
+        statusDisplay = status;
         messagesAdapter = messages;
         usersAdapter = users;
     }
 
-    public void unlink(MessageListAdapter messages, UserListAdapter users) {
+    public void unlink(TextView status, MessageListAdapter messages, UserListAdapter users) {
+        if (statusDisplay == status) statusDisplay = null;
         if (messagesAdapter == messages) messagesAdapter = null;
         if (usersAdapter == users) usersAdapter = null;
     }

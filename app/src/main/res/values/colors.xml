@@ -13,4 +13,10 @@
     <color name="indent_line">#c0c0c0</color>
 
     <color name="neutral">#c0c0c0</color>
+
+    <color name="status_unknown">#808080</color>
+    <color name="status_connecting">#808000</color>
+    <color name="status_connected">#008000</color>
+    <color name="status_reconnecting">#800000</color>
+    <color name="status_disconnected">#000000</color>
 </resources>
