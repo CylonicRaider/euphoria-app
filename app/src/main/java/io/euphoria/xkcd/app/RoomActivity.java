@@ -272,6 +272,16 @@ public class RoomActivity extends FragmentActivity {
     }
 
     @Override
+    public void onBackPressed() {
+        DrawerLayout dl = findViewById(R.id.room_drawer_root);
+        if (dl.isDrawerOpen(Gravity.END)) {
+            dl.closeDrawer(Gravity.END);
+        } else {
+            super.onBackPressed();
+        }
+    }
+
+    @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putParcelable(KEY_MESSAGES, messageAdapter.getData());
