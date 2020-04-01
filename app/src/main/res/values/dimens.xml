@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <dimen name="main_font_size">18sp</dimen>
+    <dimen name="main_font_size">15sp</dimen>
     <dimen name="small_font_size">15sp</dimen>
 </resources>
