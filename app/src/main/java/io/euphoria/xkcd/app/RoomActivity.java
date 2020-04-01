@@ -279,6 +279,10 @@ public class RoomActivity extends FragmentActivity {
         }
     }
 
+    public void showAbout(MenuItem item) {
+        startActivity(new Intent(this, AboutActivity.class));
+    }
+
     @Override
     public void onBackPressed() {
         DrawerLayout dl = findViewById(R.id.room_drawer_root);

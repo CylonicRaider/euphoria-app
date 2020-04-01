@@ -3,4 +3,6 @@
     <style name="AppTheme" parent="android:Theme.Light"/>
     <!-- Dark theme for title screen -->
     <style name="AppTheme.Title" parent="android:Theme"/>
+    <!-- Dialog theme for about screen -->
+    <style name="AppTheme.Dialog" parent="android:Theme.Dialog"/>
 </resources>

@@ -18,4 +18,13 @@
         <item name="android:windowBackground">@color/primary</item>
         <item name="android:statusBarColor">@color/primary_dark</item>
     </style>
+    <!-- Dialog theme for about screen -->
+    <style name="AppTheme.Dialog" parent="android:Theme.Material.Light.Dialog">
+        <!-- Material colors -->
+        <item name="android:colorPrimary">@color/primary</item>
+        <item name="android:colorPrimaryDark">@color/primary_dark</item>
+        <item name="android:colorAccent">@color/accent</item>
+        <!-- Ancillary Material colors -->
+        <item name="android:statusBarColor">@color/primary_dark</item>
+    </style>
 </resources>

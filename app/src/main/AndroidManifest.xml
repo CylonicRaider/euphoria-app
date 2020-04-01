@@ -40,6 +40,10 @@
                     android:scheme="http"/>
             </intent-filter>
         </activity>
+        <activity
+            android:name=".AboutActivity"
+            android:label="@string/title_about"
+            android:theme="@style/AppTheme.Dialog"/>
     </application>
 
 </manifest>

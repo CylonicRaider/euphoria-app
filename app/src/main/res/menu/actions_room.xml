@@ -12,4 +12,9 @@
         android:onClick="toggleUserDrawer"
         tools:ignore="AppCompatResource"/>
 
+    <item
+        android:id="@+id/room_show_about"
+        android:title="@string/title_about"
+        android:onClick="showAbout"/>
+
 </menu>
