@@ -1,0 +1,7 @@
+{
+  "appname": "Euphoria App",
+  "version": "0.1.0",
+  "releases": [
+    {"version": "0.1.0", "label": "Lemon", "date": "2020-04-01 20:09:31.020323731 Z", "file": "euphoria-0.1.0.apk", "sha256": "dfed977870e3938f48489fcaa9dfd67ca569965c81779e1a96a9f1c9433b6371"}
+  ]
+}
