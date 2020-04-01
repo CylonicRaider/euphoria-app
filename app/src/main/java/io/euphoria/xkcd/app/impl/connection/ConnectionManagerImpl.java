@@ -54,7 +54,11 @@ public class ConnectionManagerImpl implements ConnectionManager {
         }
     }
 
-    public void invokeLater(Runnable cb, int delay) {
+    public void invokeLater(Runnable cb) {
+        handler.post(cb);
+    }
+
+    public void invokeLater(Runnable cb, long delay) {
         handler.postDelayed(cb, delay);
     }
 

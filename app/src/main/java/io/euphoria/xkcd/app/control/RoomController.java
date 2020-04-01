@@ -1,6 +1,7 @@
 package io.euphoria.xkcd.app.control;
 
 import android.content.Context;
+import android.os.Handler;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -35,12 +36,14 @@ public class RoomController {
     public static final int DEFAULT_LOG_REQUEST_AMOUNT = 50;
 
     private final Context context;
+    private final Handler handler;
     private final RoomUIManager uiManager;
     private final ConnectionManager connManager;
     private final Set<String> openRooms;
 
     public RoomController(Context ctx, RoomUIManager uiManager, ConnectionManager connManager) {
         this.context = ctx;
+        this.handler = new Handler(ctx.getMainLooper());
         this.uiManager = uiManager;
         this.connManager = connManager;
         this.openRooms = new HashSet<>();
@@ -80,46 +83,90 @@ public class RoomController {
         }
     }
 
+    public void invokeLater(Runnable cb) {
+        handler.post(cb);
+    }
+
+    public void invokeLater(Runnable cb, long delay) {
+        handler.postDelayed(cb, delay);
+    }
+
     protected void link(final Connection conn, final RoomUI ui) {
         ui.setConnectionStatus(ConnectionStatus.CONNECTING);
         conn.addEventListener(new ConnectionListener() {
             @Override
             public void onOpen(OpenEvent evt) {
-                ui.setConnectionStatus(ConnectionStatus.CONNECTED);
+                invokeLater(new Runnable() {
+                    @Override
+                    public void run() {
+                        ui.setConnectionStatus(ConnectionStatus.CONNECTED);
+                    }
+                });
             }
 
             @Override
-            public void onIdentity(IdentityEvent evt) {
-                ui.showNicks(Collections.singletonList(evt.getIdentity()));
+            public void onIdentity(final IdentityEvent evt) {
+                invokeLater(new Runnable() {
+                    @Override
+                    public void run() {
+                        ui.showNicks(Collections.singletonList(evt.getIdentity()));
+                    }
+                });
             }
 
             @Override
-            public void onNickChange(NickChangeEvent evt) {
-                ui.showNicks(Collections.singletonList(evt.getSession()));
+            public void onNickChange(final NickChangeEvent evt) {
+                invokeLater(new Runnable() {
+                    @Override
+                    public void run() {
+                        ui.showNicks(Collections.singletonList(evt.getSession()));
+                    }
+                });
             }
 
             @Override
-            public void onMessage(MessageEvent evt) {
-                ui.showMessages(Collections.singletonList(evt.getMessage()));
+            public void onMessage(final MessageEvent evt) {
+                invokeLater(new Runnable() {
+                    @Override
+                    public void run() {
+                        ui.showMessages(Collections.singletonList(evt.getMessage()));
+                    }
+                });
             }
 
             @Override
-            public void onPresenceChange(PresenceChangeEvent evt) {
-                if (evt.isPresent()) {
-                    ui.showNicks(evt.getSessions());
-                } else {
-                    ui.removeNicks(evt.getSessions());
-                }
+            public void onPresenceChange(final PresenceChangeEvent evt) {
+                invokeLater(new Runnable() {
+                    @Override
+                    public void run() {
+                        if (evt.isPresent()) {
+                            ui.showNicks(evt.getSessions());
+                        } else {
+                            ui.removeNicks(evt.getSessions());
+                        }
+                    }
+                });
             }
 
             @Override
-            public void onLogEvent(LogEvent evt) {
-                ui.showMessages(evt.getMessages());
+            public void onLogEvent(final LogEvent evt) {
+                invokeLater(new Runnable() {
+                    @Override
+                    public void run() {
+                        ui.showMessages(evt.getMessages());
+                    }
+                });
             }
 
             @Override
-            public void onClose(CloseEvent evt) {
-                ui.setConnectionStatus(evt.isFinal() ? ConnectionStatus.DISCONNECTED : ConnectionStatus.RECONNECTING);
+            public void onClose(final CloseEvent evt) {
+                invokeLater(new Runnable() {
+                    @Override
+                    public void run() {
+                        ui.setConnectionStatus(evt.isFinal() ? ConnectionStatus.DISCONNECTED :
+                                                               ConnectionStatus.RECONNECTING);
+                    }
+                });
             }
         });
         ui.addEventListener(new UIListener() {
