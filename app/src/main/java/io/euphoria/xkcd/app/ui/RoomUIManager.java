@@ -5,6 +5,9 @@ package io.euphoria.xkcd.app.ui;
 /* Room UI wrapper retrieval hub */
 public interface RoomUIManager {
 
+    /* Set the factory for creating RoomUI-s */
+    void setRoomUIFactory(RoomUIFactory factory);
+
     /* Get the room UI for the given name */
     RoomUI getRoomUI(String roomName);
 

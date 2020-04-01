@@ -19,7 +19,10 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 
+import java.util.List;
+
 import io.euphoria.xkcd.app.control.RoomController;
+import io.euphoria.xkcd.app.data.Message;
 import io.euphoria.xkcd.app.impl.ui.InputBarView;
 import io.euphoria.xkcd.app.impl.ui.MessageForest;
 import io.euphoria.xkcd.app.impl.ui.MessageListAdapter;
@@ -29,6 +32,7 @@ import io.euphoria.xkcd.app.impl.ui.RoomUIImpl;
 import io.euphoria.xkcd.app.impl.ui.UserList;
 import io.euphoria.xkcd.app.impl.ui.UserListAdapter;
 import io.euphoria.xkcd.app.ui.RoomUI;
+import io.euphoria.xkcd.app.ui.RoomUIFactory;
 import io.euphoria.xkcd.app.ui.event.LogRequestEvent;
 import io.euphoria.xkcd.app.ui.event.MessageSendEvent;
 import io.euphoria.xkcd.app.ui.event.NewNickEvent;
@@ -37,6 +41,27 @@ import static io.euphoria.xkcd.app.impl.ui.RoomUIImpl.getRoomName;
 import static io.euphoria.xkcd.app.impl.ui.RoomUIImpl.isValidRoomUri;
 
 public class RoomActivity extends FragmentActivity {
+
+    private class LocalRoomUIFactory implements RoomUIFactory {
+        @Override
+        public RoomUI createRoomUI(String roomName) {
+            return new LocalRoomUIImpl(roomName);
+        }
+    }
+
+    private class LocalRoomUIImpl extends RoomUIImpl {
+
+        public LocalRoomUIImpl(String roomName) {
+            super(roomName);
+        }
+
+        @Override
+        public void showMessages(List<Message> messages) {
+            super.showMessages(messages);
+            isPullingLogs = false;
+            onPullingLogsFinished();
+        }
+    }
 
     // TODO find some appropriate place for this in config
     public static final boolean RIGHT_KEY_HACK = true;
@@ -59,6 +84,8 @@ public class RoomActivity extends FragmentActivity {
     private RecyclerView userList;
     private UserListAdapter userListAdapter;
     private InputBarView inputBar;
+
+    private boolean isPullingLogs;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -90,6 +117,7 @@ public class RoomActivity extends FragmentActivity {
         }
         // Acquire RoomController and roomUI
         roomController = roomControllerFragment.getRoomController();
+        roomController.getRoomUIManager().setRoomUIFactory(new LocalRoomUIFactory());
         roomUI = (RoomUIImpl) roomController.getRoomUIManager().getRoomUI(roomName);
 
         // View setup
@@ -244,10 +272,17 @@ public class RoomActivity extends FragmentActivity {
         super.onDestroy();
         roomUI.unlink(messageAdapter, userListAdapter);
         roomController.closeRoom(roomUI.getRoomName());
+        roomController.getRoomUIManager().setRoomUIFactory(null);
         roomController.shutdown();
     }
 
+    private void onPullingLogsFinished() {
+        // NYI
+    }
+
     private void requestMoreLogs() {
+        if (isPullingLogs) return;
+        isPullingLogs = true;
         final String top;
         top = (messageAdapter.getItemCount() == 0) ? null : messageAdapter.getItem(0).getID();
         roomUI.submitEvent(new LogRequestEvent() {

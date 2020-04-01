@@ -7,6 +7,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import io.euphoria.xkcd.app.ui.RoomUI;
+import io.euphoria.xkcd.app.ui.RoomUIFactory;
 import io.euphoria.xkcd.app.ui.RoomUIManager;
 import io.euphoria.xkcd.app.ui.UIManagerListener;
 import io.euphoria.xkcd.app.ui.event.RoomSwitchEvent;
@@ -16,15 +17,34 @@ import io.euphoria.xkcd.app.ui.event.RoomSwitchEvent;
 /* Implementation of RoomUIManager */
 public class RoomUIManagerImpl implements RoomUIManager {
 
+    private static class DefaultRoomUIFactory implements RoomUIFactory {
+
+        public static final DefaultRoomUIFactory INSTANCE = new DefaultRoomUIFactory();
+
+        @Override
+        public RoomUI createRoomUI(String roomName) {
+            return new RoomUIImpl(roomName);
+        }
+
+    }
+
     private final Set<UIManagerListener> listeners = new HashSet<>();
     private final HashMap<String, RoomUI> roomUIs = new HashMap<>();
+    private RoomUIFactory factory = DefaultRoomUIFactory.INSTANCE;
+
+    @Override
+    public void setRoomUIFactory(RoomUIFactory factory) {
+        if (factory == null) factory = DefaultRoomUIFactory.INSTANCE;
+        if (factory != this.factory) roomUIs.clear();
+        this.factory = factory;
+    }
 
     @Override
     public RoomUI getRoomUI(@NonNull String roomName) {
         if (roomUIs.containsKey(roomName)) {
             return roomUIs.get(roomName);
         } else {
-            RoomUI ret = new RoomUIImpl(roomName);
+            RoomUI ret = factory.createRoomUI(roomName);
             roomUIs.put(roomName, ret);
             return ret;
         }
