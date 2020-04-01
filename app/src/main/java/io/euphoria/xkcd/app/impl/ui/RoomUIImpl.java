@@ -57,7 +57,7 @@ public class RoomUIImpl implements RoomUI {
 
     @Override
     public void setConnectionStatus(ConnectionStatus status) {
-        logNYI("Setting a connection status");
+        logNYI("Setting connection status to " + status);
     }
 
     @Override
