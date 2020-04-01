@@ -478,7 +478,7 @@ public class EuphoriaWebSocketClient extends WebSocketClient {
     }
 
     private static Message parseMessage(final JSONObject source) throws JSONException {
-        return new MessageImpl(source.getString("id"), source.getString("parent"), source.getLong("timestamp"),
+        return new MessageImpl(source.getString("id"), source.optString("parent"), source.getLong("time"),
                 parseSessionView(source.getJSONObject("sender")), source.getString("content"),
                 source.optBoolean("truncated"));
     }
