@@ -240,6 +240,7 @@ public class RoomActivity extends FragmentActivity {
             public boolean onSubmit(InputBarView view) {
                 final String text = view.getMessageText();
                 final String parent = view.getMessage().getParent();
+                if (text.isEmpty()) return false;
                 roomUI.submitEvent(new MessageSendEvent() {
                     @Override
                     public String getText() {
