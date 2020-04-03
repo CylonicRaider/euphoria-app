@@ -25,10 +25,10 @@ public class MessageTree implements Comparable<MessageTree> {
     }
 
     private static String formatID(String id) {
-        return (id == null) ? "-" : id;
+        return (id == null) ? "-" : (id.equals(CURSOR_ID)) ? "~" : id;
     }
 
-    public static final String CURSOR_ID = "~";
+    public static final String CURSOR_ID = "\uFFFF";
 
     protected static final byte PF_IS_A_THING  = 0x01;
     protected static final byte PF_HAS_CONTENT = 0x02;
