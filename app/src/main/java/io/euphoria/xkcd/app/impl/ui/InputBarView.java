@@ -4,6 +4,7 @@ import android.content.Context;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.AttributeSet;
+import android.view.View;
 import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
 
@@ -73,20 +74,13 @@ public class InputBarView extends BaseMessageView {
         setEnterKeyListener(nickEntry, EditorInfo.IME_ACTION_NEXT, new Runnable() {
             @Override
             public void run() {
-                // Strip whitespace
-                Editable nickEditor = nickEntry.getText();
-                String newNick = nickEditor.toString();
-                String trimmedNick = newNick.trim();
-                if (!newNick.equals(trimmedNick)) {
-                    nickEditor.replace(0, newNick.length(), trimmedNick);
-                    newNick = trimmedNick;
-                }
-                if (nickChangeListener != null && !nickChangeListener.onChangeNick(InputBarView.this)) {
-                    nickEntry.setText(lastNick);
-                } else {
-                    lastNick = newNick;
-                }
                 messageEntry.requestFocus();
+            }
+        });
+        nickEntry.setOnFocusChangeListener(new OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+                if (!hasFocus) doNickChange();
             }
         });
         setEnterKeyListener(messageEntry, EditorInfo.IME_ACTION_SEND, new Runnable() {
@@ -169,6 +163,23 @@ public class InputBarView extends BaseMessageView {
         int index = messageEntry.getSelectionStart(), indexEnd = messageEntry.getSelectionEnd();
         return index == indexEnd && (dir == InputBarDirection.UP || dir == InputBarDirection.DOWN) &&
                 !text.contains("\n");
+    }
+
+    private void doNickChange() {
+        // Strip whitespace
+        Editable nickEditor = nickEntry.getText();
+        String newNick = nickEditor.toString();
+        String trimmedNick = newNick.trim();
+        if (!newNick.equals(trimmedNick)) {
+            nickEditor.replace(0, newNick.length(), trimmedNick);
+            newNick = trimmedNick;
+        }
+        // Invoke listener
+        if (nickChangeListener != null && !nickChangeListener.onChangeNick(InputBarView.this)) {
+            nickEntry.setText(lastNick);
+        } else {
+            lastNick = nickEntry.getText().toString();
+        }
     }
 
 }
