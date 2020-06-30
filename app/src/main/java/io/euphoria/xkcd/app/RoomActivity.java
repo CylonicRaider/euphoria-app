@@ -23,6 +23,7 @@ import android.widget.TextView;
 
 import java.util.List;
 
+import io.euphoria.xkcd.app.connection.ConnectionStatus;
 import io.euphoria.xkcd.app.control.RoomController;
 import io.euphoria.xkcd.app.data.Message;
 import io.euphoria.xkcd.app.impl.ui.InputBarView;
@@ -53,8 +54,20 @@ public class RoomActivity extends FragmentActivity {
 
     private class LocalRoomUIImpl extends RoomUIImpl {
 
+        private ConnectionStatus connectionStatus;
+
         public LocalRoomUIImpl(String roomName) {
             super(roomName);
+        }
+
+        public ConnectionStatus getConnectionStatus() {
+            return connectionStatus;
+        }
+
+        @Override
+        public void setConnectionStatus(ConnectionStatus status) {
+            super.setConnectionStatus(status);
+            connectionStatus = status;
         }
 
         @Override
@@ -88,7 +101,7 @@ public class RoomActivity extends FragmentActivity {
     private RoomControllerFragment roomControllerFragment;
     private RoomController roomController;
 
-    private RoomUIImpl roomUI;
+    private LocalRoomUIImpl roomUI;
     private TextView statusDisplay;
     private MessageListView messageList;
     private MessageListAdapter messageAdapter;
@@ -130,7 +143,7 @@ public class RoomActivity extends FragmentActivity {
         // Acquire RoomController and roomUI
         roomController = roomControllerFragment.getRoomController();
         roomController.getRoomUIManager().setRoomUIFactory(new LocalRoomUIFactory());
-        roomUI = (RoomUIImpl) roomController.getRoomUIManager().getRoomUI(roomName);
+        roomUI = (LocalRoomUIImpl) roomController.getRoomUIManager().getRoomUI(roomName);
 
         // View setup
         statusDisplay = findViewById(R.id.conn_status_display);
@@ -240,7 +253,7 @@ public class RoomActivity extends FragmentActivity {
             public boolean onSubmit(InputBarView view) {
                 final String text = view.getMessageText();
                 final String parent = view.getMessage().getParent();
-                if (text.isEmpty()) return false;
+                if (text.isEmpty() || roomUI.getConnectionStatus() != ConnectionStatus.CONNECTED) return false;
                 roomUI.submitEvent(new MessageSendEvent() {
                     @Override
                     public String getText() {
