@@ -172,10 +172,9 @@ public class InputBarView extends BaseMessageView {
         String trimmedNick = newNick.trim();
         if (!newNick.equals(trimmedNick)) {
             nickEditor.replace(0, newNick.length(), trimmedNick);
-            newNick = trimmedNick;
         }
         // Invoke listener
-        if (nickChangeListener != null && !nickChangeListener.onChangeNick(InputBarView.this)) {
+        if (nickChangeListener != null && !nickChangeListener.onChangeNick(this)) {
             nickEntry.setText(lastNick);
         } else {
             lastNick = nickEntry.getText().toString();

@@ -234,6 +234,7 @@ public class RoomActivity extends FragmentActivity {
             @Override
             public boolean onChangeNick(InputBarView view) {
                 final String text = view.getNickText();
+                if (text.isEmpty() || roomUI.getConnectionStatus() != ConnectionStatus.CONNECTED) return false;
                 roomUI.submitEvent(new NewNickEvent() {
                     @Override
                     public String getNewNick() {
