@@ -249,7 +249,7 @@ public class MessageListView extends RecyclerView {
     }
 
     private MessageListAdapter getMessageListAdapter() {
-        Adapter ret = getAdapter();
+        Adapter<?> ret = getAdapter();
         if (!(ret instanceof MessageListAdapter)) return null;
         return (MessageListAdapter) ret;
     }

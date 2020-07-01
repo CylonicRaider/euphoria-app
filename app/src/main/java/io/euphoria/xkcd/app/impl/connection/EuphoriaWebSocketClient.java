@@ -242,7 +242,7 @@ public class EuphoriaWebSocketClient extends WebSocketClient {
          }
 
          @Override
-         @SuppressWarnings("unchecked")
+         @SuppressWarnings({"unchecked", "rawtypes"})
          public List<SessionView> getSessions() {
              // HACK: User is supposed to use that read-only anyway.
              return (List) sessions;

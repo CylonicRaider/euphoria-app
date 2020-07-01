@@ -331,7 +331,7 @@ public class RoomActivity extends FragmentActivity {
 
     private void checkPullLogs() {
         LinearLayoutManager layout = (LinearLayoutManager) messageList.getLayoutManager();
-        RecyclerView.Adapter adapter = messageList.getAdapter();
+        RecyclerView.Adapter<?> adapter = messageList.getAdapter();
         if (layout == null || adapter == null) return;
         if (layout.findFirstVisibleItemPosition() > adapter.getItemCount() * LOG_PULL_THRESHOLD) return;
         pullMoreLogs();

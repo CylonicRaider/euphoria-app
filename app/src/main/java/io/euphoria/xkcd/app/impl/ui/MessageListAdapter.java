@@ -251,7 +251,7 @@ public class MessageListAdapter extends RecyclerView.Adapter<MessageListAdapter.
         data.toggleCollapsed(mt);
     }
 
-    class ViewHolder extends RecyclerView.ViewHolder {
+    static class ViewHolder extends RecyclerView.ViewHolder {
 
         public final BaseMessageView itemMessageView;
 

@@ -12,7 +12,7 @@ import io.euphoria.xkcd.app.R;
 
 public class UserListAdapter extends RecyclerView.Adapter<UserListAdapter.ViewHolder> implements DisplayListener {
 
-    class ViewHolder extends RecyclerView.ViewHolder {
+    static class ViewHolder extends RecyclerView.ViewHolder {
 
         public ViewHolder(NicknameView itemView) {
             super(itemView);

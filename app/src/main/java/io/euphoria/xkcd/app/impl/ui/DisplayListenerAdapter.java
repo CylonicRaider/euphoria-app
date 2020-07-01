@@ -16,7 +16,7 @@ public class DisplayListenerAdapter implements DisplayListener {
         }
     }
 
-    public static DisplayListener NULL = new DisplayListenerAdapter();
+    public static final DisplayListener NULL = new DisplayListenerAdapter();
 
     @Override
     public void notifyItemRangeInserted(int start, int length) {}
