@@ -67,6 +67,7 @@ public class RoomActivity extends FragmentActivity {
         @Override
         public void setConnectionStatus(ConnectionStatus status) {
             super.setConnectionStatus(status);
+            if (connectionStatus != ConnectionStatus.CONNECTED && status == ConnectionStatus.CONNECTED) trimLogs();
             connectionStatus = status;
         }
 
@@ -352,6 +353,11 @@ public class RoomActivity extends FragmentActivity {
                 return roomUI;
             }
         });
+    }
+
+    private void trimLogs() {
+        MessageListAdapter adapter = (MessageListAdapter) messageList.getAdapter();
+        adapter.getData().clear();
     }
 
 }

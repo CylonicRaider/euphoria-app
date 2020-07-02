@@ -161,6 +161,11 @@ public class MessageListAdapter extends RecyclerView.Adapter<MessageListAdapter.
         return data.getSibling(mt, offset);
     }
 
+    public void clear() {
+        data.clear();
+        data.add(inputBarTree);
+    }
+
     public MessageTree add(@NonNull MessageTree mt) {
         return data.add(mt);
     }

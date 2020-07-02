@@ -205,6 +205,15 @@ public class MessageForest implements Parcelable {
         return (visible) ? -1 : index;
     }
 
+    public void clear() {
+        int oldLength = displayed.size();
+        allMessages.clear();
+        roots.clear();
+        orphans.clear();
+        displayed.clear();
+        listener.notifyItemRangeRemoved(0, oldLength);
+    }
+
     public MessageTree add(MessageTree mt) {
         MessageTree existing = allMessages.get(mt.getID());
         if (existing == null) {
