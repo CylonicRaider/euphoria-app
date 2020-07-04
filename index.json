@@ -1,0 +1,15 @@
+{
+  "appname": "Euphoria App",
+  "version": "0.1.0",
+  "icon": "img/favicon.png",
+  "releases": [
+    {
+      "version": "0.1.0",
+      "label": "Lemon",
+      "icon": "img/lemon.svg",
+      "date": "2020-04-01 20:09:31.020323731 Z",
+      "file": "apk/euphoria-0.1.0.apk",
+      "sha256": "dfed977870e3938f48489fcaa9dfd67ca569965c81779e1a96a9f1c9433b6371"
+    }
+  ]
+}
