@@ -1,4 +1,4 @@
-package io.euphoria.xkcd.app.impl.ui;
+package io.euphoria.xkcd.app.impl.ui.views;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
@@ -7,6 +7,8 @@ import android.view.LayoutInflater;
 import android.view.ViewGroup;
 
 import io.euphoria.xkcd.app.R;
+import io.euphoria.xkcd.app.impl.ui.data.DisplayListener;
+import io.euphoria.xkcd.app.impl.ui.data.UserList;
 
 /** Created by Xyzzy on 2020-03-30. */
 

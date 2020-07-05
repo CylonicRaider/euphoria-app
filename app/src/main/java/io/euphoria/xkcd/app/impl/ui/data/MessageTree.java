@@ -1,4 +1,4 @@
-package io.euphoria.xkcd.app.impl.ui;
+package io.euphoria.xkcd.app.impl.ui.data;
 
 import android.os.Parcel;
 import android.support.annotation.NonNull;
@@ -7,6 +7,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+
+import io.euphoria.xkcd.app.impl.ui.UIUtils;
 
 /**
  * @author N00bySumairu

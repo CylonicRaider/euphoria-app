@@ -1,4 +1,4 @@
-package io.euphoria.xkcd.app.impl.ui;
+package io.euphoria.xkcd.app.impl.ui.views;
 
 import android.content.Context;
 import android.graphics.Canvas;
@@ -18,6 +18,8 @@ import java.util.Locale;
 import java.util.Map;
 
 import io.euphoria.xkcd.app.R;
+import io.euphoria.xkcd.app.impl.ui.data.MessageTree;
+import io.euphoria.xkcd.app.impl.ui.UIUtils;
 
 /** Created by Xyzzy on 2017-10-02. */
 

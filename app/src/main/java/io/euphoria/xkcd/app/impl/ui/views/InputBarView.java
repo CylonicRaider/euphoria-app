@@ -1,4 +1,4 @@
-package io.euphoria.xkcd.app.impl.ui;
+package io.euphoria.xkcd.app.impl.ui.views;
 
 import android.content.Context;
 import android.text.Editable;
@@ -9,7 +9,7 @@ import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
 
 import io.euphoria.xkcd.app.R;
-import io.euphoria.xkcd.app.impl.ui.MessageListAdapter.InputBarDirection;
+import io.euphoria.xkcd.app.impl.ui.views.MessageListAdapter.InputBarDirection;
 
 import static io.euphoria.xkcd.app.impl.ui.UIUtils.COLOR_SENDER_LIGHTNESS;
 import static io.euphoria.xkcd.app.impl.ui.UIUtils.hslToRgbInt;

@@ -1,10 +1,11 @@
-package io.euphoria.xkcd.app.impl.ui;
+package io.euphoria.xkcd.app.impl.ui.data;
 
 import android.os.Parcel;
 
 import java.util.Locale;
 
 import io.euphoria.xkcd.app.data.Message;
+import io.euphoria.xkcd.app.impl.ui.UIUtils;
 
 /** Created by Xyzzy on 2020-03-19. */
 

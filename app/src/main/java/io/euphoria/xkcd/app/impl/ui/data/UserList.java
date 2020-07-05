@@ -1,4 +1,4 @@
-package io.euphoria.xkcd.app.impl.ui;
+package io.euphoria.xkcd.app.impl.ui.data;
 
 import android.os.Parcel;
 import android.os.Parcelable;

@@ -1,4 +1,4 @@
-package io.euphoria.xkcd.app.impl.ui;
+package io.euphoria.xkcd.app.impl.ui.data;
 
 /** Created by Xyzzy on 2020-03-29. */
 

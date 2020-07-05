@@ -1,4 +1,4 @@
-package io.euphoria.xkcd.app.impl.ui.detail;
+package io.euphoria.xkcd.app.impl.ui.views;
 
 import android.content.Context;
 import android.graphics.Canvas;
@@ -13,7 +13,7 @@ import io.euphoria.xkcd.app.R;
 
 /** Created by Xyzzy on 2018-10-15. */
 
-public class TriangleView extends View {
+class TriangleView extends View {
 
     private final Path triangle;
     private final Paint paint;

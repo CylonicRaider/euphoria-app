@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<io.euphoria.xkcd.app.impl.ui.MessageView xmlns:android="http://schemas.android.com/apk/res/android"
-                                          android:layout_width="match_parent"
-                                          android:layout_height="wrap_content"
-                                          android:background="@color/background_message">
+<io.euphoria.xkcd.app.impl.ui.views.MessageView xmlns:android="http://schemas.android.com/apk/res/android"
+                                                android:layout_width="match_parent"
+                                                android:layout_height="wrap_content"
+                                                android:background="@color/background_message">
 
-    <io.euphoria.xkcd.app.impl.ui.NicknameView
+    <io.euphoria.xkcd.app.impl.ui.views.NicknameView
         android:id="@+id/nick_lbl"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -61,7 +61,7 @@
         android:gravity="center"
         android:orientation="horizontal">
 
-        <io.euphoria.xkcd.app.impl.ui.detail.TriangleView
+        <io.euphoria.xkcd.app.impl.ui.views.TriangleView
             android:id="@+id/collapser_icon"
             android:layout_width="15dp"
             android:layout_height="15dp"/>
@@ -79,4 +79,4 @@
 
     </LinearLayout>
 
-</io.euphoria.xkcd.app.impl.ui.MessageView>
+</io.euphoria.xkcd.app.impl.ui.views.MessageView>

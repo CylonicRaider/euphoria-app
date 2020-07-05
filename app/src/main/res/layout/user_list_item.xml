@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<io.euphoria.xkcd.app.impl.ui.NicknameView xmlns:android="http://schemas.android.com/apk/res/android"
-                                           android:layout_width="wrap_content"
-                                           android:layout_height="wrap_content"
-                                           android:layout_marginTop="1dp"
-                                           android:layout_marginBottom="1dp"
-                                           android:textColor="@color/text"
-                                           android:textSize="@dimen/small_font_size"/>
+<io.euphoria.xkcd.app.impl.ui.views.NicknameView xmlns:android="http://schemas.android.com/apk/res/android"
+                                                 android:layout_width="wrap_content"
+                                                 android:layout_height="wrap_content"
+                                                 android:layout_marginTop="1dp"
+                                                 android:layout_marginBottom="1dp"
+                                                 android:textColor="@color/text"
+                                                 android:textSize="@dimen/small_font_size"/>

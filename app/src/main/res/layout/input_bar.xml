@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<io.euphoria.xkcd.app.impl.ui.InputBarView xmlns:android="http://schemas.android.com/apk/res/android"
-                                           android:layout_width="match_parent"
-                                           android:layout_height="wrap_content"
-                                           android:layout_marginBottom="2dp"
-                                           android:layout_marginTop="2dp"
-                                           android:background="@color/background_input">
+<io.euphoria.xkcd.app.impl.ui.views.InputBarView xmlns:android="http://schemas.android.com/apk/res/android"
+                                                 android:layout_width="match_parent"
+                                                 android:layout_height="wrap_content"
+                                                 android:layout_marginBottom="2dp"
+                                                 android:layout_marginTop="2dp"
+                                                 android:background="@color/background_input">
 
     <!-- TODO change to button that opens nick changing dialog -->
     <EditText
@@ -53,4 +53,4 @@
         android:layout_below="@id/message_entry"
         android:background="@color/primary_dark"/>
 
-</io.euphoria.xkcd.app.impl.ui.InputBarView>
+</io.euphoria.xkcd.app.impl.ui.views.InputBarView>

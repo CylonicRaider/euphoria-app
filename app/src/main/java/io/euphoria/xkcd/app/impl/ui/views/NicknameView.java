@@ -1,4 +1,4 @@
-package io.euphoria.xkcd.app.impl.ui;
+package io.euphoria.xkcd.app.impl.ui.views;
 
 import android.content.Context;
 import android.support.annotation.ColorInt;

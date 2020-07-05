@@ -9,7 +9,7 @@
                                         android:orientation="horizontal"
                                         tools:context="io.euphoria.xkcd.app.RoomActivity">
 
-    <io.euphoria.xkcd.app.impl.ui.MessageListView
+    <io.euphoria.xkcd.app.impl.ui.views.MessageListView
         android:id="@+id/message_list_view"
         android:layout_width="0dp"
         android:layout_height="match_parent"
@@ -51,7 +51,7 @@
             android:textColor="@color/text"
             android:textStyle="bold"/>
 
-        <io.euphoria.xkcd.app.impl.ui.UserListView
+        <io.euphoria.xkcd.app.impl.ui.views.UserListView
             android:id="@+id/user_list_view"
             android:layout_width="match_parent"
             android:layout_height="match_parent"

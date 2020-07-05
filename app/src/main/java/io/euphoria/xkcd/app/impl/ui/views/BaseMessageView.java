@@ -1,4 +1,4 @@
-package io.euphoria.xkcd.app.impl.ui;
+package io.euphoria.xkcd.app.impl.ui.views;
 
 import android.content.Context;
 import android.content.res.TypedArray;
@@ -8,11 +8,13 @@ import android.util.AttributeSet;
 import android.view.ViewGroup;
 import android.widget.RelativeLayout;
 
+import io.euphoria.xkcd.app.impl.ui.data.MessageTree;
+
 import static io.euphoria.xkcd.app.impl.ui.UIUtils.dpToPx;
 
 /** Created by Xyzzy on 2017-10-27. */
 
-abstract class BaseMessageView extends RelativeLayout {
+public abstract class BaseMessageView extends RelativeLayout {
 
     private static final int PADDING_PER_INDENT = 15;
 

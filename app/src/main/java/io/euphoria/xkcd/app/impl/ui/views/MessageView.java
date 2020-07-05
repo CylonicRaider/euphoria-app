@@ -1,4 +1,4 @@
-package io.euphoria.xkcd.app.impl.ui;
+package io.euphoria.xkcd.app.impl.ui.views;
 
 import android.content.Context;
 import android.content.res.Resources;
@@ -9,7 +9,9 @@ import android.view.View;
 import android.widget.TextView;
 
 import io.euphoria.xkcd.app.R;
-import io.euphoria.xkcd.app.impl.ui.detail.TriangleView;
+import io.euphoria.xkcd.app.impl.ui.data.MessageTree;
+import io.euphoria.xkcd.app.impl.ui.data.UIMessage;
+import io.euphoria.xkcd.app.impl.ui.UIUtils;
 
 import static io.euphoria.xkcd.app.impl.ui.UIUtils.emoteColor;
 import static io.euphoria.xkcd.app.impl.ui.UIUtils.hslToRgbInt;

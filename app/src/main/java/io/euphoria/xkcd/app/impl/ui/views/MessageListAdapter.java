@@ -1,4 +1,4 @@
-package io.euphoria.xkcd.app.impl.ui;
+package io.euphoria.xkcd.app.impl.ui.views;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
@@ -9,6 +9,10 @@ import android.view.ViewGroup;
 
 import io.euphoria.xkcd.app.R;
 import io.euphoria.xkcd.app.data.Message;
+import io.euphoria.xkcd.app.impl.ui.data.DisplayListener;
+import io.euphoria.xkcd.app.impl.ui.data.MessageForest;
+import io.euphoria.xkcd.app.impl.ui.data.MessageTree;
+import io.euphoria.xkcd.app.impl.ui.data.UIMessage;
 
 public class MessageListAdapter extends RecyclerView.Adapter<MessageListAdapter.ViewHolder>
                                 implements DisplayListener {
@@ -138,7 +142,7 @@ public class MessageListAdapter extends RecyclerView.Adapter<MessageListAdapter.
     }
 
     public int indexOf(MessageTree mt) {
-        return data.findDisplayIndex(mt, true, false);
+        return data.indexOf(mt);
     }
 
     public MessageTree get(String id) {
