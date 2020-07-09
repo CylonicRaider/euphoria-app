@@ -29,6 +29,21 @@ public class Version implements Comparable<Version> {
     }
 
     @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        boolean first = true;
+        for (int f : fields) {
+            if (first) {
+                first = false;
+            } else {
+                sb.append('.');
+            }
+            sb.append(f);
+        }
+        return sb.toString();
+    }
+
+    @Override
     public int compareTo(Version other) {
         int fc = getFieldCount(), ofc = other.getFieldCount();
         for (int i = 0;; i++) {
