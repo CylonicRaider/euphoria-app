@@ -1,11 +1,11 @@
 {
-  "appname": "Euphoria App",
+  "name": "Euphoria App",
   "version": "0.1.0",
   "icon": "img/favicon.png",
   "releases": [
     {
       "version": "0.1.0",
-      "label": "Lemon",
+      "name": "Lemon",
       "icon": "img/lemon.svg",
       "date": "2020-04-01 20:09:31.020323731 Z",
       "file": "apk/euphoria-0.1.0.apk",
