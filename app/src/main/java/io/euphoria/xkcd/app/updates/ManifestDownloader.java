@@ -9,26 +9,36 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.net.URL;
 import java.net.URLConnection;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Future;
+import java.util.concurrent.Executor;
 
 /** Created by Xyzzy on 2020-07-14. */
 
 public class ManifestDownloader {
 
+    public interface Callback {
+
+        void downloadFinished(Manifest result);
+
+        void downloadFailed(Throwable error);
+
+    }
+
     private ManifestDownloader() {}
 
-    public static Future<Manifest> download(final URL source, ExecutorService exec) {
-        return exec.submit(new Callable<Manifest>() {
+    public static void download(final URL source, Executor exec, final Callback handler) {
+        exec.execute(new Runnable() {
             @Override
-            public Manifest call() throws IOException, JSONException, Manifest.MappingException {
-                URLConnection conn = source.openConnection();
-                conn.connect();
-                InputStream input = conn.getInputStream();
-                Reader inputReader = new InputStreamReader(input, "UTF-8");
-                String result = UpdateUtilities.readAll(inputReader);
-                return new Manifest(source, new JSONObject(result));
+            public void run() {
+                try {
+                    URLConnection conn = source.openConnection();
+                    conn.connect();
+                    InputStream input = conn.getInputStream();
+                    Reader inputReader = new InputStreamReader(input, "UTF-8");
+                    String result = UpdateUtilities.readAll(inputReader);
+                    handler.downloadFinished(new Manifest(source, new JSONObject(result)));
+                } catch (IOException | JSONException | Manifest.MappingException exc) {
+                    handler.downloadFailed(exc);
+                }
             }
         });
     }
