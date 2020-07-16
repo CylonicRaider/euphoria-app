@@ -10,6 +10,7 @@ import java.io.Reader;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 
 /** Created by Xyzzy on 2020-07-14. */
 
@@ -22,6 +23,8 @@ public class ManifestDownloader {
         void downloadFailed(Throwable error);
 
     }
+
+    private static final Executor EXECUTOR = Executors.newCachedThreadPool();
 
     private ManifestDownloader() {}
 
@@ -41,6 +44,9 @@ public class ManifestDownloader {
                 }
             }
         });
+    }
+    public static void download(URL source, Callback handler) {
+        download(source, EXECUTOR, handler);
     }
 
 }
