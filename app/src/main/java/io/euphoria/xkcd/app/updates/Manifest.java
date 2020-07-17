@@ -10,6 +10,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
 
@@ -94,6 +95,13 @@ public class Manifest {
 
     }
 
+    public static final Comparator<Release> RELEASE_COMPARATOR = new Comparator<Release>() {
+        @Override
+        public int compare(Release r1, Release r2) {
+            return r1.getVersion().compareTo(r2.getVersion());
+        }
+    };
+
     private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-DD HH:mm:ss.SSS X",
                                                                              Locale.ROOT);
 
@@ -141,6 +149,11 @@ public class Manifest {
 
     public List<Release> getReleases() {
         return releases;
+    }
+
+    public Release getLatestRelease() {
+        if (releases.isEmpty()) return null;
+        return Collections.max(releases, RELEASE_COMPARATOR);
     }
 
     public JSONObject toJSONObject() throws JSONException {
