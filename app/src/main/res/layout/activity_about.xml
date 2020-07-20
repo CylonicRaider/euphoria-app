@@ -25,7 +25,7 @@
         android:text="@string/version_line"
         android:layout_marginTop="6dp"
         android:drawablePadding="6dp"
-        android:drawableRight="@drawable/ic_lemon"
-        android:drawableEnd="@drawable/ic_lemon"/>
+        android:drawableRight="@drawable/ic_version_logo"
+        android:drawableEnd="@drawable/ic_version_logo"/>
 
 </LinearLayout>
