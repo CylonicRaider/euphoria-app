@@ -2,6 +2,8 @@ package io.euphoria.xkcd.app.updates;
 
 import java.util.regex.Pattern;
 
+import io.euphoria.xkcd.app.BuildConfig;
+
 /** Created by Xyzzy on 2020-07-08. */
 
 public class Version implements Comparable<Version> {
@@ -79,6 +81,10 @@ public class Version implements Comparable<Version> {
             fields[i] = Integer.parseInt(rawFields[i]);
         }
         return new Version(fields);
+    }
+
+    public static Version getCurrentAppVersion() {
+        return parseVersion(BuildConfig.VERSION_NAME);
     }
 
 }
