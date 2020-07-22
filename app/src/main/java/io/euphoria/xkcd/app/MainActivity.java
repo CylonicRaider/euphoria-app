@@ -13,8 +13,8 @@ import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.Toast;
 
-import static io.euphoria.xkcd.app.impl.ui.RoomUIImpl.isValidRoomName;
-import static io.euphoria.xkcd.app.impl.ui.RoomUIImpl.isValidRoomNameFragment;
+import static io.euphoria.xkcd.app.URLs.isValidRoomName;
+import static io.euphoria.xkcd.app.URLs.isValidRoomNameFragment;
 import static io.euphoria.xkcd.app.impl.ui.UIUtils.setEnterKeyListener;
 
 public class MainActivity extends Activity {

@@ -7,6 +7,7 @@ import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 
+import io.euphoria.xkcd.app.URLs;
 import io.euphoria.xkcd.app.connection.Connection;
 import io.euphoria.xkcd.app.connection.ConnectionListener;
 import io.euphoria.xkcd.app.connection.ConnectionStatus;
@@ -49,9 +50,9 @@ public class ConnectionImpl implements Connection {
     public synchronized void connect() {
         try {
             // FIXME: Allow specifying a custom URL template.
-            client = new EuphoriaWebSocketClient(this, new URI("wss://euphoria.io/room/" + roomName + "/ws?h=1"));
+            client = new EuphoriaWebSocketClient(this, new URI(URLs.getRoomEndpoint(roomName).toString()));
         } catch (URISyntaxException e) {
-            throw new IllegalArgumentException("Bad room name (did not form a valid URI)");
+            throw new RuntimeException("This should not happen?!", e);
         }
         client.connect();
     }

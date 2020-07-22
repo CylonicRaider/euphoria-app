@@ -26,13 +26,13 @@ import java.util.List;
 import io.euphoria.xkcd.app.connection.ConnectionStatus;
 import io.euphoria.xkcd.app.control.RoomController;
 import io.euphoria.xkcd.app.data.Message;
-import io.euphoria.xkcd.app.impl.ui.views.InputBarView;
+import io.euphoria.xkcd.app.impl.ui.RoomUIImpl;
 import io.euphoria.xkcd.app.impl.ui.data.MessageForest;
+import io.euphoria.xkcd.app.impl.ui.data.UserList;
+import io.euphoria.xkcd.app.impl.ui.views.InputBarView;
 import io.euphoria.xkcd.app.impl.ui.views.MessageListAdapter;
 import io.euphoria.xkcd.app.impl.ui.views.MessageListAdapter.InputBarDirection;
 import io.euphoria.xkcd.app.impl.ui.views.MessageListView;
-import io.euphoria.xkcd.app.impl.ui.RoomUIImpl;
-import io.euphoria.xkcd.app.impl.ui.data.UserList;
 import io.euphoria.xkcd.app.impl.ui.views.UserListAdapter;
 import io.euphoria.xkcd.app.ui.RoomUI;
 import io.euphoria.xkcd.app.ui.RoomUIFactory;
@@ -40,8 +40,8 @@ import io.euphoria.xkcd.app.ui.event.LogRequestEvent;
 import io.euphoria.xkcd.app.ui.event.MessageSendEvent;
 import io.euphoria.xkcd.app.ui.event.NewNickEvent;
 
-import static io.euphoria.xkcd.app.impl.ui.RoomUIImpl.getRoomName;
-import static io.euphoria.xkcd.app.impl.ui.RoomUIImpl.isValidRoomUri;
+import static io.euphoria.xkcd.app.URLs.getRoomName;
+import static io.euphoria.xkcd.app.URLs.isValidRoomUri;
 
 public class RoomActivity extends FragmentActivity {
 
