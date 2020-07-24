@@ -75,7 +75,13 @@ public class URLs {
     public static Uri getRoomEndpoint(String roomName) throws IllegalArgumentException {
         if (!isValidRoomName(roomName))
             throw new IllegalArgumentException("Not a valid room name: " + roomName);
+        // TODO configure in build script
         return Uri.parse("wss://euphoria.io/room/" + roomName + "/ws?h=1");
+    }
+
+    public static Uri getUpdateManifest() {
+        // TODO configure in build script
+        return Uri.parse("https://euphoria.leet.nu/app/index.json");
     }
 
 }
