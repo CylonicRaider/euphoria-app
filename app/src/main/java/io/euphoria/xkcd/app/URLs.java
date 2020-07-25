@@ -79,6 +79,11 @@ public class URLs {
         return Uri.parse("wss://euphoria.io/room/" + roomName + "/ws?h=1");
     }
 
+    /**
+     * Retrieve the URI of the update checker manifest.
+     *
+     * @return Where the update checker manifest is located.
+     */
     public static Uri getUpdateManifest() {
         // TODO configure in build script
         return Uri.parse("https://euphoria.leet.nu/app/index.json");
