@@ -4,6 +4,10 @@ import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
+import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -18,6 +22,34 @@ public class URLs {
     private static final Pattern ROOM_PATH_RE = Pattern.compile("/room/(" + ROOM_NAME_RE.pattern() + ")/?");
 
     private URLs() {}
+
+    /**
+     * Convert the given Android {@code Uri} object to a standard library {@code URL} object.
+     *
+     * @param uri The {@code Uri} to convert
+     * @return An equivalent {@code URL}
+     */
+    public static URL toURL(Uri uri) {
+        try {
+            return new URL(uri.toString());
+        } catch (MalformedURLException exc) {
+            throw new RuntimeException("Invalid URL?!", exc);
+        }
+    }
+
+    /**
+     * Convert the given Android {@code Uri} object to a standard library {@code URI} object.
+     *
+     * @param uri The {@code Uri} to convert
+     * @return An equivalent {@code URI}
+     */
+    public static URI toURI(Uri uri) {
+        try {
+            return new URI(uri.toString());
+        } catch (URISyntaxException exc) {
+            throw new RuntimeException("Invalid URI?!", exc);
+        }
+    }
 
     /**
      * Test whether the given URI denotes a valid Euphoria room.
@@ -82,7 +114,7 @@ public class URLs {
     /**
      * Retrieve the URI of the update checker manifest.
      *
-     * @return Where the update checker manifest is located.
+     * @return Where the update checker manifest is located
      */
     public static Uri getUpdateManifest() {
         // TODO configure in build script

@@ -1,10 +1,7 @@
 package io.euphoria.xkcd.app.impl.connection;
 
-import android.net.Uri;
 import android.util.Log;
 
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -49,14 +46,8 @@ public class ConnectionImpl implements Connection {
     }
 
     public synchronized void connect() {
-        try {
-            // FIXME: Allow specifying a custom URL template.
-            Uri endpoint = URLs.getRoomEndpoint(roomName);
-            client = new EuphoriaWebSocketClient(this, new URI(endpoint.getScheme(),
-                    endpoint.getEncodedSchemeSpecificPart(), null));
-        } catch (URISyntaxException e) {
-            throw new RuntimeException("This should not happen?!", e);
-        }
+        // FIXME: Allow specifying a custom URL template.
+        client = new EuphoriaWebSocketClient(this, URLs.toURI(URLs.getRoomEndpoint(roomName)));
         client.connect();
     }
 
