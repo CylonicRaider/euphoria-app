@@ -102,7 +102,7 @@ public class Manifest {
         }
     };
 
-    private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-DD HH:mm:ss.SSS X",
+    private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-DD HH:mm:ss.SSS Z",
                                                                              Locale.ROOT);
 
     private final URL baseURL;
@@ -170,6 +170,8 @@ public class Manifest {
     }
 
     public static long parseDate(String text) throws ParseException {
+        // On at least one device, SimpleDateFormat chokes on the final "Z"; substitute it with something equivalent.
+        text = text.replaceAll("\\s+Z$", " +00:00");
         synchronized (DATE_FORMAT) {
             return DATE_FORMAT.parse(text).getTime();
         }

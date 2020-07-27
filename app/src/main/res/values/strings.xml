@@ -26,4 +26,9 @@
 
     <string name="title_about">About</string>
     <string name="version_line">Version %1$s %2$s</string>
+    <string name="update_check">Check for updates</string>
+    <string name="update_check_busy">Checking for updates…</string>
+    <string name="update_check_failed">Update check failed.</string>
+    <string name="update_check_no_result">You are up-to-date.</string>
+    <string name="update_check_update_available">Update available to version %1$s!</string>
 </resources>

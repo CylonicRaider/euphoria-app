@@ -1,12 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
               xmlns:tools="http://schemas.android.com/tools"
-              android:layout_width="wrap_content"
+              android:layout_width="240dp"
               android:layout_height="wrap_content"
               android:orientation="vertical"
               android:gravity="center"
               android:padding="12dp"
               tools:context=".AboutActivity">
+    <!-- HACK: The update checker output text does not word-wrap properly if the overall width is dynamic. -->
 
     <TextView
         android:id="@+id/about_title"
@@ -27,5 +28,38 @@
         android:drawablePadding="6dp"
         android:drawableRight="@drawable/ic_version_logo"
         android:drawableEnd="@drawable/ic_version_logo"/>
+
+    <Button
+        android:id="@+id/about_updateCheck"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/update_check"
+        android:layout_marginTop="12dp"
+        android:onClick="checkForUpdates"/>
+
+    <LinearLayout
+        android:id="@+id/about_updateCheckLine"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center"
+        android:layout_marginTop="6dp"
+        android:visibility="gone">
+
+        <ProgressBar
+            android:id="@+id/about_updateCheckProgress"
+            android:layout_width="20sp"
+            android:layout_height="20sp"
+            android:layout_marginEnd="6dp"
+            android:layout_marginRight="6dp"
+            android:visibility="gone"/>
+
+        <TextView
+            android:id="@+id/about_updateCheckResult"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"/>
+
+    </LinearLayout>
 
 </LinearLayout>
