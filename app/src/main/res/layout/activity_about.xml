@@ -35,7 +35,7 @@
         android:layout_height="wrap_content"
         android:text="@string/update_check"
         android:layout_marginTop="12dp"
-        android:onClick="checkForUpdates"/>
+        android:onClick="updateButtonClicked"/>
 
     <LinearLayout
         android:id="@+id/about_updateCheckLine"

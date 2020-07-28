@@ -31,4 +31,6 @@
     <string name="update_check_failed">Update check failed.</string>
     <string name="update_check_no_result">You are up-to-date.</string>
     <string name="update_check_update_available">Update available to version %1$s!</string>
+    <string name="update_check_download">Download %1$s APK</string>
+    <string name="update_check_open_failed">Could not find application to open the APK with</string>
 </resources>

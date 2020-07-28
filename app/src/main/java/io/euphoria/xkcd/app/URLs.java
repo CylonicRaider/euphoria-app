@@ -52,6 +52,26 @@ public class URLs {
     }
 
     /**
+     * Convert the given standard library {@code URL} to an Android {@code Uri} object.
+     *
+     * @param url The {@code URL} to convert
+     * @return An equivalent {@code Uri}
+     */
+    public static Uri toUri(URL url) {
+        return Uri.parse(url.toString());
+    }
+
+    /**
+     * Convert the given standard library {@code URI} to an Android {@code Uri} object.
+     *
+     * @param uri The {@code URI} to convert
+     * @return An equivalent {@code Uri}
+     */
+    public static Uri toUri(URI uri) {
+        return Uri.parse(uri.toString());
+    }
+
+    /**
      * Test whether the given URI denotes a valid Euphoria room.
      *
      * @param uri The URI to test
