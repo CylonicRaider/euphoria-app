@@ -1,8 +1,8 @@
 package io.euphoria.xkcd.app;
 
 import android.app.Activity;
-import android.content.Intent;
-import android.content.pm.PackageManager;
+import android.app.DownloadManager;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -12,8 +12,6 @@ import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
-
-import java.net.URL;
 
 import io.euphoria.xkcd.app.updates.Manifest;
 import io.euphoria.xkcd.app.updates.ManifestDownloader;
@@ -98,13 +96,16 @@ public class AboutActivity extends Activity {
                 /* Do nothing. */
                 break;
             case UPDATE_AVAILABLE:
-                URL url = updateCheckResult.getLatestRelease().getFileURL();
-                Intent intent = new Intent(Intent.ACTION_VIEW, URLs.toUri(url));
-                if (getPackageManager().resolveActivity(intent, PackageManager.MATCH_DEFAULT_ONLY) == null) {
-                    Toast.makeText(this, R.string.update_check_open_failed, Toast.LENGTH_SHORT).show();
-                    return;
-                }
-                startActivity(intent);
+                Manifest.Release latestRelease = updateCheckResult.getLatestRelease();
+                Uri uri = URLs.toUri(latestRelease.getFileURL());
+                DownloadManager mgr = (DownloadManager) getSystemService(DOWNLOAD_SERVICE);
+                DownloadManager.Request req = new DownloadManager.Request(uri);
+                req.setMimeType("application/vnd.android.package-archive");
+                req.setDescription(getString(R.string.update_download_title, getString(R.string.app_name),
+                        latestRelease.getVersion()));
+                req.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
+                mgr.enqueue(req);
+                Toast.makeText(this, R.string.update_download_instructions, Toast.LENGTH_LONG).show();
                 break;
             default:
                 setUpdateCheckState(UpdateCheckState.BUSY);
