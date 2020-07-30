@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.DownloadManager;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
@@ -98,9 +99,21 @@ public class AboutActivity extends Activity {
             case UPDATE_AVAILABLE:
                 Manifest.Release latestRelease = updateCheckResult.getLatestRelease();
                 Uri uri = URLs.toUri(latestRelease.getFileURL());
+                String basename = uri.getLastPathSegment();
+                if (basename == null) {
+                    basename = updateCheckResult.getName().toLowerCase() + "-" + latestRelease.getVersion() + ".apk";
+                }
                 DownloadManager mgr = (DownloadManager) getSystemService(DOWNLOAD_SERVICE);
                 DownloadManager.Request req = new DownloadManager.Request(uri);
                 req.setMimeType("application/vnd.android.package-archive");
+                try {
+                    // Using private storage did not work in at least one test case (perhaps because of permission
+                    // issues).
+                    req.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, basename);
+                } catch (IllegalStateException exc) {
+                    Toast.makeText(this, R.string.update_download_failed_no_storage, Toast.LENGTH_SHORT).show();
+                    return;
+                }
                 req.setDescription(getString(R.string.update_download_title, getString(R.string.app_name),
                         latestRelease.getVersion()));
                 req.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);

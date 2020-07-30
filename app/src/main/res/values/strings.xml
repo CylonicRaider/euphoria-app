@@ -35,5 +35,6 @@
     <string name="update_check_download">Download %1$s APK</string>
 
     <string name="update_download_title">%1$s version %2$s APK</string>
+    <string name="update_download_failed_no_storage">Error: Could not prepare download location</string>
     <string name="update_download_instructions">Install the APK after it is downloaded to finish the update</string>
 </resources>
