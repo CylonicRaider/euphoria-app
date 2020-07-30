@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <io.euphoria.xkcd.app.impl.ui.views.InputBarView xmlns:android="http://schemas.android.com/apk/res/android"
+                                                 android:id="@+id/input_bar"
                                                  android:layout_width="match_parent"
                                                  android:layout_height="wrap_content"
                                                  android:layout_marginBottom="2dp"
