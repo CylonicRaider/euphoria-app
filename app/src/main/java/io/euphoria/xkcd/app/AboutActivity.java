@@ -99,6 +99,9 @@ public class AboutActivity extends Activity {
                 break;
             case UPDATE_AVAILABLE:
                 URL url = updateCheckResult.getLatestRelease().getFileURL();
+                // Downloading the file in such a way that it can be installed seems to require additional permissions
+                // (in order to put the file into external storage); therefore, we chicken out and let the Web browser
+                // handle that for us.
                 Intent intent = new Intent(Intent.ACTION_VIEW, URLs.toUri(url));
                 if (getPackageManager().resolveActivity(intent, PackageManager.MATCH_DEFAULT_ONLY) == null) {
                     Toast.makeText(this, R.string.update_check_open_failed, Toast.LENGTH_SHORT).show();
