@@ -167,6 +167,10 @@ public class MessageListAdapter extends RecyclerView.Adapter<MessageListAdapter.
 
     public void clear() {
         data.clear();
+    }
+
+    public void clearExceptInputBar() {
+        data.clear();
         data.add(inputBarTree);
     }
 

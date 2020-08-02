@@ -357,7 +357,7 @@ public class RoomActivity extends FragmentActivity {
 
     private void trimLogs() {
         MessageListAdapter adapter = (MessageListAdapter) messageList.getAdapter();
-        adapter.getData().clear();
+        adapter.clearExceptInputBar();
     }
 
 }
