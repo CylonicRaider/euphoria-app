@@ -114,6 +114,10 @@ public class MessageListAdapter extends RecyclerView.Adapter<MessageListAdapter.
         return data.get(position);
     }
 
+    public MessageTree tryGetItem(int position) {
+        return (position < 0 || position >= data.size()) ? null : data.get(position);
+    }
+
     @Override
     public long getItemId(int position) {
         return getItem(position).getLongID();

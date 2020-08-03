@@ -18,8 +18,8 @@ import java.util.Locale;
 import java.util.Map;
 
 import io.euphoria.xkcd.app.R;
-import io.euphoria.xkcd.app.impl.ui.data.MessageTree;
 import io.euphoria.xkcd.app.impl.ui.UIUtils;
+import io.euphoria.xkcd.app.impl.ui.data.MessageTree;
 
 /** Created by Xyzzy on 2017-10-02. */
 
@@ -277,7 +277,9 @@ public class MessageListView extends RecyclerView {
         MessageListAdapter adapter = getMessageListAdapter();
         if (adapter == null) return;
         for (int i = minIdx; i <= maxIdx; i++) {
-            addIndentLinesFor(adapter.getItem(i));
+            MessageTree tree = adapter.tryGetItem(i);
+            if (tree == null) continue;
+            addIndentLinesFor(tree);
         }
     }
 
