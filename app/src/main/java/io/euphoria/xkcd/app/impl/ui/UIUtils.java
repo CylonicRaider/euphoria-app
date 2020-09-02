@@ -8,6 +8,7 @@ import android.os.Build.VERSION_CODES;
 import android.support.annotation.ColorInt;
 import android.support.annotation.ColorRes;
 import android.support.annotation.DrawableRes;
+import android.support.annotation.NonNull;
 import android.support.v4.view.GestureDetectorCompat;
 import android.util.TypedValue;
 import android.view.GestureDetector;
@@ -194,6 +195,16 @@ public class UIUtils {
     /** Normalize a string for hue hash processing */
     private static String normalize(String text) {
         return EMOJI_RE.matcher(text).replaceAll("").replaceAll("[^\\w_\\-]", "").toLowerCase();
+    }
+
+    /**
+     * Trim all unicode whitespace characters from the start and end of the passed String.
+     *
+     * String::trim() uses a non-unicode-aware (or only partially so) concept of whitespace characters.
+     */
+    @NonNull
+    public static String trimUnicodeWhitespace(@NonNull String text) {
+        return text.replaceAll("^\\p{Z}+|\\p{Z}+$", "");
     }
 
     /**
