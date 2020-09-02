@@ -167,13 +167,6 @@ public class InputBarView extends BaseMessageView {
     }
 
     private void doNickChange() {
-        // Strip whitespace
-        Editable nickEditor = nickEntry.getText();
-        String newNick = nickEditor.toString();
-        String trimmedNick = trimUnicodeWhitespace(newNick);
-        if (!newNick.equals(trimmedNick)) {
-            nickEditor.replace(0, newNick.length(), trimmedNick);
-        }
         // Invoke listener
         if (nickChangeListener != null && !nickChangeListener.onChangeNick(this)) {
             nickEntry.setText(lastNick);
