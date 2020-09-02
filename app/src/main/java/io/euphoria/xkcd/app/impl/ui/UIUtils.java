@@ -203,6 +203,9 @@ public class UIUtils {
      * Trim all unicode whitespace characters from the start and end of the passed String.
      *
      * String::trim() uses a non-unicode-aware (or only partially so) concept of whitespace characters.
+     * 
+     * @param text The string to be trimmed
+     * @return The passed string with all whitespace characters at the start and end of it removed
      */
     @NonNull
     public static String trimUnicodeWhitespace(@NonNull String text) {
