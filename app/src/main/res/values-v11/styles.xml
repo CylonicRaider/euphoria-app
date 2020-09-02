@@ -1,8 +1,0 @@
-<resources>
-    <!-- Post-Honeycomb override of the theme -->
-    <style name="AppTheme" parent="android:Theme.Holo.Light"/>
-    <!-- Dark theme for title screen -->
-    <style name="AppTheme.Title" parent="android:Theme.Holo"/>
-    <!-- Dialog theme for about screen -->
-    <style name="AppTheme.Dialog" parent="android:Theme.Holo.Light.Dialog"/>
-</resources>

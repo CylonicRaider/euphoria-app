@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
-      xmlns:tools="http://schemas.android.com/tools">
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <!-- Deliberately using android:showAsAction for platform-appropriate behavior (display as an action on newer
          Androids, regular menu item on ancient ones). -->
@@ -8,9 +9,8 @@
         android:id="@+id/room_action_users"
         android:icon="@drawable/ic_euphorian_white"
         android:title="@string/room_action_users_title"
-        android:showAsAction="always"
-        android:onClick="toggleUserDrawer"
-        tools:ignore="AppCompatResource"/>
+        app:showAsAction="always"
+        android:onClick="toggleUserDrawer"/>
 
     <item
         android:id="@+id/room_show_about"

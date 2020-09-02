@@ -6,11 +6,13 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Parcelable;
 import android.support.annotation.NonNull;
-import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
 import android.util.SparseArray;
 import android.view.Gravity;
 import android.view.KeyEvent;
@@ -43,7 +45,7 @@ import io.euphoria.xkcd.app.ui.event.NewNickEvent;
 import static io.euphoria.xkcd.app.URLs.getRoomName;
 import static io.euphoria.xkcd.app.URLs.isValidRoomUri;
 
-public class RoomActivity extends FragmentActivity {
+public class RoomActivity extends AppCompatActivity {
 
     private class LocalRoomUIFactory implements RoomUIFactory {
         @Override
@@ -129,6 +131,8 @@ public class RoomActivity extends FragmentActivity {
         setContentView(R.layout.activity_room);
         String roomName = getRoomName(i.getData());
         setTitle("&" + roomName);
+
+        setSupportActionBar((Toolbar) findViewById(R.id.toolbar));
 
         // Get RoomControllerFragment
         FragmentManager fm = getSupportFragmentManager();
