@@ -18,6 +18,7 @@ import static io.euphoria.xkcd.app.impl.ui.UIUtils.hslToRgbInt;
 import static io.euphoria.xkcd.app.impl.ui.UIUtils.isEmote;
 import static io.euphoria.xkcd.app.impl.ui.UIUtils.setColoredBackground;
 import static io.euphoria.xkcd.app.impl.ui.UIUtils.setViewBackground;
+import static io.euphoria.xkcd.app.impl.ui.UIUtils.trimUnicodeWhitespace;
 
 public class MessageView extends BaseMessageView {
 
@@ -50,7 +51,7 @@ public class MessageView extends BaseMessageView {
             String content = msg.getContent();
             boolean emote = isEmote(content);
             String displayContent = emote ? content.substring(3) : content;
-            displayContent = displayContent.trim();
+            displayContent = trimUnicodeWhitespace(displayContent);
             // Apply the nickname
             nickLbl.updateParameters(emote, msg.getSenderName());
             // Apply the message's text

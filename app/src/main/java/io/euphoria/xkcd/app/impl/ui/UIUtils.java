@@ -8,6 +8,7 @@ import android.os.Build.VERSION_CODES;
 import android.support.annotation.ColorInt;
 import android.support.annotation.ColorRes;
 import android.support.annotation.DrawableRes;
+import android.support.annotation.NonNull;
 import android.support.v4.view.GestureDetectorCompat;
 import android.util.TypedValue;
 import android.view.GestureDetector;
@@ -35,6 +36,8 @@ public class UIUtils {
     // Color saturation and lightness for @mentions
     public static final float COLOR_AT_SATURATION = 0.42f;
     public static final float COLOR_AT_LIGHTNESS = 0.50f;
+
+    private static final Pattern WHITESPACE_TRIMMING_RE = Pattern.compile("^\\p{Z}+|\\p{Z}+$");
 
     // TODO check against actual list of valid emoji
     private static final Pattern EMOJI_RE = Pattern.compile(":[a-zA-Z!?\\-]+?:");
@@ -194,6 +197,19 @@ public class UIUtils {
     /** Normalize a string for hue hash processing */
     private static String normalize(String text) {
         return EMOJI_RE.matcher(text).replaceAll("").replaceAll("[^\\w_\\-]", "").toLowerCase();
+    }
+
+    /**
+     * Trim all unicode whitespace characters from the start and end of the passed String.
+     *
+     * String::trim() uses a non-unicode-aware (or only partially so) concept of whitespace characters.
+     * 
+     * @param text The string to be trimmed
+     * @return The passed string with all whitespace characters at the start and end of it removed
+     */
+    @NonNull
+    public static String trimUnicodeWhitespace(@NonNull String text) {
+        return WHITESPACE_TRIMMING_RE.matcher(text).replaceAll("");
     }
 
     /**
