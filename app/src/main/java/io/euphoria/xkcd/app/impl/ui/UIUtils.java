@@ -37,6 +37,8 @@ public class UIUtils {
     public static final float COLOR_AT_SATURATION = 0.42f;
     public static final float COLOR_AT_LIGHTNESS = 0.50f;
 
+    private static final Pattern WHITESPACE_TRIMMING_RE = Pattern.compile("^\\p{Z}+|\\p{Z}+$");
+
     // TODO check against actual list of valid emoji
     private static final Pattern EMOJI_RE = Pattern.compile(":[a-zA-Z!?\\-]+?:");
 
@@ -204,7 +206,7 @@ public class UIUtils {
      */
     @NonNull
     public static String trimUnicodeWhitespace(@NonNull String text) {
-        return text.replaceAll("^\\p{Z}+|\\p{Z}+$", "");
+        return WHITESPACE_TRIMMING_RE.matcher(text).replaceAll("");
     }
 
     /**
