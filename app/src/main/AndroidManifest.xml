@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-          package="io.euphoria.xkcd.app">
+    xmlns:tools="http://schemas.android.com/tools"
+    package="io.euphoria.xkcd.app">
 
     <uses-permission android:name="android.permission.INTERNET"/>
 
@@ -41,6 +42,11 @@
                     android:scheme="http"/>
             </intent-filter>
         </activity>
+        <activity
+            android:name=".SettingsActivity"
+            android:label="@string/title_settings"
+            android:launchMode="singleInstance"
+            android:windowSoftInputMode="adjustResize"/>
         <activity
             android:name=".AboutActivity"
             android:label="@string/title_about"

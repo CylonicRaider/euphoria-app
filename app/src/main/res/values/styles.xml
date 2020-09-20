@@ -1,8 +1,27 @@
 <resources>
-    <!-- Deriving from whatever default theme there was -->
-    <style name="AppTheme" parent="android:Theme.Light"/>
-    <!-- Dark theme for title screen -->
-    <style name="AppTheme.Title" parent="android:Theme"/>
+    <!-- Material override of the theme. -->
+    <style name="AppTheme" parent="Theme.AppCompat.Light.NoActionBar">
+        <!-- Material colors -->
+        <item name="colorPrimary">@color/primary</item>
+        <item name="colorPrimaryDark">@color/primary_dark</item>
+        <item name="colorAccent">@color/accent</item>
+    </style>
+    <!-- Title screen variation (puffing up feathers) -->
+    <style name="AppTheme.Title" parent="Theme.AppCompat.NoActionBar">
+        <!-- Material colors -->
+        <item name="colorPrimary">@color/primary</item>
+        <item name="colorPrimaryDark">@color/primary_dark</item>
+        <item name="colorAccent">@color/accent_dark</item>
+        <!-- Ancillary Material colors -->
+        <item name="android:background">@color/primary</item>
+        <item name="android:windowBackground">@color/primary</item>
+        <item name="android:colorBackground">@color/primary</item>
+    </style>
     <!-- Dialog theme for about screen -->
-    <style name="AppTheme.Dialog" parent="android:Theme.Dialog"/>
+    <style name="AppTheme.Dialog" parent="Theme.AppCompat.Light.Dialog">
+        <!-- Material colors -->
+        <item name="colorPrimary">@color/primary</item>
+        <item name="colorPrimaryDark">@color/primary_dark</item>
+        <item name="colorAccent">@color/accent</item>
+    </style>
 </resources>

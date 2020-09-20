@@ -1,9 +1,9 @@
 package io.euphoria.xkcd.app;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.text.InputFilter;
 import android.text.Spanned;
 import android.view.View;
@@ -17,7 +17,7 @@ import static io.euphoria.xkcd.app.URLs.isValidRoomName;
 import static io.euphoria.xkcd.app.URLs.isValidRoomNameFragment;
 import static io.euphoria.xkcd.app.impl.ui.UIUtils.setEnterKeyListener;
 
-public class MainActivity extends Activity {
+public class MainActivity extends AppCompatActivity {
 
     private Button enterBtn;
     private AutoCompleteTextView roomField;
@@ -77,4 +77,7 @@ public class MainActivity extends Activity {
         startActivity(roomIntent);
     }
 
+    public void showSettings(View settingsBtn) {
+        startActivity(new Intent(this, SettingsActivity.class));
+    }
 }
