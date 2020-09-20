@@ -299,6 +299,10 @@ public class RoomActivity extends AppCompatActivity {
         }
     }
 
+    public void showSettings(MenuItem item) {
+        startActivity(new Intent(this, SettingsActivity.class));
+    }
+
     public void showAbout(MenuItem item) {
         startActivity(new Intent(this, AboutActivity.class));
     }

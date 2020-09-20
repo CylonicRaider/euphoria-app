@@ -77,7 +77,7 @@ public class MainActivity extends AppCompatActivity {
         startActivity(roomIntent);
     }
 
-    public void settingsButtonOnClick(View settingsBtn) {
+    public void showSettings(View settingsBtn) {
         startActivity(new Intent(this, SettingsActivity.class));
     }
 }

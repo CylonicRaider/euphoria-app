@@ -46,12 +46,7 @@
             android:name=".SettingsActivity"
             android:label="@string/title_settings"
             android:launchMode="singleInstance"
-            android:windowSoftInputMode="adjustResize"
-            android:parentActivityName=".MainActivity">
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="io.euphoria.xkcd.app.MainActivity" />
-        </activity>
+            android:windowSoftInputMode="adjustResize"/>
         <activity
             android:name=".AboutActivity"
             android:label="@string/title_about"

@@ -11,6 +11,13 @@
         android:onClick="toggleUserDrawer"/>
 
     <item
+        android:id="@+id/room_action_settings"
+        android:icon="@drawable/ic_settings_white"
+        android:title="@string/room_action_settings_title"
+        app:showAsAction="ifRoom"
+        android:onClick="showSettings"/>
+
+    <item
         android:id="@+id/room_show_about"
         android:title="@string/title_about"
         android:onClick="showAbout"/>

@@ -58,7 +58,7 @@
         android:layout_marginRight="16dp"
         android:background="?selectableItemBackgroundBorderless"
         android:contentDescription="@string/content_desc_btn_settings"
-        android:onClick="settingsButtonOnClick"
+        android:onClick="showSettings"
         android:src="@drawable/ic_settings_white"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
