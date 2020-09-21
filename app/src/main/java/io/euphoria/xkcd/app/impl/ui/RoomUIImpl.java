@@ -15,6 +15,7 @@ import io.euphoria.xkcd.app.connection.ConnectionStatus;
 import io.euphoria.xkcd.app.data.Message;
 import io.euphoria.xkcd.app.data.SessionView;
 import io.euphoria.xkcd.app.impl.ui.data.UIMessage;
+import io.euphoria.xkcd.app.impl.ui.views.InputBarView;
 import io.euphoria.xkcd.app.impl.ui.views.MessageListAdapter;
 import io.euphoria.xkcd.app.impl.ui.views.UserListAdapter;
 import io.euphoria.xkcd.app.ui.RoomUI;
@@ -30,9 +31,11 @@ public class RoomUIImpl implements RoomUI {
 
     private final String roomName;
     private final Set<UIListener> listeners = new LinkedHashSet<>();
+    private SessionView identity;
     private TextView statusDisplay;
     private MessageListAdapter messagesAdapter;
     private UserListAdapter usersAdapter;
+    private InputBarView inputBar;
 
     public RoomUIImpl(String roomName) {
         this.roomName = roomName;
@@ -85,6 +88,11 @@ public class RoomUIImpl implements RoomUI {
     }
 
     @Override
+    public void setIdentity(SessionView identity) {
+        this.identity = identity;
+    }
+
+    @Override
     public void showMessages(List<Message> messages) {
         for (Message m : messages) {
             messagesAdapter.add(new UIMessage(m));
@@ -94,6 +102,11 @@ public class RoomUIImpl implements RoomUI {
     @Override
     public void showNicks(List<SessionView> sessions) {
         usersAdapter.getData().addAll(sessions);
+        for (SessionView s : sessions) {
+            if (s.getSessionID().equals(identity.getSessionID())) {
+                inputBar.setNickText(s.getName());
+            }
+        }
     }
 
     @Override
@@ -129,16 +142,18 @@ public class RoomUIImpl implements RoomUI {
         Log.e("RoomUIImpl", detail + " is not yet implemented...");
     }
 
-    public void link(TextView status, MessageListAdapter messages, UserListAdapter users) {
+    public void link(TextView status, MessageListAdapter messages, UserListAdapter users, InputBarView input) {
         statusDisplay = status;
         messagesAdapter = messages;
         usersAdapter = users;
+        inputBar = input;
     }
 
-    public void unlink(TextView status, MessageListAdapter messages, UserListAdapter users) {
+    public void unlink(TextView status, MessageListAdapter messages, UserListAdapter users, InputBarView input) {
         if (statusDisplay == status) statusDisplay = null;
         if (messagesAdapter == messages) messagesAdapter = null;
         if (usersAdapter == users) usersAdapter = null;
+        if (inputBar == input) inputBar = null;
     }
 
     public void submitEvent(UIEvent evt) {

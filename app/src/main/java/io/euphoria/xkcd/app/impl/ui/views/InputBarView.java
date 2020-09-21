@@ -16,7 +16,6 @@ import static io.euphoria.xkcd.app.impl.ui.UIUtils.hslToRgbInt;
 import static io.euphoria.xkcd.app.impl.ui.UIUtils.nickColor;
 import static io.euphoria.xkcd.app.impl.ui.UIUtils.setColoredBackground;
 import static io.euphoria.xkcd.app.impl.ui.UIUtils.setEnterKeyListener;
-import static io.euphoria.xkcd.app.impl.ui.UIUtils.trimUnicodeWhitespace;
 
 public class InputBarView extends BaseMessageView {
 
@@ -135,6 +134,10 @@ public class InputBarView extends BaseMessageView {
 
     public String getNickText() {
         return nickEntry.getText().toString();
+    }
+
+    public void setNickText(String newNick) {
+        nickEntry.setText(newNick);
     }
 
     public String getMessageText() {
