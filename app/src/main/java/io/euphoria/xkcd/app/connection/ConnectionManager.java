@@ -1,5 +1,7 @@
 package io.euphoria.xkcd.app.connection;
 
+import java.net.HttpCookie;
+
 /** Created by Xyzzy on 2017-02-24. */
 
 /* Main entry point of the connection submodule */
@@ -31,4 +33,10 @@ public interface ConnectionManager {
      */
     void shutdown();
 
+    /* Update the stored session cookie
+     * to match what was received from the server over one of the connections.
+     *
+     * @param sessionCookie The new session cookie, as sent by the server.
+     */
+    void updateSessionCookie(HttpCookie sessionCookie);
 }

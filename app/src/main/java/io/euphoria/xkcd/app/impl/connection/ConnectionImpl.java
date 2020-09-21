@@ -1,7 +1,9 @@
 package io.euphoria.xkcd.app.impl.connection;
 
+import android.support.annotation.Nullable;
 import android.util.Log;
 
+import java.net.HttpCookie;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -27,13 +29,15 @@ public class ConnectionImpl implements Connection {
     private final List<ConnectionListener> listeners;
     private ConnectionStatus status;
     private EuphoriaWebSocketClient client;
+    private HttpCookie sessionCookie;
     private int seqid;
 
-    public ConnectionImpl(ConnectionManagerImpl parent, String roomName) {
+    public ConnectionImpl(ConnectionManagerImpl parent, String roomName, @Nullable HttpCookie sessionCookie) {
         this.parent = parent;
         this.roomName = roomName;
         this.listeners = new ArrayList<>();
         this.status = ConnectionStatus.CONNECTING;
+        this.sessionCookie = sessionCookie;
     }
 
     public ConnectionManagerImpl getParent() {
@@ -47,7 +51,7 @@ public class ConnectionImpl implements Connection {
 
     public synchronized void connect() {
         // FIXME: Allow specifying a custom URL template.
-        client = new EuphoriaWebSocketClient(this, URLs.toURI(URLs.getRoomEndpoint(roomName)));
+        client = new EuphoriaWebSocketClient(this, URLs.toURI(URLs.getRoomEndpoint(roomName)), sessionCookie);
         client.connect();
     }
 
@@ -137,6 +141,11 @@ public class ConnectionImpl implements Connection {
     @Override
     public synchronized void removeEventListener(ConnectionListener l) {
         listeners.remove(l);
+    }
+
+    @Override
+    public void updateSessionCookie(HttpCookie sessionCookie) {
+        parent.updateSessionCookie(sessionCookie);
     }
 
 }

@@ -3,9 +3,11 @@ package io.euphoria.xkcd.app.impl.connection;
 import android.os.Handler;
 import android.os.Looper;
 
+import java.net.HttpCookie;
 import java.util.HashMap;
 import java.util.Map;
 
+import io.euphoria.xkcd.app.Settings;
 import io.euphoria.xkcd.app.connection.Connection;
 import io.euphoria.xkcd.app.connection.ConnectionManager;
 
@@ -14,10 +16,12 @@ import io.euphoria.xkcd.app.connection.ConnectionManager;
 /* Implementation of ConnectionManager */
 public class ConnectionManagerImpl implements ConnectionManager {
 
+    private final Settings settings;
     private final Handler handler;
     private final Map<String, ConnectionImpl> connections;
 
-    public ConnectionManagerImpl() {
+    public ConnectionManagerImpl(Settings settings) {
+        this.settings = settings;
         handler = new Handler(Looper.getMainLooper());
         connections = new HashMap<>();
     }
@@ -31,7 +35,7 @@ public class ConnectionManagerImpl implements ConnectionManager {
     public synchronized Connection connect(String roomName) {
         ConnectionImpl conn = connections.get(roomName);
         if (conn == null) {
-            conn = new ConnectionImpl(this, roomName);
+            conn = new ConnectionImpl(this, roomName, settings.shouldContinuePrevSession() ? settings.getSessionCookie() : null);
             conn.connect();
             connections.put(roomName, conn);
         }
@@ -52,6 +56,11 @@ public class ConnectionManagerImpl implements ConnectionManager {
         for (ConnectionImpl c : connections.values()) {
             c.close();
         }
+    }
+
+    @Override
+    public void updateSessionCookie(HttpCookie sessionCookie) {
+        settings.setSessionCookie(sessionCookie);
     }
 
     public void invokeLater(Runnable cb) {

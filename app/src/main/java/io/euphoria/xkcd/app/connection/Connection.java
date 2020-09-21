@@ -1,5 +1,7 @@
 package io.euphoria.xkcd.app.connection;
 
+import java.net.HttpCookie;
+
 /** Created by Xyzzy on 2017-02-24. */
 
 /* A connection to the Euphoria backend */
@@ -46,4 +48,9 @@ public interface Connection {
     /* Remove an event listener */
     void removeEventListener(ConnectionListener l);
 
+    /* Update the stored session cookie to match what was received from the server.
+     *
+     * @param sessionCookie The new session cookie, as sent by the server.
+     */
+    void updateSessionCookie(HttpCookie sessionCookie);
 }

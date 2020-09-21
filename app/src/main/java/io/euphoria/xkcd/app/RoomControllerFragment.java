@@ -24,7 +24,7 @@ public class RoomControllerFragment extends Fragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         roomUIManager = new RoomUIManagerImpl();
-        connManager = new ConnectionManagerImpl();
+        connManager = new ConnectionManagerImpl(new Settings(getActivity().getApplicationContext()));
         roomController = new RoomController(getActivity().getApplicationContext(), roomUIManager, connManager);
         setRetainInstance(true);
     }

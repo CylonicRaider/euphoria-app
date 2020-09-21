@@ -1,5 +1,6 @@
 package io.euphoria.xkcd.app.impl.connection;
 
+import android.support.annotation.Nullable;
 import android.util.Log;
 
 import org.java_websocket.client.WebSocketClient;
@@ -8,6 +9,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.net.HttpCookie;
 import java.net.URI;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
@@ -33,6 +35,8 @@ import io.euphoria.xkcd.app.data.SessionView;
 /** Created by Xyzzy on 2017-05-01. */
 
 public class EuphoriaWebSocketClient extends WebSocketClient {
+
+    private final static String SESSION_COOKIE_NAME = "a";
 
     private static class SessionViewImpl implements ServerSessionView {
 
@@ -290,6 +294,7 @@ public class EuphoriaWebSocketClient extends WebSocketClient {
     }
 
     private final ConnectionImpl parent;
+    private final URI endpoint;
     private final Map<String, ServerSessionView> sessions;
     private final Queue<String> sendaheadQueue;
     private boolean ready;
@@ -297,9 +302,11 @@ public class EuphoriaWebSocketClient extends WebSocketClient {
     private String sessionID;
     private String confirmedNick;
 
-    public EuphoriaWebSocketClient(ConnectionImpl parent, URI endpoint) {
-        super(endpoint);
+    public EuphoriaWebSocketClient(ConnectionImpl parent, URI endpoint, @Nullable final HttpCookie sessionCookie) {
+        super(endpoint, sessionCookie != null ? Collections.singletonMap("Cookie", sessionCookie.toString()) : null);
+
         this.parent = parent;
+        this.endpoint = endpoint;
         this.sessions = new HashMap<>();
         this.sendaheadQueue = new ArrayDeque<>();
         this.ready = false;
@@ -314,6 +321,20 @@ public class EuphoriaWebSocketClient extends WebSocketClient {
 
     @Override
     public void onOpen(ServerHandshake handshakedata) {
+        // update the session cookie based on what the server sends us
+        String cookieString = handshakedata.getFieldValue("Set-Cookie");
+        if (!cookieString.equals("")) {
+            List<HttpCookie> cookies = HttpCookie.parse(cookieString);
+            for (HttpCookie cookie: cookies) {
+                if (
+                        (cookie.getDomain() == null || cookie.getDomain().equals(endpoint.getHost()))
+                        && cookie.getName().equals(SESSION_COOKIE_NAME)
+                ) {
+                    parent.updateSessionCookie(cookie);
+                    break;
+                }
+            }
+        }
         parent.submitEvent(new OpenEventImpl());
     }
 
