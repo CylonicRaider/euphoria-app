@@ -104,7 +104,7 @@ public class RoomUIImpl implements RoomUI {
         usersAdapter.getData().addAll(sessions);
         for (SessionView s : sessions) {
             if (s.getSessionID().equals(identity.getSessionID())) {
-                inputBar.setNickText(s.getName());
+                inputBar.setAllNicks(s.getName());
             }
         }
     }

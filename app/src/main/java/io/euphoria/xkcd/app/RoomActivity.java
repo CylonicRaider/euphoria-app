@@ -237,8 +237,9 @@ public class RoomActivity extends AppCompatActivity {
         inputBar.setNickChangeListener(new InputBarView.NickChangeListener() {
             @Override
             public boolean onChangeNick(InputBarView view) {
-                final String text = view.getNickText();
+                final String text = view.getNextNick();
                 if (text.isEmpty() || roomUI.getConnectionStatus() != ConnectionStatus.CONNECTED) return false;
+                if (text.equals(view.getConfirmedNick())) return true;
                 roomUI.submitEvent(new NewNickEvent() {
                     @Override
                     public String getNewNick() {
