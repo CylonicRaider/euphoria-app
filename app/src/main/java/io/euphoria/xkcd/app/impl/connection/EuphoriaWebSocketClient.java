@@ -294,6 +294,8 @@ public class EuphoriaWebSocketClient extends WebSocketClient {
     private final Queue<String> sendaheadQueue;
     private boolean ready;
     private boolean closed;
+    private String sessionID;
+    private String confirmedNick;
 
     public EuphoriaWebSocketClient(ConnectionImpl parent, URI endpoint) {
         super(endpoint);
@@ -302,6 +304,8 @@ public class EuphoriaWebSocketClient extends WebSocketClient {
         this.sendaheadQueue = new ArrayDeque<>();
         this.ready = false;
         this.closed = false;
+        this.sessionID = null;
+        this.confirmedNick = "";
     }
 
     public ConnectionImpl getParent() {
@@ -353,7 +357,9 @@ public class EuphoriaWebSocketClient extends WebSocketClient {
                             .toString());
                     break;
                 case "hello-event":
-                    submitEvent(new IdentityEventImpl(parseSessionView(data.getJSONObject("session"))));
+                    ServerSessionView identity = parseSessionView(data.getJSONObject("session"));
+                    sessionID = identity.getSessionID();
+                    submitEvent(new IdentityEventImpl(identity));
                     dispatchReady();
                     break;
                 case "join-event":
@@ -377,15 +383,34 @@ public class EuphoriaWebSocketClient extends WebSocketClient {
                     } else {
                         Log.w("EuphoriaWebSocketClient", "Unknown network-event subtype: " + subtype);
                     }
+                    break;
                 case "nick-event": case "nick-reply":
-                    ServerSessionView session = sessions.get(data.getString("session_id"));
-                    if (session == null) {
-                        Log.e("EuphoriaWebSocketClient", "Dropping nick change of unknown session ID " +
-                                data.getString("session_id") + "!");
-                        break;
+                    String newNick;
+                    ServerSessionView session;
+                    if (data == null) {
+                        // Error: The server rejected a nickname change -- roll back to the latest confirmed nick.
+                        if (type.equals("nick-event")) {
+                            Log.e("EuphoriaWebSocketClient", "nick-event contains no data?!");
+                            break;
+                        }
+                        newNick = confirmedNick;
+                        session = sessions.get(sessionID);
+                        if (session == null) {
+                            Log.e("EuphoriaWebSocketClient",
+                                    "Cannot locate our own session while processing a failed nick-reply?!");
+                            break;
+                        }
+                    } else {
+                        newNick = data.getString("to");
+                        confirmedNick = newNick;
+                        session = sessions.get(data.getString("session_id"));
+                        if (session == null) {
+                            Log.e("EuphoriaWebSocketClient", "Dropping nick change of unknown session ID " +
+                                    data.getString("session_id") + "!");
+                            break;
+                        }
                     }
-                    submitEvent(new NickChangeEventImpl(new SessionViewImpl(session, data.getString("to")),
-                            session.getName()));
+                    submitEvent(new NickChangeEventImpl(new SessionViewImpl(session, newNick), session.getName()));
                     break;
                 case "part-event":
                     submitEvent(new PresenceChangeEventImpl(Collections.singletonList(parseSessionView(data)),

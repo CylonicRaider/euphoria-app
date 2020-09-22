@@ -8,7 +8,6 @@ import android.os.Parcelable;
 import android.support.annotation.NonNull;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -233,13 +232,14 @@ public class RoomActivity extends AppCompatActivity {
         });
 
         // Controller etc. setup
-        roomUI.link(statusDisplay, messageAdapter, userListAdapter);
+        roomUI.link(statusDisplay, messageAdapter, userListAdapter, inputBar);
         roomController.openRoom(roomName);
         inputBar.setNickChangeListener(new InputBarView.NickChangeListener() {
             @Override
             public boolean onChangeNick(InputBarView view) {
-                final String text = view.getNickText();
+                final String text = view.getNextNick();
                 if (text.isEmpty() || roomUI.getConnectionStatus() != ConnectionStatus.CONNECTED) return false;
+                if (text.equals(view.getConfirmedNick())) return true;
                 roomUI.submitEvent(new NewNickEvent() {
                     @Override
                     public String getNewNick() {
@@ -332,7 +332,7 @@ public class RoomActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        roomUI.unlink(statusDisplay, messageAdapter, userListAdapter);
+        roomUI.unlink(statusDisplay, messageAdapter, userListAdapter, inputBar);
         roomController.closeRoom(roomUI.getRoomName());
         roomController.getRoomUIManager().setRoomUIFactory(null);
         roomController.shutdown();

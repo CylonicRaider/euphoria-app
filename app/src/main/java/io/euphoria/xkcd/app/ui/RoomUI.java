@@ -29,6 +29,9 @@ public interface RoomUI {
      */
     void setConnectionStatus(ConnectionStatus status);
 
+    /* Set the identity of the user this UI acts as */
+    void setIdentity(SessionView identity);
+
     /* Display the given messages
      *
      * If a message in the list is already visible (as determined by the message ID), it is to be replaced.

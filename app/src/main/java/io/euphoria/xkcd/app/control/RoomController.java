@@ -109,6 +109,7 @@ public class RoomController {
                 invokeLater(new Runnable() {
                     @Override
                     public void run() {
+                        ui.setIdentity(evt.getIdentity());
                         ui.showNicks(Collections.singletonList(evt.getIdentity()));
                     }
                 });

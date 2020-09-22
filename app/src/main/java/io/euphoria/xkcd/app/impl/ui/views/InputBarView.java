@@ -16,7 +16,6 @@ import static io.euphoria.xkcd.app.impl.ui.UIUtils.hslToRgbInt;
 import static io.euphoria.xkcd.app.impl.ui.UIUtils.nickColor;
 import static io.euphoria.xkcd.app.impl.ui.UIUtils.setColoredBackground;
 import static io.euphoria.xkcd.app.impl.ui.UIUtils.setEnterKeyListener;
-import static io.euphoria.xkcd.app.impl.ui.UIUtils.trimUnicodeWhitespace;
 
 public class InputBarView extends BaseMessageView {
 
@@ -33,6 +32,7 @@ public class InputBarView extends BaseMessageView {
     }
 
     private final MarginLayoutParams defaultLayoutParams;
+    private String confirmedNick;
     private String lastNick;
     private EditText nickEntry;
     private EditText messageEntry;
@@ -105,6 +105,10 @@ public class InputBarView extends BaseMessageView {
         // TODO state saving should go here
     }
 
+    public String getConfirmedNick() {
+        return confirmedNick;
+    }
+
     public String getLastNick() {
         return lastNick;
     }
@@ -133,8 +137,14 @@ public class InputBarView extends BaseMessageView {
         this.nickChangeListener = nickChangeListener;
     }
 
-    public String getNickText() {
+    public String getNextNick() {
         return nickEntry.getText().toString();
+    }
+
+    public void setAllNicks(String nick) {
+        confirmedNick = nick;
+        lastNick = nick;
+        nickEntry.setText(nick);
     }
 
     public String getMessageText() {
