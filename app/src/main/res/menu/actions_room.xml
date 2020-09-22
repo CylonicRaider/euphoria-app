@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+      xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item
         android:id="@+id/room_action_users"
@@ -14,7 +13,6 @@
         android:id="@+id/room_action_settings"
         android:icon="@drawable/ic_settings_white"
         android:title="@string/room_action_settings_title"
-        app:showAsAction="ifRoom"
         android:onClick="showSettings"/>
 
     <item
