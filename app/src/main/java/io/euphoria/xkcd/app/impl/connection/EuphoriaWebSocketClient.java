@@ -305,7 +305,7 @@ public class EuphoriaWebSocketClient extends WebSocketClient {
         this.ready = false;
         this.closed = false;
         this.sessionID = null;
-        this.confirmedNick = null;
+        this.confirmedNick = "";
     }
 
     public ConnectionImpl getParent() {
