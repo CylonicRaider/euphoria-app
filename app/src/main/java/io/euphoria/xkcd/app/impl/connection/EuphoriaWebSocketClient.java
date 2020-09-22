@@ -383,6 +383,7 @@ public class EuphoriaWebSocketClient extends WebSocketClient {
                     } else {
                         Log.w("EuphoriaWebSocketClient", "Unknown network-event subtype: " + subtype);
                     }
+                    break;
                 case "nick-event": case "nick-reply":
                     String newNick;
                     ServerSessionView session;
