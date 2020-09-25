@@ -303,8 +303,8 @@ public class EuphoriaWebSocketClient extends WebSocketClient {
     private String sessionID;
     private String confirmedNick;
 
-    public EuphoriaWebSocketClient(ConnectionImpl parent, URI endpoint, @Nullable final HttpCookie sessionCookie) {
-        super(endpoint, sessionCookie != null ? Collections.singletonMap("Cookie", sessionCookie.toString()) : null);
+    public EuphoriaWebSocketClient(ConnectionImpl parent, URI endpoint) {
+        super(endpoint);
 
         this.parent = parent;
         this.endpoint = endpoint;
@@ -314,6 +314,10 @@ public class EuphoriaWebSocketClient extends WebSocketClient {
         this.closed = false;
         this.sessionID = null;
         this.confirmedNick = "";
+
+        HttpCookie sessionCookie = parent.getSessionCookie();
+        if (sessionCookie != null)
+            addHeader("Cookie", sessionCookie.toString());
     }
 
     public ConnectionImpl getParent() {
@@ -324,14 +328,14 @@ public class EuphoriaWebSocketClient extends WebSocketClient {
     public void onOpen(ServerHandshake handshakedata) {
         // update the session cookie based on what the server sends us
         String cookieString = handshakedata.getFieldValue("Set-Cookie");
-        if (!cookieString.equals("")) {
+        if (!cookieString.isEmpty()) {
             List<HttpCookie> cookies = HttpCookie.parse(cookieString);
             for (HttpCookie cookie: cookies) {
                 if (
                         (cookie.getDomain() == null || cookie.getDomain().equals(endpoint.getHost()))
                         && cookie.getName().equals(SESSION_COOKIE_NAME)
                 ) {
-                    parent.updateSessionCookie(cookie);
+                    parent.putSessionCookie(cookie);
                     break;
                 }
             }

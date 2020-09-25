@@ -32,12 +32,4 @@ public interface ConnectionManager {
      * Any still-present connections should be closed, and any resources held released.
      */
     void shutdown();
-
-    /* Update the stored session cookie
-     * to match what was received from the server over one of the connections.
-     *
-     * @param sessionCookie The new session cookie, as sent by the server.
-     */
-    void updateSessionCookie(HttpCookie sessionCookie);
-
 }
