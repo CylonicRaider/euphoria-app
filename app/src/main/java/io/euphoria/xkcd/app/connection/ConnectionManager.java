@@ -39,4 +39,5 @@ public interface ConnectionManager {
      * @param sessionCookie The new session cookie, as sent by the server.
      */
     void updateSessionCookie(HttpCookie sessionCookie);
+
 }

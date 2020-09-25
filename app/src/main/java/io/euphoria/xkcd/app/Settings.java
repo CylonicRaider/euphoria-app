@@ -9,6 +9,7 @@ import java.net.HttpCookie;
 import java.util.List;
 
 public class Settings {
+
     private static final String KEY_CONTINUE_PREV_SESSION = "continue_prev_session";
     private static final String KEY_SESSION_COOKIE = "session_cookie";
 
@@ -55,4 +56,5 @@ public class Settings {
         }
         prefEditor.apply();
     }
+
 }
