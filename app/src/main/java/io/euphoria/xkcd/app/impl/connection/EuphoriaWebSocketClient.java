@@ -36,8 +36,6 @@ import io.euphoria.xkcd.app.data.SessionView;
 
 public class EuphoriaWebSocketClient extends WebSocketClient {
 
-    private final static String SESSION_COOKIE_NAME = "a";
-
     private static class SessionViewImpl implements ServerSessionView {
 
         private final String sessionID;
@@ -292,6 +290,9 @@ public class EuphoriaWebSocketClient extends WebSocketClient {
         }
 
     }
+
+    // FIXME: Allow configuring this somewhere?
+    private final static String SESSION_COOKIE_NAME = "a";
 
     private final ConnectionImpl parent;
     private final URI endpoint;
