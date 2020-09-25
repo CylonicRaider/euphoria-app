@@ -445,9 +445,9 @@ public class EuphoriaWebSocketClient extends WebSocketClient {
                     submitEvent(new PresenceChangeEventImpl(parseSessionViewArray(data.getJSONArray("listing")),
                             true));
                     submitEvent(new LogEventImpl(parseMessageArray(data.getJSONArray("log"))));
-                    // A nick from a previous session might be included
+                    // A nick from a previous session might be included.
                     if (data.has("nick")) {
-                        // not-null by protocol (the session_id should be that of this client)
+                        // Not-null by protocol (the session_id should be that of this client).
                         session = sessions.get(data.getString("session_id"));
                         submitEvent(new NickChangeEventImpl(new SessionViewImpl(session, data.getString("nick")), session.getName()));
                     }
