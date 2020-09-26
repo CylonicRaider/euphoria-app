@@ -31,6 +31,9 @@ public class Settings {
     /**
      * Retrieve the stored session cookie, if one was stored previously.
      *
+     * This retrieves the cookie unconditionally; also check {@link #shouldContinuePrevSession()} for whether a stored
+     * cookie should be used at all.
+     *
      * @return The retrieved session cookie, or <code>null</code> if none was stored previously.
      */
     @Nullable

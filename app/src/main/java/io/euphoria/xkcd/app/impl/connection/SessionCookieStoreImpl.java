@@ -18,7 +18,7 @@ public class SessionCookieStoreImpl implements SessionCookieStore {
 
     @Nullable
     public HttpCookie getSessionCookie(@NonNull String roomName) {
-        return settings.getSessionCookie();
+        return settings.shouldContinuePrevSession() ? settings.getSessionCookie() : null;
     }
 
     public void putSessionCookie(@NonNull String roomName, @NonNull HttpCookie newSessionCookie) {
