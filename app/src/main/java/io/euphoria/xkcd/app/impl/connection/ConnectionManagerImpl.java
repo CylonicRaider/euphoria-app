@@ -8,18 +8,25 @@ import java.util.Map;
 
 import io.euphoria.xkcd.app.connection.Connection;
 import io.euphoria.xkcd.app.connection.ConnectionManager;
+import io.euphoria.xkcd.app.connection.SessionCookieStore;
 
 /** Created by Xyzzy on 2017-02-24. */
 
 /* Implementation of ConnectionManager */
 public class ConnectionManagerImpl implements ConnectionManager {
 
+    private final SessionCookieStore sessionCookieStore;
     private final Handler handler;
     private final Map<String, ConnectionImpl> connections;
 
-    public ConnectionManagerImpl() {
+    public ConnectionManagerImpl(SessionCookieStore sessionCookieStore) {
+        this.sessionCookieStore = sessionCookieStore;
         handler = new Handler(Looper.getMainLooper());
         connections = new HashMap<>();
+    }
+
+    public SessionCookieStore getSessionCookieStore() {
+        return sessionCookieStore;
     }
 
     @Override

@@ -1,7 +1,10 @@
 package io.euphoria.xkcd.app.impl.connection;
 
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.util.Log;
 
+import java.net.HttpCookie;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -137,6 +140,15 @@ public class ConnectionImpl implements Connection {
     @Override
     public synchronized void removeEventListener(ConnectionListener l) {
         listeners.remove(l);
+    }
+
+    @Nullable
+    HttpCookie getSessionCookie() {
+        return parent.getSessionCookieStore().getSessionCookie(roomName);
+    }
+
+    void putSessionCookie(@NonNull HttpCookie newSessionCookie) {
+        parent.getSessionCookieStore().putSessionCookie(roomName, newSessionCookie);
     }
 
 }

@@ -8,6 +8,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.net.HttpCookie;
 import java.net.URI;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
@@ -289,7 +290,11 @@ public class EuphoriaWebSocketClient extends WebSocketClient {
 
     }
 
+    // FIXME: Allow configuring this somewhere?
+    private final static String SESSION_COOKIE_NAME = "a";
+
     private final ConnectionImpl parent;
+    private final URI endpoint;
     private final Map<String, ServerSessionView> sessions;
     private final Queue<String> sendaheadQueue;
     private boolean ready;
@@ -299,13 +304,19 @@ public class EuphoriaWebSocketClient extends WebSocketClient {
 
     public EuphoriaWebSocketClient(ConnectionImpl parent, URI endpoint) {
         super(endpoint);
+
         this.parent = parent;
+        this.endpoint = endpoint;
         this.sessions = new HashMap<>();
         this.sendaheadQueue = new ArrayDeque<>();
         this.ready = false;
         this.closed = false;
         this.sessionID = null;
         this.confirmedNick = "";
+
+        HttpCookie sessionCookie = parent.getSessionCookie();
+        if (sessionCookie != null)
+            addHeader("Cookie", sessionCookie.toString());
     }
 
     public ConnectionImpl getParent() {
@@ -314,6 +325,20 @@ public class EuphoriaWebSocketClient extends WebSocketClient {
 
     @Override
     public void onOpen(ServerHandshake handshakedata) {
+        // update the session cookie based on what the server sends us
+        String cookieString = handshakedata.getFieldValue("Set-Cookie");
+        if (!cookieString.isEmpty()) {
+            List<HttpCookie> cookies = HttpCookie.parse(cookieString);
+            for (HttpCookie cookie: cookies) {
+                if (
+                        (cookie.getDomain() == null || cookie.getDomain().equals(endpoint.getHost()))
+                        && cookie.getName().equals(SESSION_COOKIE_NAME)
+                ) {
+                    parent.putSessionCookie(cookie);
+                    break;
+                }
+            }
+        }
         parent.submitEvent(new OpenEventImpl());
     }
 
@@ -423,6 +448,12 @@ public class EuphoriaWebSocketClient extends WebSocketClient {
                     submitEvent(new PresenceChangeEventImpl(parseSessionViewArray(data.getJSONArray("listing")),
                             true));
                     submitEvent(new LogEventImpl(parseMessageArray(data.getJSONArray("log"))));
+                    // A nick from a previous session might be included.
+                    if (data.has("nick")) {
+                        // Not-null by protocol (the session_id should be that of this client).
+                        session = sessions.get(data.getString("session_id"));
+                        submitEvent(new NickChangeEventImpl(new SessionViewImpl(session, data.getString("nick")), session.getName()));
+                    }
                     break;
                 case "get-message-reply":
                     submitEvent(new LogEventImpl(Collections.singletonList(parseMessage(data))));

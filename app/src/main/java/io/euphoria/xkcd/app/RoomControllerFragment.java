@@ -5,8 +5,10 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 
 import io.euphoria.xkcd.app.connection.ConnectionManager;
+import io.euphoria.xkcd.app.connection.SessionCookieStore;
 import io.euphoria.xkcd.app.control.RoomController;
 import io.euphoria.xkcd.app.impl.connection.ConnectionManagerImpl;
+import io.euphoria.xkcd.app.impl.connection.SessionCookieStoreImpl;
 import io.euphoria.xkcd.app.impl.ui.RoomUIManagerImpl;
 import io.euphoria.xkcd.app.ui.RoomUIManager;
 
@@ -24,7 +26,8 @@ public class RoomControllerFragment extends Fragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         roomUIManager = new RoomUIManagerImpl();
-        connManager = new ConnectionManagerImpl();
+        SessionCookieStore sessionCookieStore = new SessionCookieStoreImpl(new Settings(getActivity().getApplicationContext()));
+        connManager = new ConnectionManagerImpl(sessionCookieStore);
         roomController = new RoomController(getActivity().getApplicationContext(), roomUIManager, connManager);
         setRetainInstance(true);
     }
