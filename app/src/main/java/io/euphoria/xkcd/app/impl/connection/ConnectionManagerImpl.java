@@ -15,7 +15,7 @@ import io.euphoria.xkcd.app.connection.SessionCookieStore;
 /* Implementation of ConnectionManager */
 public class ConnectionManagerImpl implements ConnectionManager {
 
-    final SessionCookieStore sessionCookieStore;
+    private final SessionCookieStore sessionCookieStore;
     private final Handler handler;
     private final Map<String, ConnectionImpl> connections;
 
@@ -23,6 +23,10 @@ public class ConnectionManagerImpl implements ConnectionManager {
         this.sessionCookieStore = sessionCookieStore;
         handler = new Handler(Looper.getMainLooper());
         connections = new HashMap<>();
+    }
+
+    public SessionCookieStore getSessionCookieStore() {
+        return sessionCookieStore;
     }
 
     @Override

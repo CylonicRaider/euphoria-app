@@ -142,13 +142,13 @@ public class ConnectionImpl implements Connection {
         listeners.remove(l);
     }
 
-    void putSessionCookie(@NonNull HttpCookie newSessionCookie) {
-        parent.sessionCookieStore.putSessionCookie(roomName, newSessionCookie);
-    }
-
     @Nullable
     HttpCookie getSessionCookie() {
-        return parent.sessionCookieStore.getSessionCookie(roomName);
+        return parent.getSessionCookieStore().getSessionCookie(roomName);
+    }
+
+    void putSessionCookie(@NonNull HttpCookie newSessionCookie) {
+        parent.getSessionCookieStore().putSessionCookie(roomName, newSessionCookie);
     }
 
 }
