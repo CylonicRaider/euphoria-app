@@ -150,4 +150,5 @@ public class ConnectionImpl implements Connection {
     HttpCookie getSessionCookie() {
         return parent.sessionCookieStore.getSessionCookie(roomName);
     }
+
 }

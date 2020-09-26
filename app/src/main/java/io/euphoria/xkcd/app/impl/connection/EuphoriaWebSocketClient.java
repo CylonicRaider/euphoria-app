@@ -1,6 +1,5 @@
 package io.euphoria.xkcd.app.impl.connection;
 
-import android.support.annotation.Nullable;
 import android.util.Log;
 
 import org.java_websocket.client.WebSocketClient;

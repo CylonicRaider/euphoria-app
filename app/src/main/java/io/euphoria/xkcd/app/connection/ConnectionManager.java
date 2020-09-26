@@ -1,7 +1,5 @@
 package io.euphoria.xkcd.app.connection;
 
-import java.net.HttpCookie;
-
 /** Created by Xyzzy on 2017-02-24. */
 
 /* Main entry point of the connection submodule */
@@ -32,4 +30,5 @@ public interface ConnectionManager {
      * Any still-present connections should be closed, and any resources held released.
      */
     void shutdown();
+
 }

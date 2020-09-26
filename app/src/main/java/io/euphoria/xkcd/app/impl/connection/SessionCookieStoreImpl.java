@@ -24,4 +24,5 @@ public class SessionCookieStoreImpl implements SessionCookieStore {
     public void putSessionCookie(@NonNull String roomName, @NonNull HttpCookie newSessionCookie) {
         settings.setSessionCookie(newSessionCookie);
     }
+
 }
