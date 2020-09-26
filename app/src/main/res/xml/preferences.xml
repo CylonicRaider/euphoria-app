@@ -4,6 +4,6 @@
         app:key="continue_prev_session"
         app:title="@string/setting_continue_prev_session_title"
         app:summary="@string/setting_continue_prev_session_summary"
-        app:defaultValue="false"
+        app:defaultValue="true"
         />
 </PreferenceScreen>
