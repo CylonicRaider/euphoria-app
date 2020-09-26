@@ -20,9 +20,11 @@ public class Settings {
     }
 
     /**
-     * Check in the apps settings if the previous session should be continued.
+     * Return whether the previous session should be continued.
      *
-     * @return <code>true</code> if the previous session should be continued, <code>false</code> otherwise.
+     * This retrieves the value of a user-configurable setting.
+     *
+     * @return {@code true} if the previous session should be continued, {@code false} otherwise.
      */
     public boolean shouldContinuePrevSession() {
         return preferences.getBoolean(KEY_CONTINUE_PREV_SESSION, false);
@@ -31,10 +33,10 @@ public class Settings {
     /**
      * Retrieve the stored session cookie, if one was stored previously.
      *
-     * This retrieves the cookie unconditionally; also check {@link #shouldContinuePrevSession()} for whether a stored
+     * This reads the cookie unconditionally; also check {@link #shouldContinuePrevSession()} for whether a stored
      * cookie should be used at all.
      *
-     * @return The retrieved session cookie, or <code>null</code> if none was stored previously.
+     * @return The retrieved session cookie, or {@code null} if none was stored previously.
      */
     @Nullable
     public HttpCookie getSessionCookie() {
@@ -46,9 +48,9 @@ public class Settings {
     }
 
     /**
-     * Store the current session cookie to be re-used for future session.
+     * Store the current session cookie to be re-used for future sessions.
      *
-     * @param sessionCookie The session cookie to store, or <code>null</code> to clear the currently stored session cookie.
+     * @param sessionCookie The session cookie to store, or {@code null} to clear the currently stored session cookie.
      */
     public void setSessionCookie(@Nullable HttpCookie sessionCookie) {
         SharedPreferences.Editor prefEditor = preferences.edit();
