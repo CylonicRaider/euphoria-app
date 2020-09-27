@@ -18,11 +18,11 @@ public class SessionCookieStoreImpl implements SessionCookieStore {
 
     @Nullable
     public HttpCookie getSessionCookie(@NonNull String roomName) {
-        return settings.shouldContinuePrevSession() ? settings.getSessionCookie() : null;
+        return settings.isInPrivateMode() ? null : settings.getSessionCookie();
     }
 
     public void putSessionCookie(@NonNull String roomName, @NonNull HttpCookie newSessionCookie) {
-        settings.setSessionCookie(newSessionCookie);
+        if (!settings.isInPrivateMode()) settings.setSessionCookie(newSessionCookie);
     }
 
 }

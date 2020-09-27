@@ -10,7 +10,7 @@ import java.util.List;
 
 public class Settings {
 
-    private static final String KEY_CONTINUE_PREV_SESSION = "continue_prev_session";
+    private static final String KEY_PRIVATE_MODE = "private_mode";
     private static final String KEY_SESSION_COOKIE = "session_cookie";
 
     private final SharedPreferences preferences;
@@ -20,21 +20,21 @@ public class Settings {
     }
 
     /**
-     * Return whether the previous session should be continued.
+     * Return whether the "private mode" setting is enabled.
      *
-     * This retrieves the value of a user-configurable setting.
+     * In private mode, the session cookie (see {@link #getSessionCookie()}) should be neither read nor written.
      *
-     * @return {@code true} if the previous session should be continued, {@code false} otherwise.
+     * @return {@code true} in private mode, {@code false} otherwise.
      */
-    public boolean shouldContinuePrevSession() {
-        return preferences.getBoolean(KEY_CONTINUE_PREV_SESSION, false);
+    public boolean isInPrivateMode() {
+        return preferences.getBoolean(KEY_PRIVATE_MODE, false);
     }
 
     /**
      * Retrieve the stored session cookie, if one was stored previously.
      *
-     * This reads the cookie unconditionally; also check {@link #shouldContinuePrevSession()} for whether a stored
-     * cookie should be used at all.
+     * This reads the cookie unconditionally; also check {@link #isInPrivateMode()} for whether a stored cookie should
+     * be used at all.
      *
      * @return The retrieved session cookie, or {@code null} if none was stored previously.
      */
