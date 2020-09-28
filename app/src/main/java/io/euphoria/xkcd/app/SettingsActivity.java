@@ -2,6 +2,7 @@ package io.euphoria.xkcd.app;
 
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.preference.Preference;
 import android.support.v7.preference.PreferenceFragmentCompat;
 import android.support.v7.widget.Toolbar;
 
@@ -12,6 +13,16 @@ public class SettingsActivity extends AppCompatActivity {
         @Override
         public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
             setPreferencesFromResource(R.xml.preferences, rootKey);
+            final Settings settings = new Settings(getContext());
+
+            Preference deletePref = getPreferenceManager().findPreference("delete_cookie");
+            deletePref.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+                @Override
+                public boolean onPreferenceClick(Preference preference) {
+                    settings.setSessionCookie(null);
+                    return true;
+                }
+            });
         }
 
     }

@@ -32,6 +32,10 @@
         When enabled, you will appear as a new person every time you open a room. When disabled, you will regain your
         old identity.
     </string>
+    <string name="setting_delete_cookie_title">Delete cookie</string>
+    <string name="setting_delete_cookie_summary">
+        This will make you appear as a new person (outside of private mode)
+    </string>
 
     <string name="title_about">About</string>
     <string name="version_line">Version %1$s %2$s</string>

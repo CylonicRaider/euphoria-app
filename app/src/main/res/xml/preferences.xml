@@ -5,4 +5,8 @@
         app:title="@string/setting_private_mode_title"
         app:summary="@string/setting_private_mode_summary"
         app:defaultValue="false"/>
+    <Preference
+        app:key="delete_cookie"
+        app:title="@string/setting_delete_cookie_title"
+        app:summary="@string/setting_delete_cookie_summary"/>
 </PreferenceScreen>
