@@ -145,6 +145,10 @@ public class InputBarView extends BaseMessageView {
         confirmedNick = nick;
         lastNick = nick;
         nickEntry.setText(nick);
+        if (!nick.isEmpty()) {
+            nickEntry.setSelection(nick.length());
+            if (nickEntry.isFocused()) messageEntry.requestFocus();
+        }
     }
 
     public String getMessageText() {
