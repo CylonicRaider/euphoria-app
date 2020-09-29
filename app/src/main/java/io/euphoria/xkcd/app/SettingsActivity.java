@@ -1,6 +1,8 @@
 package io.euphoria.xkcd.app;
 
+import android.content.DialogInterface;
 import android.os.Bundle;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.preference.Preference;
 import android.support.v7.preference.PreferenceFragmentCompat;
@@ -19,7 +21,18 @@ public class SettingsActivity extends AppCompatActivity {
             deletePref.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
                 @Override
                 public boolean onPreferenceClick(Preference preference) {
-                    settings.setSessionCookie(null);
+                    new AlertDialog.Builder(getContext())
+                            .setTitle(getString(R.string.setting_delete_cookie_title))
+                            .setMessage(R.string.setting_delete_cookie_confirmation)
+                            .setPositiveButton(R.string.setting_delete_cookie_commit,
+                                    new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    settings.setSessionCookie(null);
+                                }
+                            })
+                            .setNegativeButton(R.string.cancel, null)
+                            .show();
                     return true;
                 }
             });
