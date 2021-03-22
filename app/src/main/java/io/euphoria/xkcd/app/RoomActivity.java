@@ -100,14 +100,12 @@ public class RoomActivity extends AppCompatActivity {
     // Tag for finding RoomControllerFragment
     private static final String TAG_ROOM_CONTROLLER_FRAGMENT = RoomControllerFragment.class.getSimpleName();
 
-    private RoomControllerFragment roomControllerFragment;
     private RoomController roomController;
 
     private LocalRoomUIImpl roomUI;
     private TextView statusDisplay;
     private MessageListView messageList;
     private MessageListAdapter messageAdapter;
-    private RecyclerView userList;
     private UserListAdapter userListAdapter;
     private InputBarView inputBar;
 
@@ -135,17 +133,17 @@ public class RoomActivity extends AppCompatActivity {
 
         // Get RoomControllerFragment
         FragmentManager fm = getSupportFragmentManager();
-        roomControllerFragment = (RoomControllerFragment) fm.findFragmentByTag(TAG_ROOM_CONTROLLER_FRAGMENT);
+        RoomControllerFragment rcf = (RoomControllerFragment) fm.findFragmentByTag(TAG_ROOM_CONTROLLER_FRAGMENT);
 
         // create the fragment and data the first time
-        if (roomControllerFragment == null) {
+        if (rcf == null) {
             // add the fragment
-            roomControllerFragment = new RoomControllerFragment();
-            fm.beginTransaction().add(roomControllerFragment, TAG_ROOM_CONTROLLER_FRAGMENT).commit();
+            rcf = new RoomControllerFragment();
+            fm.beginTransaction().add(rcf, TAG_ROOM_CONTROLLER_FRAGMENT).commit();
             fm.executePendingTransactions();
         }
         // Acquire RoomController and roomUI
-        roomController = roomControllerFragment.getRoomController();
+        roomController = rcf.getRoomController();
         roomController.getRoomUIManager().setRoomUIFactory(new LocalRoomUIFactory());
         roomUI = (LocalRoomUIImpl) roomController.getRoomUIManager().getRoomUI(roomName);
 
@@ -153,7 +151,7 @@ public class RoomActivity extends AppCompatActivity {
         statusDisplay = findViewById(R.id.conn_status_display);
 
         messageList = findViewById(R.id.message_list_view);
-        userList = findViewById(R.id.user_list_view);
+        RecyclerView userList = findViewById(R.id.user_list_view);
         userList.setLayoutManager(new LinearLayoutManager(userList.getContext()));
 
         LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
