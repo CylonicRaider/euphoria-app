@@ -14,6 +14,14 @@ import io.euphoria.xkcd.app.impl.ui.data.UserList;
 
 public class UserListAdapter extends RecyclerView.Adapter<UserListAdapter.ViewHolder> implements DisplayListener {
 
+    public interface UserListState {
+
+        UserList getUsers();
+
+        void setUsers(UserList users);
+
+    }
+
     static class ViewHolder extends RecyclerView.ViewHolder {
 
         public ViewHolder(NicknameView itemView) {
@@ -26,11 +34,27 @@ public class UserListAdapter extends RecyclerView.Adapter<UserListAdapter.ViewHo
 
     }
 
-    private final UserList data;
+    private UserList data;
 
     public UserListAdapter(UserList data) {
         this.data = data;
         data.setDisplayListener(this);
+    }
+
+    public void swap(UserListState saveTo, UserListState loadFrom) {
+        // Save data.
+        saveTo.setUsers(data);
+        // Clear old references.
+        data.setDisplayListener(null);
+        // Replace refernces.
+        if (loadFrom == null) {
+            data = new UserList();
+        } else {
+            data = loadFrom.getUsers();
+        }
+        data.setDisplayListener(this);
+        // Update listeners.
+        notifyDataSetChanged();
     }
 
     @NonNull

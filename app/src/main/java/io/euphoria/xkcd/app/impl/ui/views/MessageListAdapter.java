@@ -1,8 +1,10 @@
 package io.euphoria.xkcd.app.impl.ui.views;
 
 import android.content.Context;
+import android.os.Parcelable;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
+import android.util.SparseArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,6 +18,20 @@ import io.euphoria.xkcd.app.impl.ui.data.UIMessage;
 
 public class MessageListAdapter extends RecyclerView.Adapter<MessageListAdapter.ViewHolder>
                                 implements DisplayListener {
+
+    public interface MessageListState {
+
+        MessageForest getMessages();
+
+        void setMessages(MessageForest messages);
+
+        SparseArray<Parcelable> getInputBarState();
+
+        void setInputBarState(SparseArray<Parcelable> inputBarState);
+
+        SparseArray<Parcelable> createInputBarState();
+
+    }
 
     public interface InputBarListener {
 
@@ -35,11 +51,11 @@ public class MessageListAdapter extends RecyclerView.Adapter<MessageListAdapter.
     private static final int INPUT_BAR = 1;
 
     // The main data structure
-    private final MessageForest data;
+    private MessageForest data;
+    // MessageTree representation of the input bar
+    private MessageTree inputBarTree;
     // View of the input bar
     private final InputBarView inputBar;
-    // MessageTree representation of the input bar
-    private final MessageTree inputBarTree;
 
     private InputBarListener inputBarListener;
 
@@ -56,6 +72,32 @@ public class MessageListAdapter extends RecyclerView.Adapter<MessageListAdapter.
         inputBar.recycle();
         inputBar.setMessage(inputBarTree);
         setHasStableIds(true);
+    }
+
+    public void swap(MessageListState saveTo, MessageListState loadFrom) {
+        // Store data.
+        saveTo.setMessages(data);
+        SparseArray<Parcelable> sap = saveTo.createInputBarState();
+        inputBar.saveHierarchyState(sap);
+        saveTo.setInputBarState(sap);
+        // Clear old references.
+        data.setListener(null);
+        inputBar.recycle();
+        // Replace references.
+        if (loadFrom == null) {
+            data = new MessageForest();
+            inputBarTree = new MessageTree(null);
+            data.add(inputBarTree);
+            inputBar.setMessage(inputBarTree);
+        } else {
+            data = loadFrom.getMessages();
+            inputBarTree = data.get(MessageTree.CURSOR_ID);
+            inputBar.setMessage(inputBarTree);
+            inputBar.restoreHierarchyState(loadFrom.getInputBarState());
+        }
+        data.setListener(this);
+        // Update listeners.
+        notifyDataSetChanged();
     }
 
     @Override
