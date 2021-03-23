@@ -404,7 +404,7 @@ public class MessageForest implements Parcelable {
         if (recursive) {
             // If removing recursively, the children need not become orphans, but have to be removed from the ID index
             // instead.
-            for (MessageTree r : mt.traverseVisibleReplies(false)) allMessages.remove(r.getID());
+            removeFromAllMessagesRecursive(mt);
         } else {
             // Create orphans! :(
             getOrphanList(mt.getID()).addAll(mt.getReplies());
@@ -416,6 +416,13 @@ public class MessageForest implements Parcelable {
         if (displayIndex == -1) return;
         // Splice the message along with its replies out.
         removeDisplayRange(mt, displayIndex, true);
+    }
+
+    private void removeFromAllMessagesRecursive(MessageTree mt) {
+        allMessages.remove(mt.getID());
+        for (MessageTree r : mt.getReplies()) {
+            removeFromAllMessagesRecursive(r);
+        }
     }
 
 }
