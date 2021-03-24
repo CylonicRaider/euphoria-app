@@ -85,6 +85,7 @@ public class RoomActivity extends AppCompatActivity {
             isPullingLogs = false;
             checkPullLogs();
         }
+
     }
 
     // TODO find some appropriate place for this in config
