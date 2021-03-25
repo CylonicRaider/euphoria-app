@@ -14,6 +14,7 @@ import io.euphoria.xkcd.app.R;
 import io.euphoria.xkcd.app.connection.ConnectionStatus;
 import io.euphoria.xkcd.app.data.Message;
 import io.euphoria.xkcd.app.data.SessionView;
+import io.euphoria.xkcd.app.impl.ui.data.RoomState;
 import io.euphoria.xkcd.app.impl.ui.data.UIMessage;
 import io.euphoria.xkcd.app.impl.ui.views.InputBarView;
 import io.euphoria.xkcd.app.impl.ui.views.MessageListAdapter;
@@ -29,15 +30,18 @@ import io.euphoria.xkcd.app.ui.event.UIEvent;
 
 public class RoomUIImpl implements RoomUI {
 
+    private final RoomUIManagerImpl parent;
     private final String roomName;
     private final Set<UIListener> listeners = new LinkedHashSet<>();
+    private final RoomState saveState = new RoomState();
     private SessionView identity;
     private TextView statusDisplay;
     private MessageListAdapter messagesAdapter;
     private UserListAdapter usersAdapter;
     private InputBarView inputBar;
 
-    public RoomUIImpl(String roomName) {
+    public RoomUIImpl(RoomUIManagerImpl parent, String roomName) {
+        this.parent = parent;
         this.roomName = roomName;
     }
 
@@ -48,12 +52,12 @@ public class RoomUIImpl implements RoomUI {
 
     @Override
     public void show() {
-        logNYI("Showing a room");
+        parent.selectRoom(roomName);
     }
 
     @Override
     public void close() {
-        logNYI("Closing a room");
+        parent.closeRoom(roomName);
     }
 
     @Override
@@ -138,8 +142,8 @@ public class RoomUIImpl implements RoomUI {
         listeners.remove(l);
     }
 
-    private static void logNYI(String detail) {
-        Log.e("RoomUIImpl", detail + " is not yet implemented...");
+    public RoomState getSaveState() {
+        return saveState;
     }
 
     public void link(TextView status, MessageListAdapter messages, UserListAdapter users, InputBarView input) {

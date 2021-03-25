@@ -28,6 +28,7 @@ import io.euphoria.xkcd.app.connection.ConnectionStatus;
 import io.euphoria.xkcd.app.control.RoomController;
 import io.euphoria.xkcd.app.data.Message;
 import io.euphoria.xkcd.app.impl.ui.RoomUIImpl;
+import io.euphoria.xkcd.app.impl.ui.RoomUIManagerImpl;
 import io.euphoria.xkcd.app.impl.ui.data.MessageForest;
 import io.euphoria.xkcd.app.impl.ui.data.UserList;
 import io.euphoria.xkcd.app.impl.ui.views.InputBarView;
@@ -49,7 +50,7 @@ public class RoomActivity extends AppCompatActivity {
     private class LocalRoomUIFactory implements RoomUIFactory {
         @Override
         public RoomUI createRoomUI(String roomName) {
-            return new LocalRoomUIImpl(roomName);
+            return new LocalRoomUIImpl((RoomUIManagerImpl) roomController.getRoomUIManager(), roomName);
         }
     }
 
@@ -57,8 +58,8 @@ public class RoomActivity extends AppCompatActivity {
 
         private ConnectionStatus connectionStatus;
 
-        public LocalRoomUIImpl(String roomName) {
-            super(roomName);
+        public LocalRoomUIImpl(RoomUIManagerImpl parent, String roomName) {
+            super(parent, roomName);
         }
 
         public ConnectionStatus getConnectionStatus() {

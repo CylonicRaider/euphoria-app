@@ -2,8 +2,10 @@ package io.euphoria.xkcd.app.impl.ui;
 
 import android.support.annotation.NonNull;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import io.euphoria.xkcd.app.ui.RoomUI;
@@ -17,24 +19,24 @@ import io.euphoria.xkcd.app.ui.event.RoomSwitchEvent;
 /* Implementation of RoomUIManager */
 public class RoomUIManagerImpl implements RoomUIManager {
 
-    private static class DefaultRoomUIFactory implements RoomUIFactory {
-
-        public static final DefaultRoomUIFactory INSTANCE = new DefaultRoomUIFactory();
+    private class DefaultRoomUIFactory implements RoomUIFactory {
 
         @Override
         public RoomUI createRoomUI(String roomName) {
-            return new RoomUIImpl(roomName);
+            return new RoomUIImpl(RoomUIManagerImpl.this, roomName);
         }
 
     }
 
     private final Set<UIManagerListener> listeners = new HashSet<>();
     private final HashMap<String, RoomUI> roomUIs = new HashMap<>();
-    private RoomUIFactory factory = DefaultRoomUIFactory.INSTANCE;
+    private final List<String> openRooms = new ArrayList<>();
+    private RoomUIFactory factory = new DefaultRoomUIFactory();
+    private String currentRoom;
 
     @Override
     public void setRoomUIFactory(RoomUIFactory factory) {
-        if (factory == null) factory = DefaultRoomUIFactory.INSTANCE;
+        if (factory == null) factory = new DefaultRoomUIFactory();
         if (factory != this.factory) roomUIs.clear();
         this.factory = factory;
     }
@@ -46,6 +48,7 @@ public class RoomUIManagerImpl implements RoomUIManager {
         } else {
             RoomUI ret = factory.createRoomUI(roomName);
             roomUIs.put(roomName, ret);
+            UIUtils.insertSorted(openRooms, roomName);
             return ret;
         }
     }
@@ -74,20 +77,29 @@ public class RoomUIManagerImpl implements RoomUIManager {
         listeners.remove(l);
     }
 
-    public void onRoomSwitch(final String roomName) {
-        for (UIManagerListener listener : listeners) {
-            listener.onRoomSwitch(new RoomSwitchEvent() {
-                @Override
-                public String getRoomName() {
-                    return roomName;
-                }
+    public void selectRoom(final String roomName) {
+        currentRoom = roomName;
+        RoomSwitchEvent evt = new RoomSwitchEvent() {
+            @Override
+            public String getRoomName() {
+                return roomName;
+            }
 
-                @Override
-                public RoomUI getRoomUI() {
-                    return RoomUIManagerImpl.this.getRoomUI(roomName);
-                }
-            });
+            @Override
+            public RoomUI getRoomUI() {
+                return RoomUIManagerImpl.this.getRoomUI(roomName);
+            }
+        };
+        for (UIManagerListener listener : listeners) {
+            listener.onRoomSwitch(evt);
         }
+    }
+
+    public void closeRoom(String roomName) {
+        int oldIndex = UIUtils.removeSorted(openRooms, roomName);
+        if (!roomName.equals(currentRoom) || openRooms.isEmpty()) return;
+        if (oldIndex == -1) oldIndex = 0;
+        selectRoom(openRooms.get(oldIndex));
     }
 
 }

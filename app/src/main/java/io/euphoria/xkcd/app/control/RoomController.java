@@ -65,6 +65,7 @@ public class RoomController {
         Connection conn = connManager.connect(roomName);
         RoomUI ui = uiManager.getRoomUI(roomName);
         if (openRooms.add(roomName)) link(conn, ui);
+        ui.show();
     }
 
     public void closeRoom(String roomName) {
