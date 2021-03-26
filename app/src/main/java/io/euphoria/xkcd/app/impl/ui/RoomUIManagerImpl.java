@@ -29,7 +29,7 @@ public class RoomUIManagerImpl implements RoomUIManager {
     }
 
     private final Set<UIManagerListener> listeners = new HashSet<>();
-    private final HashMap<String, RoomUI> roomUIs = new HashMap<>();
+    private final HashMap<String, RoomUIImpl> roomUIs = new HashMap<>();
     private final List<String> openRooms = new ArrayList<>();
     private RoomUIFactory factory = new DefaultRoomUIFactory();
     private String currentRoom;
@@ -42,11 +42,11 @@ public class RoomUIManagerImpl implements RoomUIManager {
     }
 
     @Override
-    public RoomUI getRoomUI(@NonNull String roomName) {
+    public RoomUIImpl getRoomUI(@NonNull String roomName) {
         if (roomUIs.containsKey(roomName)) {
             return roomUIs.get(roomName);
         } else {
-            RoomUI ret = factory.createRoomUI(roomName);
+            RoomUIImpl ret = (RoomUIImpl) factory.createRoomUI(roomName);
             roomUIs.put(roomName, ret);
             UIUtils.insertSorted(openRooms, roomName);
             return ret;
@@ -78,7 +78,11 @@ public class RoomUIManagerImpl implements RoomUIManager {
     }
 
     public void selectRoom(final String roomName) {
+        if (roomName != null && roomName.equals(currentRoom)) return;
+        RoomUIImpl prevUI = roomUIs.get(currentRoom);
         currentRoom = roomName;
+        final RoomUIImpl newUI = getRoomUI(roomName);
+        newUI.swapIn(prevUI);
         RoomSwitchEvent evt = new RoomSwitchEvent() {
             @Override
             public String getRoomName() {
@@ -87,7 +91,7 @@ public class RoomUIManagerImpl implements RoomUIManager {
 
             @Override
             public RoomUI getRoomUI() {
-                return RoomUIManagerImpl.this.getRoomUI(roomName);
+                return newUI;
             }
         };
         for (UIManagerListener listener : listeners) {

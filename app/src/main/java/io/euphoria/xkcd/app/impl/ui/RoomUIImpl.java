@@ -30,11 +30,14 @@ import io.euphoria.xkcd.app.ui.event.UIEvent;
 
 public class RoomUIImpl implements RoomUI {
 
+    private static final String TAG = "RoomUIImpl";
+
     private final RoomUIManagerImpl parent;
     private final String roomName;
     private final Set<UIListener> listeners = new LinkedHashSet<>();
     private final RoomState saveState = new RoomState();
     private SessionView identity;
+    private ConnectionStatus currentStatus;
     private TextView statusDisplay;
     private MessageListAdapter messagesAdapter;
     private UserListAdapter usersAdapter;
@@ -62,6 +65,7 @@ public class RoomUIImpl implements RoomUI {
 
     @Override
     public void setConnectionStatus(ConnectionStatus status) {
+        currentStatus = status;
         @ColorRes int color = R.color.status_unknown;
         @StringRes int content = R.string.status_unknown;
         switch (status) {
@@ -84,7 +88,7 @@ public class RoomUIImpl implements RoomUI {
         }
         // This one is called after unlinking; handle that case gracefully.
         if (statusDisplay == null) {
-            Log.e("RoomUIImpl", "Lost connection status update: " + status);
+            Log.e(TAG, "Lost connection status update: " + status);
             return;
         }
         statusDisplay.setTextColor(UIUtils.getColor(statusDisplay.getContext(), color));
@@ -144,6 +148,19 @@ public class RoomUIImpl implements RoomUI {
 
     public RoomState getSaveState() {
         return saveState;
+    }
+
+    public void swapIn(RoomUIImpl awayFrom) {
+        RoomState saveTo;
+        if (awayFrom == null) {
+            Log.w(TAG, "Swapping in from unknown room?!");
+            saveTo = new RoomState();
+        } else {
+            saveTo = awayFrom.getSaveState();
+        }
+        messagesAdapter.swap(saveTo, saveState);
+        usersAdapter.swap(saveTo, saveState);
+        setConnectionStatus(currentStatus);
     }
 
     public void link(TextView status, MessageListAdapter messages, UserListAdapter users, InputBarView input) {
