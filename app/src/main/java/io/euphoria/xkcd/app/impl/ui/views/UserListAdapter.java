@@ -46,12 +46,10 @@ public class UserListAdapter extends RecyclerView.Adapter<UserListAdapter.ViewHo
         saveTo.setUsers(data);
         // Clear old references.
         data.setDisplayListener(null);
-        // Replace refernces.
-        if (loadFrom == null) {
+        // Replace references.
+        data = loadFrom.getUsers();
+        if (data == null)
             data = new UserList();
-        } else {
-            data = loadFrom.getUsers();
-        }
         data.setDisplayListener(this);
         // Update listeners.
         notifyDataSetChanged();
