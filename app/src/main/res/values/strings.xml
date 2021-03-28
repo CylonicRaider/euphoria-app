@@ -20,6 +20,8 @@
     <string name="room_action_settings_title">Settings</string>
     <string name="heading_users">Users:</string>
 
+    <string name="nav_rooms">Rooms…</string>
+
     <string name="status_unknown">Unknown?!</string>
     <string name="status_connecting">Connecting…</string>
     <string name="status_connected">Online</string>

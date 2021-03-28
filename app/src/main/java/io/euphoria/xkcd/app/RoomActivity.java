@@ -312,6 +312,8 @@ public class RoomActivity extends AppCompatActivity {
         DrawerLayout dl = findViewById(R.id.room_drawer_root);
         if (dl.isDrawerOpen(Gravity.END)) {
             dl.closeDrawer(Gravity.END);
+        } else if (dl.isDrawerOpen(Gravity.START)) {
+            dl.closeDrawer(Gravity.START);
         } else {
             super.onBackPressed();
         }
