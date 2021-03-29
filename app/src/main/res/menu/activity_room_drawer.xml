@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/menu_rooms"
+        android:title="@string/menu_rooms_title">
+
+        <menu android:checkableBehavior="single">
+
+            <group
+                android:id="@+id/menu_rooms_list"/>
+
+            <item
+                android:id="@+id/menu_rooms_join"
+                android:title="@string/menu_rooms_join"
+                android:orderInCategory="10"/>
+
+        </menu>
+
+    </item>
+
+</menu>

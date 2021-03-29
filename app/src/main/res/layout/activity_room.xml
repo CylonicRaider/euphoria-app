@@ -28,7 +28,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintVertical_chainStyle="spread_inside"
-            app:popupTheme="@style/ThemeOverlay.AppCompat.Light" />
+            app:popupTheme="@style/ThemeOverlay.AppCompat.Light"/>
 
         <!--
             FrameLayout provides the drop shadow on older versions of Android.
@@ -53,34 +53,16 @@
                 android:layout_height="match_parent"
                 android:clipToPadding="false"
                 android:padding="4dp"
-                android:scrollbars="vertical" />
+                android:scrollbars="vertical"/>
 
         </FrameLayout>
     </android.support.constraint.ConstraintLayout>
 
-    <LinearLayout
-        android:layout_width="180dp"
+    <android.support.design.widget.NavigationView
+        android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:layout_gravity="start"
-        android:orientation="vertical"
-        android:background="#ffffff">
-
-        <!-- Placeholder -->
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:paddingStart="12dp"
-            android:paddingLeft="12dp"
-            android:paddingTop="12dp"
-            android:paddingBottom="4dp"
-            android:paddingRight="12dp"
-            android:paddingEnd="12dp"
-            android:text="@string/nav_rooms"
-            android:textSize="@dimen/small_font_size"
-            android:textColor="@color/text"
-            android:textStyle="bold"/>
-
-    </LinearLayout>
+        app:menu="@menu/activity_room_drawer"/>
 
     <LinearLayout
         android:layout_width="180dp"
