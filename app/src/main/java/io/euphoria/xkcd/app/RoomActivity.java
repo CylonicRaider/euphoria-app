@@ -2,12 +2,15 @@ package io.euphoria.xkcd.app;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Parcelable;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -105,6 +108,7 @@ public class RoomActivity extends AppCompatActivity {
     private RoomController roomController;
 
     private LocalRoomUIImpl roomUI;
+    private ActionBarDrawerToggle roomToggle;
     private TextView statusDisplay;
     private MessageListView messageList;
     private MessageListAdapter messageAdapter;
@@ -130,8 +134,13 @@ public class RoomActivity extends AppCompatActivity {
         setContentView(R.layout.activity_room);
         String roomName = getRoomName(i.getData());
         setTitle("&" + roomName);
+        Toolbar toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
 
-        setSupportActionBar((Toolbar) findViewById(R.id.toolbar));
+        DrawerLayout roomDrawer = findViewById(R.id.room_drawer_root);
+        roomToggle = new ActionBarDrawerToggle(this, roomDrawer, toolbar,
+                R.string.menu_rooms_open, R.string.menu_rooms_close);
+        roomDrawer.addDrawerListener(roomToggle);
 
         // Get RoomControllerFragment
         FragmentManager fm = getSupportFragmentManager();
@@ -284,10 +293,28 @@ public class RoomActivity extends AppCompatActivity {
     }
 
     @Override
+    protected void onPostCreate(@Nullable Bundle savedInstanceState) {
+        roomToggle.syncState();
+        super.onPostCreate(savedInstanceState);
+    }
+
+    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.actions_room, menu);
         return true;
+    }
+
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        roomToggle.onConfigurationChanged(newConfig);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (roomToggle.onOptionsItemSelected(item)) return true;
+        return super.onOptionsItemSelected(item);
     }
 
     public void toggleUserDrawer(MenuItem item) {
